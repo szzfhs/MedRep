@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>资源中心 - Clinical Nexus</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline-variant": "#c2c6d4",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "on-background": "#191c1d",
+                        "secondary-fixed-dim": "#afcbd8",
+                        "on-error": "#ffffff",
+                        "primary-container": "#0056b3",
+                        "on-secondary-fixed-variant": "#304a55",
+                        "on-secondary-container": "#4e6874",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#115cb9",
+                        "secondary-fixed": "#cbe7f5",
+                        "secondary-container": "#cbe7f5",
+                        "on-tertiary-container": "#ffc2a7",
+                        "on-secondary-fixed": "#021f29",
+                        "on-primary-fixed": "#001a40",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#e1e3e4",
+                        "primary-fixed-dim": "#acc7ff",
+                        "primary-fixed": "#d7e2ff",
+                        "on-primary-container": "#bbd0ff",
+                        "tertiary-fixed-dim": "#ffb694",
+                        "error": "#ba1a1a",
+                        "surface-dim": "#d9dadb",
+                        "surface": "#f8f9fa",
+                        "outline": "#727784",
+                        "surface-container-low": "#f3f4f5",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e7e8e9",
+                        "primary": "#003f87",
+                        "inverse-primary": "#acc7ff",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#f8f9fa",
+                        "on-surface": "#191c1d",
+                        "inverse-surface": "#2e3132",
+                        "surface-container": "#edeeef",
+                        "surface-container-highest": "#e1e3e4",
+                        "on-primary-fixed-variant": "#004491",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#ffdbcc",
+                        "tertiary": "#722b00",
+                        "on-tertiary": "#ffffff",
+                        "inverse-on-surface": "#f0f1f2",
+                        "on-surface-variant": "#424752",
+                        "on-tertiary-fixed": "#351000",
+                        "tertiary-container": "#983c00",
+                        "surface-bright": "#f8f9fa",
+                        "secondary": "#48626e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; color: #191c1d; }
+        .font-headline { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+        .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e1e3e4; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- Top Navigation Shell -->
+<nav class="fixed top-0 w-full z-50 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center px-8 py-0 h-16 shadow-sm">
+<div class="flex items-center gap-12">
+<span class="text-2xl font-bold tracking-tight text-[#1a2b6d] dark:text-blue-100 font-headline">Clinical Nexus</span>
+<div class="hidden md:flex items-center gap-10 h-16">
+<a class="text-slate-500 hover:text-primary transition-colors font-medium text-[15px] flex items-center h-full border-b-2 border-transparent" href="#">首页</a>
+<a class="text-slate-500 hover:text-primary transition-colors font-medium text-[15px] flex items-center h-full border-b-2 border-transparent" href="#">实验大厅</a>
+<a class="text-slate-500 hover:text-primary transition-colors font-medium text-[15px] flex items-center h-full border-b-2 border-transparent" href="#">课程中心</a>
+<a class="text-[#0056B3] font-bold text-[15px] flex items-center h-full border-b-[3px] border-[#0056B3]" href="#">资源中心</a>
+<a class="text-slate-500 hover:text-primary transition-colors font-medium text-[15px] flex items-center h-full border-b-2 border-transparent" href="#">关于我们</a>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">search</span>
+<input class="pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-sm w-72 focus:ring-1 focus:ring-primary/20 placeholder:text-slate-400" placeholder="搜索资源..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined p-1.5 text-slate-600 hover:bg-slate-50 rounded-full cursor-pointer text-2xl" data-icon="notifications">notifications</span>
+<div class="flex items-center gap-2 cursor-pointer group">
+<img alt="User Avatar" class="w-8 h-8 rounded-full border border-slate-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUb52HAZGMY_Mbm7PaM5Sd2VTbLEAzwZdDLD1ai523vtAyamQI6FWByEj9AsFTmK8BnpYKwCn6liHlg_YvCUM3ifmP4lZu_sF_uI6n_ciATBLyb2gOQRllzDVrIllGfSIrIZvgOonq7S6oXxjuN6-UATRKutXmIo64RiojVw4fAYQ65edFl5dZt2EjZwNTRRGKNDR7psxCqZN2r2gTbRpeKks1Bv6k9dTzIA5P6vFCJdXgnchVgmkblTogOmp_U0Rp51uParkwxcXe"/>
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">keyboard_arrow_down</span>
+</div>
+</div>
+</div>
+</nav>
+<!-- Sidebar Navigation Shell -->
+<aside class="h-screen w-64 fixed left-0 top-0 pt-16 bg-slate-50 dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col hidden md:flex">
+<div class="p-6 flex flex-col gap-1">
+<span class="text-lg font-extrabold text-[#1a2b6d] dark:text-blue-50 font-headline">医学模拟</span>
+<span class="text-xs text-slate-500 font-bold tracking-widest uppercase">资源总库</span>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<div class="text-xs font-bold text-slate-400 px-4 py-3 uppercase tracking-widest">资源库分类</div>
+<a class="flex items-center gap-3 bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-400 rounded-l-full ml-4 pl-4 py-3 shadow-sm transition-all translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="folder_shared">folder_shared</span>
+<span class="font-bold text-xs uppercase tracking-wider">课程资源</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 hover:text-blue-600 pl-8 py-3 transition-all hover:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="hub">hub</span>
+<span class="font-bold text-xs uppercase tracking-wider">校级共享库</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 hover:text-blue-600 pl-8 py-3 transition-all hover:translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="public">public</span>
+<span class="font-bold text-xs uppercase tracking-wider">公共素材池</span>
+</a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800 space-y-1">
+<a class="flex items-center gap-3 text-slate-500 hover:text-blue-600 pl-4 py-2 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+<span class="font-bold text-xs uppercase tracking-wider">帮助中心</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 hover:text-blue-600 pl-4 py-2 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="archive">archive</span>
+<span class="font-bold text-xs uppercase tracking-wider">归档中心</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-0 md:ml-64 pt-24 pb-12 px-8 min-h-screen">
+<!-- Page Header & Action -->
+<header class="flex justify-between items-end mb-8">
+<div>
+<nav class="flex items-center gap-2 text-sm text-slate-400 mb-2">
+<span>资源中心</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="text-primary font-medium">课程资源</span>
+</nav>
+<h1 class="text-3xl font-extrabold font-headline text-on-background tracking-tight">资源中心 <span class="text-slate-300 font-light ml-2">/ Resource Center</span></h1>
+</div>
+<button class="flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-primary to-primary-container text-white rounded-full font-semibold shadow-lg hover:shadow-primary/20 transition-all active:scale-95">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+                上传新资源
+            </button>
+</header>
+<!-- Category Bookshelf (High-End Bento Style) -->
+<section class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
+<div class="relative overflow-hidden group p-6 rounded-xl bg-primary-container text-white h-44 flex flex-col justify-between cursor-pointer transition-transform hover:-translate-y-1">
+<div class="z-10">
+<span class="material-symbols-outlined text-4xl mb-2" data-icon="menu_book">menu_book</span>
+<h3 class="text-xl font-bold font-headline">数字教材</h3>
+<p class="text-sm opacity-80">128 个文件</p>
+</div>
+<div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[120px]" data-icon="menu_book">menu_book</span>
+</div>
+</div>
+<div class="relative overflow-hidden group p-6 rounded-xl bg-surface-container-lowest text-on-surface h-44 flex flex-col justify-between cursor-pointer border border-slate-100 hover:shadow-xl transition-all">
+<div class="z-10">
+<span class="material-symbols-outlined text-4xl text-primary mb-2" data-icon="view_in_ar">view_in_ar</span>
+<h3 class="text-xl font-bold font-headline">3D 素材</h3>
+<p class="text-sm text-slate-500">45 个模型</p>
+</div>
+<div class="absolute -right-4 -bottom-4 text-slate-100 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[120px]" data-icon="view_in_ar">view_in_ar</span>
+</div>
+</div>
+<div class="relative overflow-hidden group p-6 rounded-xl bg-surface-container-lowest text-on-surface h-44 flex flex-col justify-between cursor-pointer border border-slate-100 hover:shadow-xl transition-all">
+<div class="z-10">
+<span class="material-symbols-outlined text-4xl text-tertiary mb-2" data-icon="description">description</span>
+<h3 class="text-xl font-bold font-headline">讲义课件</h3>
+<p class="text-sm text-slate-500">312 份文档</p>
+</div>
+<div class="absolute -right-4 -bottom-4 text-slate-100 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[120px]" data-icon="description">description</span>
+</div>
+</div>
+<div class="relative overflow-hidden group p-6 rounded-xl bg-surface-container-lowest text-on-surface h-44 flex flex-col justify-between cursor-pointer border border-slate-100 hover:shadow-xl transition-all">
+<div class="z-10">
+<span class="material-symbols-outlined text-4xl text-secondary mb-2" data-icon="video_library">video_library</span>
+<h3 class="text-xl font-bold font-headline">视频资源</h3>
+<p class="text-sm text-slate-500">86 个录像</p>
+</div>
+<div class="absolute -right-4 -bottom-4 text-slate-100 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[120px]" data-icon="video_library">video_library</span>
+</div>
+</div>
+</section>
+<!-- Search & Filters Container -->
+<section class="bg-surface-container-low rounded-xl p-4 mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
+<div class="flex flex-wrap gap-3">
+<div class="flex items-center gap-2 bg-surface-container-lowest px-4 py-2 rounded-lg border border-slate-200">
+<span class="text-xs font-bold text-slate-400 uppercase">学科:</span>
+<select class="bg-transparent border-none text-sm font-medium focus:ring-0 p-0 cursor-pointer">
+<option>全学科</option>
+<option>解剖学</option>
+<option>病理学</option>
+<option>临床诊断</option>
+</select>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-lowest px-4 py-2 rounded-lg border border-slate-200">
+<span class="text-xs font-bold text-slate-400 uppercase">文件类型:</span>
+<select class="bg-transparent border-none text-sm font-medium focus:ring-0 p-0 cursor-pointer">
+<option>所有格式</option>
+<option>PDF / 文档</option>
+<option>OBJ / 3D</option>
+<option>MP4 / 视频</option>
+</select>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-lowest px-4 py-2 rounded-lg border border-slate-200">
+<span class="text-xs font-bold text-slate-400 uppercase">上传时间:</span>
+<select class="bg-transparent border-none text-sm font-medium focus:ring-0 p-0 cursor-pointer">
+<option>不限时间</option>
+<option>最近一周</option>
+<option>最近一个月</option>
+</select>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 bg-white rounded-lg border border-slate-200 text-slate-400 hover:text-primary">
+<span class="material-symbols-outlined">grid_view</span>
+</button>
+<button class="p-2 bg-transparent text-slate-400 hover:text-primary">
+<span class="material-symbols-outlined">view_list</span>
+</button>
+</div>
+</section>
+<!-- Resource Grid -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+<!-- Resource Card 1 -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
+<div class="aspect-video relative overflow-hidden bg-slate-100">
+<img alt="人体骨骼系统高精度解剖模型" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDmpqOOB7od_9STwBalZlFCDVpWt5CFpJZfKBZHRXCpWPS6AZP1RF5LBWXF00SxrDqp13BnWbTtIN76YpRXE8qEmV4DEGrbacxJDUjByjhGmpGFAYjg4T5vllaTQSFTtAXgQl4MKGW4AwRFyNdlvPR9h7ZM5G5TwjR3uw9gnO-HIAgaEKvBmGJ9m-fipp9tqDEaTxmylBiorwyq8EYzrIi_yDg7ulWpA3-V0RVY2m1ZWTncROwD2ye0N_BlzXh2daOO7lw7s3Y8Ku_a"/>
+<div class="absolute top-3 right-3">
+<span class="bg-primary text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">3D 模型</span>
+</div>
+</div>
+<div class="p-5">
+<h4 class="font-headline font-bold text-on-surface mb-1 truncate">人体骨骼系统高精度解剖模型</h4>
+<div class="flex items-center gap-3 mb-4">
+<span class="text-[11px] text-slate-500 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">database</span> 145.2 MB
+                        </span>
+<span class="text-[11px] text-slate-500 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span> 2小时前
+                        </span>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-slate-50">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-green-600" data-weight="fill">verified_user</span>
+<span class="text-[11px] font-semibold text-green-700">全平台可见</span>
+</div>
+<button class="text-primary hover:bg-primary/5 p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Resource Card 2 -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
+<div class="aspect-video relative overflow-hidden bg-slate-100">
+<img alt="临床病理学" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABAYndFbALneIk7l8uejPD8PbouJ8efm9S5knNnLy-wIQZq9_A982gRlxCt3GDS-dGT9gaMS-x9oTyoevPkGrm_aqNRZF-l2G4VAPDokE5ZVzkQy29Aqmyg7CvyiCUSouvLQ__-ZRfFRnbGNdgKbnkGn6kaeyPurrftINhrb-bj9k0JFC3u7vYGyN9yGaJQ9BPPEN6ob13EVNjGEI2l-ofds7sTNf5cx-WudevBCIiFTFmNSEXPLNISsiXNAEOXv_RVy99BHyEMfRE"/>
+<div class="absolute top-3 right-3">
+<span class="bg-tertiary text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">讲义课件</span>
+</div>
+</div>
+<div class="p-5">
+<h4 class="font-headline font-bold text-on-surface mb-1 truncate">临床病理学：细胞损伤与适应</h4>
+<div class="flex items-center gap-3 mb-4">
+<span class="text-[11px] text-slate-500 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">description</span> 12.4 MB
+                        </span>
+<span class="text-[11px] text-slate-500 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span> 昨日
+                        </span>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-slate-50">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-blue-600" data-weight="fill">group</span>
+<span class="text-[11px] font-semibold text-blue-700">班级可见</span>
+</div>
+<button class="text-primary hover:bg-primary/5 p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Resource Card 3 -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
+<div class="aspect-video relative overflow-hidden bg-slate-100">
+<img alt="微创外科手术演示" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnrDVEzpl4R21nQFvQPOwQspi3J4yabQaAHiNfTIu7DWJjemPiHl9zVk7tMWrp_ciDrpAwCynMJwFa-jvt6KEfu1oXfm4aduV6EVx6sWWSv1f9-VRwrqkHosV_QWWDxzpCSdPyz91v1q2k7Kz5IxYl3Gb_fWCySAlLbAOY4aq7R1p1EMzEMqdpKBHi76rtC8lqNiDlx0KU09fGd9LN42S18l4MHgCeWMmtBZFzqN0oPCny21FgTOJNzhOtL-0Qs2CdV9AFmm8OSWT0"/>
+<div class="absolute top-3 right-3">
+<span class="bg-secondary text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">视频资源</span>
+</div>
+</div>
+<div class="p-5">
+<h4 class="font-headline font-bold text-on-surface mb-1 truncate">微创外科手术基本流程演示</h4>
+<div class="flex items-center gap-3 mb-4">
+<span class="text-[11px] text-slate-500 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">movie</span> 1.2 GB
+                        </span>
+<span class="text-[11px] text-slate-500 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span> 3天前
+                        </span>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-slate-50">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-green-600" data-weight="fill">verified_user</span>
+<span class="text-[11px] font-semibold text-green-700">全平台可见</span>
+</div>
+<button class="text-primary hover:bg-primary/5 p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Resource Card 4 -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
+<div class="aspect-video relative overflow-hidden bg-slate-100">
+<img alt="内科学" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEc3X_ZsA2uJP43NZbKPVCogkNBJtD5UJi4I2SFXH1Q-ohv8tFkyBjT5u6zzq6yVBQfudHjmurXdiAqXr1N1x7WV3CM4uzAjMn8I32cdyRGs25XJRoiPmoR1clLCv6yzz_PpfVjZqy6DIKLqaFtUifJT4-KklNS05yla0326U6bDLJ9GP3rGBSHJo-gnTPlUQdBdUBTM6tksmoK-JzSIkfA9T2TVScbG9YCggV06DmcF2FGEhdcb-_cICUGwkE2DxF8ksAd5RLtE0M"/>
+<div class="absolute top-3 right-3">
+<span class="bg-slate-700 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">数字教材</span>
+</div>
+</div>
+<div class="p-5">
+<h4 class="font-headline font-bold text-on-surface mb-1 truncate">内科学（第十版）数字扫描本</h4>
+<div class="flex items-center gap-3 mb-4">
+<span class="text-[11px] text-slate-500 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">book</span> 88.0 MB
+                        </span>
+<span class="text-[11px] text-slate-500 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span> 1周前
+                        </span>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-slate-50">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-slate-400" data-weight="fill">lock</span>
+<span class="text-[11px] font-semibold text-slate-500">仅自己可见</span>
+</div>
+<button class="text-primary hover:bg-primary/5 p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- More Cards -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
+<div class="aspect-video relative overflow-hidden bg-slate-100">
+<img alt="实验室安全" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWupRwuTmROUGpx132jRE5qPvSFTt4pf6TlGZpVld27KkcizRm27tkdAXI_N4kr1PksUEbPiCISgY6dBig7oHrvqWNqnnTZvMPS8J7z0TtOSV4h9dgspJjxuExce38l5rrD5bSZMuuE83g26sQhktpAmhZuDl0JjRXSriefeS2XvUqcrl7woL4XcswBMaB_SkjI6Vn-Ag6073qS0Yw1BKK7ZeWNQ-WWGfMG7qig2Chpes8z4B4ueno8v3cypoyR5rjEQibpAc_9RvO"/>
+<div class="absolute top-3 right-3">
+<span class="bg-secondary text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">视频资源</span>
+</div>
+</div>
+<div class="p-5">
+<h4 class="font-headline font-bold text-on-surface mb-1 truncate">实验室安全规范与防护培训</h4>
+<div class="flex items-center gap-3 mb-4">
+<span class="text-[11px] text-slate-500 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">movie</span> 425 MB
+                        </span>
+<span class="text-[11px] text-slate-500 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span> 2周前
+                        </span>
+</div>
+<div class="flex items-center justify-between pt-4 border-t border-slate-50">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-green-600" data-weight="fill">verified_user</span>
+<span class="text-[11px] font-semibold text-green-700">全平台可见</span>
+</div>
+<button class="text-primary hover:bg-primary/5 p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Upload Ghost Card -->
+<div class="border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center p-8 bg-surface-container-low hover:bg-white hover:border-primary transition-all group cursor-pointer">
+<div class="w-12 h-12 rounded-full bg-slate-100 group-hover:bg-primary/10 flex items-center justify-center mb-4 transition-colors">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary" data-icon="cloud_upload">cloud_upload</span>
+</div>
+<span class="font-bold text-slate-500 group-hover:text-primary transition-colors">上传新资源</span>
+<span class="text-xs text-slate-400 mt-2">支持 PDF, MP4, OBJ 等</span>
+</div>
+</section>
+<!-- Pagination / Footer Metadata -->
+<footer class="mt-12 flex items-center justify-between border-t border-slate-200 pt-6">
+<div class="text-sm text-slate-500">
+                显示 1-6 / 共 458 个资源
+            </div>
+<div class="flex items-center gap-2">
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 disabled:opacity-30">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg bg-primary text-white font-bold text-xs">1</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50">2</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50">3</button>
+<span class="text-slate-400 mx-1">...</span>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50">20</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</footer>
+</main>
+<!-- Mobile Bottom Navigation (Visible only on mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-white shadow-[0_-2px_10px_rgba(0,0,0,0.05)] flex justify-around items-center py-3 px-4 z-50">
+<div class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px]">首页</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined">science</span>
+<span class="text-[10px]">实验大厅</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">folder</span>
+<span class="text-[10px] font-bold">资源中心</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px]">我的</span>
+</div>
+</nav>
+</body></html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Clinical Nexus - 视频资源查看</title>
+<!-- Fonts and Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#021f29",
+                    "secondary-fixed": "#cbe7f5",
+                    "primary-fixed": "#d7e2ff",
+                    "on-primary-fixed": "#001a40",
+                    "surface-dim": "#d9dadb",
+                    "surface-container-highest": "#e1e3e4",
+                    "inverse-surface": "#2e3132",
+                    "background": "#f8f9fa",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed-variant": "#304a55",
+                    "error-container": "#ffdad6",
+                    "surface-variant": "#e1e3e4",
+                    "surface-container": "#edeeef",
+                    "on-primary-container": "#bbd0ff",
+                    "outline": "#727784",
+                    "surface-tint": "#115cb9",
+                    "on-error": "#ffffff",
+                    "tertiary-container": "#983c00",
+                    "primary": "#003f87",
+                    "on-tertiary-fixed-variant": "#7b2f00",
+                    "tertiary-fixed": "#ffdbcc",
+                    "surface-bright": "#f8f9fa",
+                    "on-background": "#191c1d",
+                    "secondary-fixed-dim": "#afcbd8",
+                    "on-secondary-container": "#4e6874",
+                    "tertiary-fixed-dim": "#ffb694",
+                    "surface-container-low": "#f3f4f5",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-on-surface": "#f0f1f2",
+                    "primary-fixed-dim": "#acc7ff",
+                    "on-tertiary-fixed": "#351000",
+                    "tertiary": "#722b00",
+                    "inverse-primary": "#acc7ff",
+                    "on-surface": "#191c1d",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-high": "#e7e8e9",
+                    "on-primary": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "primary-container": "#0056b3",
+                    "secondary-container": "#cbe7f5",
+                    "on-primary-fixed-variant": "#004491",
+                    "error": "#ba1a1a",
+                    "outline-variant": "#c2c6d4",
+                    "on-surface-variant": "#424752",
+                    "secondary": "#48626e",
+                    "on-tertiary-container": "#ffc2a7",
+                    "surface": "#f8f9fa"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .vitals-gradient {
+            background: linear-gradient(135deg, #003f87 0%, #0056b3 100%);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body antialiased">
+<!-- Top Navigation Bar -->
+<nav class="bg-white dark:bg-slate-900 shadow-sm dark:shadow-none flex justify-between items-center w-full px-6 py-3 max-w-full docked full-width top-0 z-50 sticky">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold text-blue-900 dark:text-blue-100 tracking-tight font-headline">临床连接 (Clinical Nexus)</span>
+<div class="hidden md:flex gap-6">
+<a class="font-headline font-bold text-base text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">首页</a>
+<a class="font-headline font-bold text-base text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">实验大厅</a>
+<a class="font-headline font-bold text-base text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">课程中心</a>
+<a class="font-headline font-bold text-base text-blue-700 dark:text-blue-400 border-b-2 border-blue-700 pb-1" href="#">资源中心</a>
+<a class="font-headline font-bold text-base text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">关于我们</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<input class="bg-surface-container-high border-none rounded-md px-4 py-2 text-sm w-64 focus:ring-2 focus:ring-primary/20" placeholder="搜索医学资源..." type="text"/>
+<span class="material-symbols-outlined absolute right-3 top-2 text-outline text-lg">search</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer active:scale-95 duration-200">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer active:scale-95 duration-200">settings</span>
+<div class="w-8 h-8 rounded-full bg-primary-fixed overflow-hidden border border-outline-variant">
+<img alt="临床医生个人资料" data-alt="professional headshot of a medical clinician wearing a white lab coat neutral clean background soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDO-sLqJXO8poCgi8rGfHY2bzjr4nA1m4tmKR2uppx7gGoknYqLoxuKLRLfAnLvGOWs4ppDfEY4XeASH0k5ZMpS88spD4Lswchczoc9NW2sP3qVfw80ofvBqvGfrcIIud60PiDcAfiDTQ0vTdib1aSFDZ2lDlzDcphKfvhyjgwXkEScz5Xa4CelKyJevGG7PbKcg3-AI89wxrIOu7bKhybtBT6OsuDWV4Je9MGBjriVUS0IVCDRsg1zGK5FAihnK917hodomw6m9r-Z"/>
+</div>
+</div>
+</nav>
+<main class="flex flex-col md:flex-row min-h-[calc(100vh-64px)]">
+<!-- Left Content: Player & Breadcrumbs -->
+<section class="flex-1 p-6 lg:p-8 space-y-6 overflow-y-auto">
+<!-- Breadcrumbs -->
+<nav class="flex items-center gap-2 text-sm text-on-surface-variant font-medium">
+<a class="hover:text-primary transition-colors" href="#">资源中心</a>
+<span class="material-symbols-outlined text-base">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">课程资源</a>
+<span class="material-symbols-outlined text-base">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">视频资源</a>
+<span class="material-symbols-outlined text-base">chevron_right</span>
+<span class="text-primary font-bold">临床解剖基础</span>
+</nav>
+<!-- Video Player Container -->
+<div class="relative rounded-xl overflow-hidden shadow-2xl bg-black aspect-video group">
+<img alt="Video Placeholder" class="w-full h-full object-cover opacity-80" data-alt="high-fidelity 3d medical animation of a human heart circulatory system glowing red and blue vessels against a dark technical background cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2zTWv1Gezngcg0xfFr8Q6WKWzPOhGQ99K0WYZB84HvDE3zRiV3HmarPfJYDwRdRaSsAYEeKeX6dCvqn1SoAVYfqVXMcXRDdEn3jgkAWLBET0bpyZMlLkD9T1CsdnixuCyv810e52JGVp5K4k-adFp-FL3Na9P0wPXk-XFsK4MxJOJQ65ShhIAzJY7VFlgT1Ut2BVm1cka0lcOxuMaBNCGdKRg_QP8qht1DPxmRlVD8x2WGPRJ01psT5GSZbFh2XeB3fZ4hnKsM65Q"/>
+<!-- Player Overlay (Simulation Controls) -->
+<div class="absolute inset-0 flex flex-col justify-between p-6 bg-gradient-to-t from-black/80 via-transparent to-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+<div class="flex justify-between items-start">
+<span class="bg-primary/90 text-white px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase">实时模拟</span>
+<div class="flex gap-2">
+<span class="material-symbols-outlined text-white cursor-pointer hover:text-primary-fixed">closed_caption</span>
+<span class="material-symbols-outlined text-white cursor-pointer hover:text-primary-fixed">settings</span>
+</div>
+</div>
+<div class="space-y-4">
+<!-- Progress Bar -->
+<div class="relative h-1.5 w-full bg-white/20 rounded-full cursor-pointer overflow-hidden">
+<div class="absolute top-0 left-0 h-full w-1/3 vitals-gradient rounded-full"></div>
+</div>
+<!-- Controls -->
+<div class="flex justify-between items-center text-white">
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-3xl cursor-pointer hover:scale-110 transition-transform">play_arrow</span>
+<span class="material-symbols-outlined text-2xl cursor-pointer hover:scale-110 transition-transform">skip_next</span>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-2xl cursor-pointer">volume_up</span>
+<div class="w-16 h-1 bg-white/20 rounded-full overflow-hidden">
+<div class="h-full w-3/4 bg-white"></div>
+</div>
+</div>
+<span class="text-sm font-medium tabular-nums">12:45 / 45:00</span>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-xs font-bold px-2 py-1 rounded bg-white/10 hover:bg-white/20 transition-colors">1080P</button>
+<div class="flex gap-3 text-sm font-bold">
+<span class="text-primary-fixed-dim">1.0x</span>
+<span class="opacity-50 cursor-pointer hover:opacity-100">1.25x</span>
+<span class="opacity-50 cursor-pointer hover:opacity-100">1.5x</span>
+<span class="opacity-50 cursor-pointer hover:opacity-100">2.0x</span>
+</div>
+<span class="material-symbols-outlined text-2xl cursor-pointer">fullscreen</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Video Info Summary -->
+<div class="flex flex-col lg:flex-row justify-between items-start gap-4 pb-6 border-b border-outline-variant/30">
+<div class="space-y-2">
+<h1 class="text-3xl font-headline font-extrabold text-primary tracking-tight">人体心血管系统 3D 动画演示</h1>
+<div class="flex items-center gap-4 text-sm text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">person</span> 上传者: 陈建国教授</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> 更新于: 2023-11-20</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">visibility</span> 4,502 次查看</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container-high hover:bg-surface-container-highest transition-colors font-semibold text-sm">
+<span class="material-symbols-outlined text-xl">thumb_up</span> 点赞
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container-high hover:bg-surface-container-highest transition-colors font-semibold text-sm">
+<span class="material-symbols-outlined text-xl">grade</span> 收藏
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container-high hover:bg-surface-container-highest transition-colors font-semibold text-sm">
+<span class="material-symbols-outlined text-xl">share</span> 分享
+                    </button>
+</div>
+</div>
+<!-- Detailed Description -->
+<div class="space-y-4">
+<div class="flex items-center gap-2">
+<div class="w-1 h-6 vitals-gradient rounded-full"></div>
+<h2 class="font-headline font-bold text-lg text-on-surface">资源简介</h2>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl border-l-4 border-primary">
+<p class="text-on-surface-variant leading-relaxed text-sm">
+                        本视频资源旨在通过高精度的 3D 建模技术，详细演示人体心血管系统的解剖结构与生理功能。教学目标包括：
+                    </p>
+<ul class="mt-4 space-y-2 text-sm text-on-surface-variant list-disc list-inside">
+<li>深入理解心脏瓣膜的动态运作机制</li>
+<li>识别主要动静脉血管的解剖分布</li>
+<li>掌握肺循环与体循环的血液流动路径</li>
+<li>探讨心律失常对整体循环效率的影响</li>
+</ul>
+</div>
+</div>
+</section>
+<!-- Right Side: SideNavBar / Meta Explorer -->
+<aside class="w-full md:w-80 lg:w-96 bg-slate-50 dark:bg-slate-950 flex flex-col border-l border-slate-200 dark:border-slate-800 sticky top-16 h-[calc(100vh-64px)]">
+<div class="p-6 space-y-8 overflow-y-auto">
+<!-- Related Assets Section -->
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<h3 class="font-headline font-bold text-blue-900 dark:text-blue-300 flex items-center gap-2">
+<span class="material-symbols-outlined">account_tree</span> 关联资源
+                        </h3>
+<span class="text-xs bg-primary-fixed text-on-primary-fixed px-2 py-0.5 rounded font-bold">3 项</span>
+</div>
+<div class="space-y-3">
+<!-- Asset Card -->
+<div class="p-3 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-outline-variant/10 hover:shadow-md transition-all cursor-pointer group">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center text-red-600">
+<span class="material-symbols-outlined">picture_as_pdf</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold truncate group-hover:text-primary">心血管生理学讲义.pdf</p>
+<p class="text-[10px] text-on-surface-variant">PDF • 4.2 MB • 2023-11-21</p>
+</div>
+</div>
+</div>
+<!-- Asset Card -->
+<div class="p-3 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-outline-variant/10 hover:shadow-md transition-all cursor-pointer group">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+<span class="material-symbols-outlined">deployed_code</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold truncate group-hover:text-primary">互动式心脏 3D 模型</p>
+<p class="text-[10px] text-on-surface-variant">交互式 • 12 MB • 2023-11-15</p>
+</div>
+</div>
+</div>
+<!-- Asset Card -->
+<div class="p-3 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-outline-variant/10 hover:shadow-md transition-all cursor-pointer group">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center text-green-600">
+<span class="material-symbols-outlined">quiz</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold truncate group-hover:text-primary">课后知识测评</p>
+<p class="text-[10px] text-on-surface-variant">测评 • 15 题目 • 难度: 中等</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Activity Log / Metadata -->
+<div class="space-y-4">
+<h3 class="font-headline font-bold text-blue-900 dark:text-blue-300 flex items-center gap-2">
+<span class="material-symbols-outlined">history</span> 学习记录
+                    </h3>
+<div class="space-y-4 border-l-2 border-primary-fixed ml-2 pl-4">
+<div class="relative">
+<div class="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-primary border-2 border-white"></div>
+<p class="text-xs font-bold">上次观看到 12:45</p>
+<p class="text-[10px] text-on-surface-variant">2 小时前</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-outline-variant border-2 border-white"></div>
+<p class="text-xs">下载了关联讲义</p>
+<p class="text-[10px] text-on-surface-variant">昨天 14:20</p>
+</div>
+</div>
+</div>
+<!-- CTA -->
+<div class="pt-6">
+<button class="w-full py-4 vitals-gradient text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-[0.98] transition-transform">
+<span class="material-symbols-outlined">download</span>
+<span>下载完整课程包</span>
+</button>
+<p class="text-[10px] text-center mt-3 text-on-surface-variant">Clinical Precision v2.4 • 符合 HIPAA 标准</p>
+</div>
+</div>
+</aside>
+</main>
+<!-- Bottom Navigation Bar (Mobile only) -->
+<footer class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-outline-variant/30 px-6 py-2 flex justify-around items-center z-50">
+<div class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined">video_library</span>
+<span class="text-[10px] font-bold">首页</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="text-[10px] font-bold">资源</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">history</span>
+<span class="text-[10px] font-bold">记录</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-bold">我的</span>
+</div>
+</footer>
+</body></html>

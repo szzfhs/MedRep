@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Clinical Nexus | 教师控制台</title>
+<!-- Google Fonts: Manrope & Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error-container": "#ffdad6",
+                    "tertiary": "#722b00",
+                    "tertiary-container": "#983c00",
+                    "primary-container": "#0056b3",
+                    "on-primary-fixed-variant": "#004491",
+                    "on-primary": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-primary": "#acc7ff",
+                    "surface-container-high": "#e7e8e9",
+                    "surface-container-highest": "#e1e3e4",
+                    "background": "#f8f9fa",
+                    "on-secondary-container": "#4e6874",
+                    "on-secondary-fixed": "#021f29",
+                    "outline-variant": "#c2c6d4",
+                    "primary": "#0056B3",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-container": "#bbd0ff",
+                    "on-background": "#191c1d",
+                    "inverse-surface": "#2e3132",
+                    "secondary-fixed": "#cbe7f5",
+                    "on-tertiary-container": "#ffc2a7",
+                    "surface-tint": "#0056B3",
+                    "secondary": "#48626e",
+                    "outline": "#727784",
+                    "surface-container-low": "#f3f4f5",
+                    "surface-container": "#edeeef",
+                    "on-surface-variant": "#424752",
+                    "on-error": "#ffffff",
+                    "primary-fixed": "#d7e2ff",
+                    "tertiary-fixed-dim": "#ffb694",
+                    "secondary-container": "#cbe7f5",
+                    "on-secondary": "#ffffff",
+                    "surface": "#f8f9fa",
+                    "on-surface": "#191c1d",
+                    "on-primary-fixed": "#001a40",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed-variant": "#304a55",
+                    "tertiary-fixed": "#ffdbcc",
+                    "primary-fixed-dim": "#acc7ff",
+                    "inverse-on-surface": "#f0f1f2",
+                    "on-tertiary-fixed-variant": "#7b2f00",
+                    "surface-variant": "#e1e3e4",
+                    "on-tertiary-fixed": "#351000",
+                    "surface-dim": "#d9dadb",
+                    "surface-bright": "#f8f9fa",
+                    "secondary-fixed-dim": "#afcbd8",
+                    "error": "#ba1a1a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "manrope": ["Manrope", "sans-serif"],
+                    "inter": ["Inter", "sans-serif"],
+                    "body": ["Inter", "sans-serif"],
+                    "label": ["Inter", "sans-serif"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .brand-font, .font-manrope { font-family: 'Manrope', sans-serif; }
+        .sidebar-item-active {
+            background-color: #0056B3;
+            color: white;
+        }
+        .sidebar-sub-item {
+            padding-left: 3rem;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface flex overflow-hidden">
+<!-- SideNavBar Component -->
+<aside class="h-screen w-64 fixed left-0 top-0 hidden md:flex flex-col bg-slate-50 dark:bg-slate-950 border-r border-slate-200/50 dark:border-slate-800/50 py-6 px-4 space-y-2 z-50 overflow-y-auto">
+<div class="px-2 mb-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">science</span>
+</div>
+<div>
+<div class="font-manrope font-bold text-lg text-primary dark:text-white leading-tight">医学模拟系统</div>
+<div class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">临床精准教学</div>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<!-- 教学工作台 -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl sidebar-item-active transition-all duration-200 cursor-pointer font-inter text-sm font-semibold mb-1" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>教学工作台</span>
+</a>
+<!-- 报告批阅 -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all duration-200 cursor-pointer font-inter text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="rate_review">rate_review</span>
+<span>报告批阅</span>
+</a>
+<!-- 实验管理 -->
+<div class="pt-2">
+<div class="flex items-center gap-3 px-3 py-2 text-slate-400 text-[11px] font-bold uppercase tracking-wider">
+<span class="material-symbols-outlined text-sm">biotech</span>
+<span>实验管理</span>
+</div>
+<div class="space-y-1 mt-1">
+<a class="flex items-center gap-3 sidebar-sub-item py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all text-sm font-medium" href="#">
+<span>虚拟仿真实验</span>
+</a>
+<a class="flex items-center gap-3 sidebar-sub-item py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all text-sm font-medium" href="#">
+<span>线下实验管理</span>
+</a>
+</div>
+</div>
+<!-- 课程建设 -->
+<div class="pt-2">
+<div class="flex items-center gap-3 px-3 py-2 text-slate-400 text-[11px] font-bold uppercase tracking-wider">
+<span class="material-symbols-outlined text-sm">edit_note</span>
+<span>课程建设</span>
+</div>
+<div class="space-y-1 mt-1">
+<a class="flex items-center gap-3 sidebar-sub-item py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all text-sm font-medium" href="#">
+<span>课程编辑器</span>
+</a>
+<a class="flex items-center gap-3 sidebar-sub-item py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all text-sm font-medium" href="#">
+<span>任务发布</span>
+</a>
+</div>
+</div>
+<!-- 学情监控 -->
+<div class="pt-2">
+<div class="flex items-center gap-3 px-3 py-2 text-slate-400 text-[11px] font-bold uppercase tracking-wider">
+<span class="material-symbols-outlined text-sm">monitoring</span>
+<span>学情监控</span>
+</div>
+<div class="space-y-1 mt-1">
+<a class="flex items-center gap-3 sidebar-sub-item py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all text-sm font-medium" href="#">
+<span>班级看板</span>
+</a>
+<a class="flex items-center gap-3 sidebar-sub-item py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all text-sm font-medium" href="#">
+<span>学生档案</span>
+</a>
+</div>
+</div>
+<!-- 素材库 -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all duration-200 cursor-pointer font-inter text-sm font-medium mt-2" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span>素材库</span>
+</a>
+</nav>
+<div class="mt-auto pt-6 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors duration-200 font-inter text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span>帮助中心</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors duration-200 font-inter text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span>退出登录</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-64 h-screen overflow-y-auto bg-surface">
+<!-- TopNavBar Component -->
+<header class="bg-white/70 dark:bg-slate-900/70 backdrop-blur-md shadow-sm dark:shadow-none flex justify-between items-center w-full px-6 py-3 max-w-full mx-auto docked full-width top-0 z-40 sticky border-b border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-8">
+<h1 class="text-2xl font-extrabold text-primary dark:text-blue-100 tracking-tighter brand-font">Clinical Nexus</h1>
+<nav class="hidden lg:flex items-center gap-6 font-manrope font-bold text-sm tracking-tight">
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-primary transition-colors" href="#">首页</a>
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-primary transition-colors" href="#">实验大厅</a>
+<a class="text-primary dark:text-blue-400 border-b-2 border-primary pb-1" href="#">课程中心</a>
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-primary transition-colors" href="#">资源中心</a>
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-primary transition-colors" href="#">数据仪表盘</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+<input class="pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-sm w-64 focus:ring-2 focus:ring-primary/20" placeholder="搜索资源、学生或课程..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+</div>
+<div class="h-8 w-[1px] bg-slate-200 mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<div class="text-xs font-bold text-slate-900 dark:text-white">陈莎拉 博士</div>
+<div class="text-[10px] text-slate-500 font-medium">心内科负责人</div>
+</div>
+<img alt="用户个人资料" class="w-10 h-10 rounded-xl object-cover ring-2 ring-primary/10 shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZQBgJelMD3YtPFNMBgFnhujKLlJY4GKiEt97zuDQKdke-60ODqKmoAiWLe_5H8GuFglSb22cKCbS1pV0y6Jzs9Med7BQKWQiZPaxuqurRWKgnWUU-C0ezMj87w4vE3yx1OWkxdCk5MVUsIiexW8dB8BVH6Lay8nQGM_NISGl0O7h0FgAHDS_jbfW4SSMLazf0Nwdgbk8HhY9P0riN8vO1QD0pthP5ALx8if9kRakn5YMDLxFzEFLWS28ndU7OY1kYiv-UMV2VAAwN"/>
+</div>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="p-8 max-w-7xl mx-auto space-y-8">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h2 class="text-3xl font-manrope font-extrabold text-on-surface tracking-tight">教职工控制台</h2>
+<p class="text-slate-500 text-sm mt-1">2023/24 学年 • 第二学期</p>
+</div>
+<div class="flex gap-3">
+<button class="px-5 py-2.5 bg-surface-container-highest text-on-surface font-bold rounded-xl text-sm hover:translate-x-1 transition-transform flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">download</span>
+                    下载分析报告
+                </button>
+<button class="px-5 py-2.5 bg-primary text-white font-bold rounded-xl text-sm shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">add_task</span>
+                    创建测评
+                </button>
+</div>
+</div>
+<!-- Quick Actions Section -->
+<section class="space-y-4">
+<h3 class="text-sm font-manrope font-bold text-slate-400 uppercase tracking-widest">常用快捷功能</h3>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+<button class="flex items-center gap-4 p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-primary hover:shadow-md transition-all group text-left">
+<div class="p-3 bg-blue-50 dark:bg-blue-900/30 text-primary rounded-xl group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">play_circle</span>
+</div>
+<div>
+<div class="font-bold text-slate-900 dark:text-white">开始新实验</div>
+<div class="text-xs text-slate-500">立即启动虚拟仿真环境</div>
+</div>
+</button>
+<button class="flex items-center gap-4 p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-primary hover:shadow-md transition-all group text-left">
+<div class="p-3 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 rounded-xl group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">send</span>
+</div>
+<div>
+<div class="font-bold text-slate-900 dark:text-white">发布课程任务</div>
+<div class="text-xs text-slate-500">向指定班级同步教学进度</div>
+</div>
+</button>
+<button class="flex items-center gap-4 p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-primary hover:shadow-md transition-all group text-left">
+<div class="p-3 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 rounded-xl group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">upload_file</span>
+</div>
+<div>
+<div class="font-bold text-slate-900 dark:text-white">资源上传</div>
+<div class="text-xs text-slate-500">更新教学素材与实验指南</div>
+</div>
+</button>
+</div>
+</section>
+<!-- Stats Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Managed Classes -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 relative overflow-hidden group">
+<div class="flex items-center gap-4 mb-4">
+<div class="p-3 bg-blue-50 dark:bg-blue-900/30 text-primary rounded-xl">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">groups</span>
+</div>
+<span class="font-manrope font-bold text-slate-500 text-sm uppercase tracking-wider">管理班级</span>
+</div>
+<div class="text-4xl font-manrope font-extrabold text-slate-900 dark:text-white">08</div>
+<div class="text-xs text-emerald-600 font-bold mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+                    本学期新增 2 个
+                </div>
+</div>
+<!-- Active Students -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 relative overflow-hidden group">
+<div class="flex items-center gap-4 mb-4">
+<div class="p-3 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 rounded-xl">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">school</span>
+</div>
+<span class="font-manrope font-bold text-slate-500 text-sm uppercase tracking-wider">活跃学生</span>
+</div>
+<div class="text-4xl font-manrope font-extrabold text-slate-900 dark:text-white">246</div>
+<div class="text-xs text-slate-500 font-medium mt-2">覆盖所有模拟实验项目</div>
+</div>
+<!-- Pending Reports Summary -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 border-b-4 border-tertiary relative overflow-hidden group">
+<div class="flex items-center gap-4 mb-4">
+<div class="p-3 bg-orange-50 dark:bg-orange-900/30 text-tertiary rounded-xl">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">description</span>
+</div>
+<span class="font-manrope font-bold text-slate-500 text-sm uppercase tracking-wider">待处理报告</span>
+</div>
+<div class="text-4xl font-manrope font-extrabold text-tertiary">37</div>
+<div class="text-xs text-tertiary font-bold mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">priority_high</span>
+                    需要立即审核
+                </div>
+</div>
+</div>
+<!-- Main Analytical Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Class Activity Chart -->
+<div class="lg:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h3 class="font-manrope font-bold text-lg text-slate-900 dark:text-white">班级活跃度趋势</h3>
+<p class="text-slate-500 text-xs font-medium uppercase tracking-tighter">实时参与度与成功率分析</p>
+</div>
+<div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+<button class="px-4 py-1 text-xs font-bold bg-white dark:bg-slate-700 rounded-md shadow-sm">本周</button>
+<button class="px-4 py-1 text-xs font-bold text-slate-500">本月</button>
+</div>
+</div>
+<!-- Simulated Echarts Area -->
+<div class="h-72 relative">
+<div class="absolute inset-0 flex items-end justify-between px-4">
+<div class="w-[10%] bg-primary/20 h-[40%] rounded-t-xl relative group transition-all hover:bg-primary/40">
+<div class="w-full bg-primary h-[20%] absolute bottom-0 rounded-t-xl"></div>
+</div>
+<div class="w-[10%] bg-primary/20 h-[65%] rounded-t-xl relative group transition-all hover:bg-primary/40">
+<div class="w-full bg-primary h-[45%] absolute bottom-0 rounded-t-xl"></div>
+</div>
+<div class="w-[10%] bg-primary/20 h-[85%] rounded-t-xl relative group transition-all hover:bg-primary/40">
+<div class="w-full bg-primary h-[70%] absolute bottom-0 rounded-t-xl"></div>
+</div>
+<div class="w-[10%] bg-primary/20 h-[55%] rounded-t-xl relative group transition-all hover:bg-primary/40">
+<div class="w-full bg-primary h-[30%] absolute bottom-0 rounded-t-xl"></div>
+</div>
+<div class="w-[10%] bg-primary/20 h-[92%] rounded-t-xl relative group transition-all hover:bg-primary/40">
+<div class="w-full bg-primary h-[85%] absolute bottom-0 rounded-t-xl"></div>
+</div>
+<div class="w-[10%] bg-primary/20 h-[70%] rounded-t-xl relative group transition-all hover:bg-primary/40">
+<div class="w-full bg-primary h-[50%] absolute bottom-0 rounded-t-xl"></div>
+</div>
+<div class="w-[10%] bg-primary/20 h-[30%] rounded-t-xl relative group transition-all hover:bg-primary/40">
+<div class="w-full bg-primary h-[15%] absolute bottom-0 rounded-t-xl"></div>
+</div>
+</div>
+<!-- Axis Labels -->
+<div class="absolute -bottom-6 w-full flex justify-between px-4 font-label text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+<span>周一</span><span>周二</span><span>周三</span><span>周四</span><span>周五</span><span>周六</span><span>周日</span>
+</div>
+<!-- Y-Axis Grid Lines -->
+<div class="absolute inset-0 border-b border-slate-100 dark:border-slate-800 flex flex-col justify-between pointer-events-none opacity-50">
+<div class="border-t border-slate-100 dark:border-slate-800 w-full h-0"></div>
+<div class="border-t border-slate-100 dark:border-slate-800 w-full h-0"></div>
+<div class="border-t border-slate-100 dark:border-slate-800 w-full h-0"></div>
+</div>
+</div>
+<div class="mt-14 grid grid-cols-2 gap-4">
+<div class="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
+<div class="w-2 h-10 bg-primary rounded-full"></div>
+<div>
+<div class="text-[10px] font-bold text-slate-500 uppercase tracking-tight">实验平均得分</div>
+<div class="text-xl font-manrope font-extrabold text-slate-900 dark:text-white">84.2%</div>
+</div>
+</div>
+<div class="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
+<div class="w-2 h-10 bg-primary/30 rounded-full"></div>
+<div>
+<div class="text-[10px] font-bold text-slate-500 uppercase tracking-tight">平均操作耗时</div>
+<div class="text-xl font-manrope font-extrabold text-slate-900 dark:text-white">42分 15秒</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Course List Sidebar -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm space-y-6">
+<div class="flex items-center justify-between">
+<h3 class="font-manrope font-bold text-lg text-slate-900 dark:text-white">课程列表</h3>
+<button class="p-1.5 text-primary hover:bg-primary/5 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-2xl">add</span>
+</button>
+</div>
+<div class="space-y-4">
+<!-- Course Item -->
+<div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer group border border-slate-100 dark:border-slate-800">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-blue-100 dark:bg-blue-900/40 text-primary dark:text-blue-300 text-[10px] px-2 py-0.5 rounded-md font-bold uppercase">CARD-202</span>
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors text-lg">more_horiz</span>
+</div>
+<div class="font-bold text-sm text-slate-900 dark:text-white mb-1">高级心电图分析</div>
+<div class="text-xs text-slate-500 flex items-center gap-3">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">folder</span> 12 资源</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">person</span> 32 学生</span>
+</div>
+</div>
+<!-- Course Item -->
+<div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer group border border-slate-100 dark:border-slate-800">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-[10px] px-2 py-0.5 rounded-md font-bold uppercase">PHYS-101</span>
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors text-lg">more_horiz</span>
+</div>
+<div class="font-bold text-sm text-slate-900 dark:text-white mb-1">细胞生理学实验室</div>
+<div class="text-xs text-slate-500 flex items-center gap-3">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">folder</span> 8 资源</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">person</span> 112 学生</span>
+</div>
+</div>
+<!-- Course Item -->
+<div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer group border border-slate-100 dark:border-slate-800">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-[10px] px-2 py-0.5 rounded-md font-bold uppercase">PATH-305</span>
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors text-lg">more_horiz</span>
+</div>
+<div class="font-bold text-sm text-slate-900 dark:text-white mb-1">肾脏病理生理学</div>
+<div class="text-xs text-slate-500 flex items-center gap-3">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">folder</span> 15 资源</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">person</span> 44 学生</span>
+</div>
+</div>
+</div>
+<button class="w-full py-3 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl text-slate-400 text-xs font-bold uppercase tracking-widest hover:border-primary hover:text-primary transition-all">
+                    查看所有课程系统
+                </button>
+</div>
+</div>
+<!-- Enhanced Pending Reports Detailed List -->
+<div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm overflow-hidden border border-slate-100 dark:border-slate-800">
+<div class="px-8 py-6 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<div class="flex items-center gap-3 mb-1">
+<h3 class="font-manrope font-bold text-xl text-slate-900 dark:text-white">待审核报告</h3>
+<span class="px-2.5 py-0.5 bg-tertiary/10 text-tertiary text-[10px] font-bold rounded-full border border-tertiary/20">37 份待处理</span>
+</div>
+<p class="text-slate-500 text-xs">包含高优先级提交内容。系统已完成初步自动评估，请进行最终批阅。</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">课程筛选</span>
+<select class="text-xs border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-lg focus:ring-primary/20 focus:border-primary py-1.5 pl-3 pr-8 font-medium">
+<option>全部课程项目</option>
+<option>CARD-202 高级心电图</option>
+<option>PHYS-101 细胞生理学</option>
+</select>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">排序</span>
+<select class="text-xs border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-lg focus:ring-primary/20 focus:border-primary py-1.5 pl-3 pr-8 font-medium">
+<option>按提交时间正序</option>
+<option>按提交时间倒序</option>
+<option>按分值升序</option>
+</select>
+</div>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-slate-50/80 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
+<th class="px-8 py-4 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">学生详情</th>
+<th class="px-8 py-4 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">归属课程</th>
+<th class="px-8 py-4 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">实验模块</th>
+<th class="px-8 py-4 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">提交状态</th>
+<th class="px-8 py-4 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest text-center">预评分</th>
+<th class="px-8 py-4 text-right text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">操作</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-50 dark:divide-slate-800">
+<!-- Student Row 1 -->
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group">
+<td class="px-8 py-5">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-primary font-bold text-xs ring-2 ring-white dark:ring-slate-900 overflow-hidden shadow-sm">
+<img alt="Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_SJp7RUMDYa30upPi_hfAexnm9S6leC2dYu0H3JID0YHlli9o96y4wpBWQ0JDQdFXZx6SNrDdISeM4IwAD8p1r5a3WLBnzkqYwpVsmoduS451gV3Cm93XqNKoa7_TnCv4ocsiSKSEAQkRAuQYesQKdr1rY1i3DquymBYsvlPKS_xN6rBmbZksEE4vL0dE-L-VWLqPQrCvLuswM2Ua4GmdMVX1I2liEJU8Q06oXMKqSSAsTQu4_NcwTjjmhenpkvu8LUBp9jTQ94ax"/>
+</div>
+<div>
+<div class="text-sm font-bold text-slate-900 dark:text-white">詹姆斯·安德森</div>
+<div class="text-[10px] text-slate-400 font-medium">学号: 202308001</div>
+</div>
+</div>
+</td>
+<td class="px-8 py-5">
+<div class="text-xs font-bold text-slate-700 dark:text-slate-300">CARD-202</div>
+<div class="text-[10px] text-slate-500">临床心血管病学</div>
+</td>
+<td class="px-8 py-5">
+<div class="text-sm text-slate-700 dark:text-slate-300 font-medium max-w-[180px] truncate">急性心肌梗死综合模拟</div>
+</td>
+<td class="px-8 py-5">
+<div class="flex flex-col gap-1">
+<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 w-fit">首次提交</span>
+<span class="text-[10px] text-slate-400 font-medium">2小时前</span>
+</div>
+</td>
+<td class="px-8 py-5 text-center">
+<div class="text-lg font-manrope font-extrabold text-primary">88<span class="text-slate-400 text-xs ml-0.5">/100</span></div>
+</td>
+<td class="px-8 py-5 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="px-4 py-2 bg-primary text-white text-xs font-bold rounded-xl hover:opacity-90 transition-all shadow-md shadow-primary/10">开始批改</button>
+</div>
+</td>
+</tr>
+<!-- Student Row 2 -->
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group">
+<td class="px-8 py-5">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs ring-2 ring-white dark:ring-slate-900 overflow-hidden shadow-sm">
+<img alt="Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFbVbyCvK1nWTXF9TR3BZ2J1soZAwWyq46htkeeqfS_NY_GcNBY8iBHZ-Q3B0yA4jY6euWub4Fs0B7OADsYD47qjrAZEK0KmoTIyQML6THbROdr0dTfbTvw-XQ26NtVzjFuvekZg9UyrS9oeOa3sQ6jFdmcy2SmsrOL6sDSI5EeMIgLNeAFpTJS71wOrI6NbrWp4PSj6GU-tQlJvz84CJjGcNNgRmWlLERZL8vJTlOQ1S4fVyBBDMuvvlOiIxF1P1f5DJ8mWSbrsgc"/>
+</div>
+<div>
+<div class="text-sm font-bold text-slate-900 dark:text-white">琳达·斯特林</div>
+<div class="text-[10px] text-slate-400 font-medium">学号: 202308042</div>
+</div>
+</div>
+</td>
+<td class="px-8 py-5">
+<div class="text-xs font-bold text-slate-700 dark:text-slate-300">PHYS-101</div>
+<div class="text-[10px] text-slate-500">医学实验室生理学</div>
+</td>
+<td class="px-8 py-5">
+<div class="text-sm text-slate-700 dark:text-slate-300 font-medium max-w-[180px] truncate">失血性生命体征动态反应</div>
+</td>
+<td class="px-8 py-5">
+<div class="flex flex-col gap-1">
+<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 w-fit">重新提交</span>
+<span class="text-[10px] text-slate-400 font-medium">5小时前</span>
+</div>
+</td>
+<td class="px-8 py-5 text-center">
+<div class="text-lg font-manrope font-extrabold text-slate-500">62<span class="text-slate-400 text-xs ml-0.5">/100</span></div>
+</td>
+<td class="px-8 py-5 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="px-4 py-2 bg-primary text-white text-xs font-bold rounded-xl hover:opacity-90 transition-all shadow-md shadow-primary/10">开始批改</button>
+</div>
+</td>
+</tr>
+<!-- Student Row 3 -->
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group">
+<td class="px-8 py-5">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-bold text-xs ring-2 ring-white dark:ring-slate-900 overflow-hidden shadow-sm">
+<img alt="Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpNtsEllN9xm1i9EB2_590-hNZYKftTWjQDxPQhzAEFIcnjTNtZ7-wb6FpTnesgLNTzT5JJnDOYoxdPO7UtxY4Cd9UoyJeMQbEePjZbfC2tzWfhTuF_KNUfiDRRU-b3Y1DpX6Myq9Xs-6h7JhaGp8vV269ZcLeYA1D9bktJAJ8mJKT3CiGfSFZS6AYd6PErc5L9Y7TpqZ0AkGl5AzgTankImFOJbOu21rUtGkmSX-aG2zvLm2SsCHEK-GgXEnJB2gHCWAvekhnef1N"/>
+</div>
+<div>
+<div class="text-sm font-bold text-slate-900 dark:text-white">罗伯特·泰勒</div>
+<div class="text-[10px] text-slate-400 font-medium">学号: 202308115</div>
+</div>
+</div>
+</td>
+<td class="px-8 py-5">
+<div class="text-xs font-bold text-slate-700 dark:text-slate-300">PATH-305</div>
+<div class="text-[10px] text-slate-500">肾脏病理学</div>
+</td>
+<td class="px-8 py-5">
+<div class="text-sm text-slate-700 dark:text-slate-300 font-medium max-w-[180px] truncate">肾小球滤过率变量分析</div>
+</td>
+<td class="px-8 py-5">
+<div class="flex flex-col gap-1">
+<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 w-fit">首次提交</span>
+<span class="text-[10px] text-slate-400 font-medium">昨天 14:30</span>
+</div>
+</td>
+<td class="px-8 py-5 text-center">
+<div class="text-lg font-manrope font-extrabold text-primary">94<span class="text-slate-400 text-xs ml-0.5">/100</span></div>
+</td>
+<td class="px-8 py-5 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="px-4 py-2 bg-primary text-white text-xs font-bold rounded-xl hover:opacity-90 transition-all shadow-md shadow-primary/10">开始批改</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-8 py-5 bg-slate-50/50 dark:bg-slate-800/20 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+<p class="text-[11px] text-slate-500 font-bold uppercase tracking-wider">当前展示 3 / 37 个待处理项</p>
+<button class="text-primary font-bold text-xs uppercase tracking-widest hover:translate-x-1 transition-transform flex items-center gap-2">
+<span>进入报告管理中心</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Footer Component -->
+<footer class="w-full py-10 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col md:flex-row justify-between items-center px-8 max-w-7xl mx-auto mt-12">
+<div class="mb-6 md:mb-0">
+<span class="font-manrope font-extrabold text-primary brand-font tracking-tight text-lg">Clinical Nexus</span>
+<span class="font-inter text-xs text-slate-500 dark:text-slate-400 ml-6 border-l border-slate-200 dark:border-slate-700 pl-6">© 2024 大学虚拟仿真实验室。版权所有。</span>
+</div>
+<div class="flex gap-8 font-inter text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+<a class="hover:text-primary transition-colors" href="#">隐私政策</a>
+<a class="hover:text-primary transition-colors" href="#">服务条款</a>
+<a class="hover:text-primary transition-colors" href="#">机构授权</a>
+<a class="hover:text-primary transition-colors" href="#">技术支持</a>
+</div>
+</footer>
+</main>
+</body></html>

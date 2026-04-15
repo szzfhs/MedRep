@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Clinical Precision - 登录</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#115cb9",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#f8f9fa",
+                        "on-tertiary-container": "#ffc2a7",
+                        "secondary": "#48626e",
+                        "on-surface": "#191c1d",
+                        "secondary-fixed-dim": "#afcbd8",
+                        "on-tertiary": "#ffffff",
+                        "primary": "#003f87",
+                        "outline-variant": "#c2c6d4",
+                        "on-secondary-container": "#4e6874",
+                        "on-secondary-fixed": "#021f29",
+                        "on-primary-fixed": "#001a40",
+                        "surface-variant": "#e1e3e4",
+                        "secondary-fixed": "#cbe7f5",
+                        "inverse-on-surface": "#f0f1f2",
+                        "tertiary": "#722b00",
+                        "secondary-container": "#cbe7f5",
+                        "primary-container": "#0056b3",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e7e8e9",
+                        "surface-container": "#edeeef",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "on-tertiary-fixed": "#351000",
+                        "surface-container-highest": "#e1e3e4",
+                        "outline": "#727784",
+                        "tertiary-fixed": "#ffdbcc",
+                        "surface": "#f8f9fa",
+                        "on-primary-fixed-variant": "#004491",
+                        "surface-dim": "#d9dadb",
+                        "on-secondary-fixed-variant": "#304a55",
+                        "inverse-primary": "#acc7ff",
+                        "primary-fixed-dim": "#acc7ff",
+                        "surface-container-low": "#f3f4f5",
+                        "primary-fixed": "#d7e2ff",
+                        "inverse-surface": "#2e3132",
+                        "on-surface-variant": "#424752",
+                        "on-primary-container": "#bbd0ff",
+                        "tertiary-container": "#983c00",
+                        "on-background": "#191c1d",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#f8f9fa",
+                        "tertiary-fixed-dim": "#ffb694"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface min-h-screen flex flex-col">
+<!-- Top Navigation (Shell Suprresed for focused task, but Brand remains) -->
+<header class="fixed top-0 w-full z-50 h-16 flex items-center px-8">
+<div class="font-headline font-extrabold text-xl tracking-tight text-primary">
+            Clinical Precision
+        </div>
+</header>
+<!-- Main Content: Login Canvas -->
+<main class="flex-grow flex items-center justify-center px-4 relative overflow-hidden">
+<!-- Background Decorative Elements -->
+<div class="absolute top-[-10%] left-[-5%] w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
+<div class="absolute bottom-[-10%] right-[-5%] w-96 h-96 bg-primary-container/10 rounded-full blur-3xl"></div>
+<section class="w-full max-w-md z-10">
+<!-- Login Card -->
+<div class="surface-container-lowest glass-panel rounded-xl shadow-[0_12px_40px_rgba(0,63,135,0.06)] p-8 md:p-10">
+<!-- Logo & Header -->
+<div class="text-center mb-10">
+<div class="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-xl mb-6 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-white text-3xl" style="font-variation-settings: 'FILL' 1;">science</span>
+</div>
+<h1 class="font-headline font-bold text-2xl text-on-surface mb-2">欢迎回来</h1>
+<p class="font-label text-sm uppercase tracking-widest text-outline">Clinical Nexus 数字化实验室</p>
+</div>
+<!-- Login Form -->
+<form class="space-y-6">
+<!-- ID Input -->
+<div class="space-y-2">
+<label class="font-headline font-semibold text-xs uppercase tracking-wider text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">badge</span>
+                            用户名 / 员工 ID
+                        </label>
+<div class="relative group">
+<input class="w-full h-12 px-4 bg-surface-container-high border-none rounded-lg focus:ring-0 focus:bg-surface-container-lowest transition-all duration-200 peer" placeholder="请输入您的 ID" type="text"/>
+<div class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 peer-focus:w-full"></div>
+</div>
+</div>
+<!-- Password Input -->
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<label class="font-headline font-semibold text-xs uppercase tracking-wider text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">lock</span>
+                                密码
+                            </label>
+</div>
+<div class="relative group">
+<input class="w-full h-12 px-4 bg-surface-container-high border-none rounded-lg focus:ring-0 focus:bg-surface-container-lowest transition-all duration-200 peer" placeholder="••••••••" type="password"/>
+<div class="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 peer-focus:w-full"></div>
+</div>
+</div>
+<!-- Options -->
+<div class="flex items-center justify-between py-2">
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="w-4 h-4 rounded-sm border-outline-variant text-primary focus:ring-primary/20 transition-all" type="checkbox"/>
+<span class="text-sm text-on-surface-variant group-hover:text-primary transition-colors">记住我</span>
+</label>
+<a class="text-sm font-semibold text-primary hover:text-primary-container transition-colors" href="#">忘记密码？</a>
+</div>
+<!-- Submit Button -->
+<button class="w-full h-12 bg-gradient-to-br from-primary to-primary-container text-white font-headline font-bold rounded-full shadow-md shadow-primary/10 hover:shadow-lg hover:shadow-primary/20 active:scale-[0.98] transition-all duration-200" type="submit">
+                        登录系统
+                    </button>
+</form>
+<!-- Divider -->
+<div class="relative my-8">
+<div class="absolute inset-0 flex items-center">
+<div class="w-full border-t border-outline-variant/30"></div>
+</div>
+<div class="relative flex justify-center text-xs uppercase">
+<span class="bg-white px-4 text-outline font-label tracking-widest">或者通过</span>
+</div>
+</div>
+<!-- SSO Login -->
+<button class="w-full h-12 flex items-center justify-center gap-3 bg-surface-container-highest text-on-surface font-headline font-semibold rounded-full hover:bg-surface-dim active:scale-[0.98] transition-all duration-200">
+<span class="material-symbols-outlined text-xl">account_balance</span>
+                    机构 SSO 登录
+                </button>
+<!-- Footer Link -->
+<div class="mt-8 text-center">
+<p class="text-xs text-outline">
+                        需要帮助访问您的账户？ <a class="text-primary font-semibold" href="#">联系 IT 支持</a>
+</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer (Using JSON Structure) -->
+<footer class="w-full py-12 px-8 bg-slate-50 dark:bg-slate-950">
+<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-4">
+<div class="flex flex-col gap-2">
+<div class="font-manrope font-black text-blue-900 dark:text-blue-200">Clinical Precision</div>
+<div class="bg-slate-200 dark:bg-slate-800 h-[1px] w-full mb-8"></div>
+<p class="font-inter text-xs leading-relaxed text-slate-500 dark:text-slate-500">
+                    © 2024 The Clinical Precision Framework. Institutional Laboratory Division.
+                </p>
+</div>
+<div class="flex md:justify-end gap-6">
+<a class="text-slate-500 font-inter text-xs hover:text-blue-600 transition-all opacity-80 hover:opacity-100" href="#">Contact Support</a>
+<a class="text-slate-500 font-inter text-xs hover:text-blue-600 transition-all opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="text-slate-500 font-inter text-xs hover:text-blue-600 transition-all opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+<a class="text-slate-500 font-inter text-xs hover:text-blue-600 transition-all opacity-80 hover:opacity-100" href="#">Faculty Portal</a>
+</div>
+</div>
+</footer>
+</body></html>

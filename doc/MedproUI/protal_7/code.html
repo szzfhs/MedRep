@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error-container": "#ffdad6",
+                    "on-error-container": "#93000a",
+                    "surface-tint": "#115cb9",
+                    "error": "#ba1a1a",
+                    "surface-bright": "#f8f9fa",
+                    "on-tertiary-container": "#ffc2a7",
+                    "secondary": "#48626e",
+                    "on-surface": "#191c1d",
+                    "secondary-fixed-dim": "#afcbd8",
+                    "on-tertiary": "#ffffff",
+                    "primary": "#003f87",
+                    "outline-variant": "#c2c6d4",
+                    "on-secondary-container": "#4e6874",
+                    "on-secondary-fixed": "#021f29",
+                    "on-primary-fixed": "#001a40",
+                    "surface-variant": "#e1e3e4",
+                    "secondary-fixed": "#cbe7f5",
+                    "inverse-on-surface": "#f0f1f2",
+                    "tertiary": "#722b00",
+                    "secondary-container": "#cbe7f5",
+                    "primary-container": "#0056b3",
+                    "on-secondary": "#ffffff",
+                    "surface-container-high": "#e7e8e9",
+                    "surface-container": "#edeeef",
+                    "on-tertiary-fixed-variant": "#7b2f00",
+                    "on-tertiary-fixed": "#351000",
+                    "surface-container-highest": "#e1e3e4",
+                    "outline": "#727784",
+                    "tertiary-fixed": "#ffdbcc",
+                    "surface": "#f8f9fa",
+                    "on-primary-fixed-variant": "#004491",
+                    "surface-dim": "#d9dadb",
+                    "on-secondary-fixed-variant": "#304a55",
+                    "inverse-primary": "#acc7ff",
+                    "primary-fixed-dim": "#acc7ff",
+                    "surface-container-low": "#f3f4f5",
+                    "primary-fixed": "#d7e2ff",
+                    "inverse-surface": "#2e3132",
+                    "on-surface-variant": "#424752",
+                    "on-primary-container": "#bbd0ff",
+                    "tertiary-container": "#983c00",
+                    "on-background": "#191c1d",
+                    "on-primary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "background": "#f8f9fa",
+                    "tertiary-fixed-dim": "#ffb694"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-headline { font-family: 'Manrope', sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 shadow-sm">
+<div class="flex justify-between items-center px-8 h-16 max-w-screen-2xl mx-auto">
+<div class="text-xl font-bold tracking-tight text-blue-900 dark:text-blue-100">Clinical Precision</div>
+<div class="hidden md:flex items-center space-gap-8 gap-8">
+<a class="font-manrope font-bold uppercase tracking-wider text-sm text-slate-600 dark:text-slate-400 hover:text-blue-800 transition-colors" href="#">Home</a>
+<a class="font-manrope font-bold uppercase tracking-wider text-sm text-slate-600 dark:text-slate-400 hover:text-blue-800 transition-colors" href="#">Simulation Hall</a>
+<a class="font-manrope font-bold uppercase tracking-wider text-sm text-slate-600 dark:text-slate-400 hover:text-blue-800 transition-colors" href="#">News</a>
+<a class="font-manrope font-bold uppercase tracking-wider text-sm text-slate-600 dark:text-slate-400 hover:text-blue-800 transition-colors" href="#">Course Center</a>
+<a class="font-manrope font-bold uppercase tracking-wider text-sm text-slate-600 dark:text-slate-400 hover:text-blue-800 transition-colors" href="#">Policies</a>
+<a class="font-manrope font-bold uppercase tracking-wider text-sm text-blue-700 dark:text-blue-400 border-b-2 border-blue-700 pb-1" href="#">About Us</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="px-5 py-2 text-sm font-bold text-blue-800 hover:bg-slate-50 transition-all rounded-full">Login</button>
+<button class="px-5 py-2 text-sm font-bold bg-primary text-white hover:bg-primary-container transition-all rounded-full shadow-md">Register</button>
+</div>
+</div>
+</nav>
+<main class="pt-16">
+<!-- Hero Section: Institutional Vision -->
+<section class="relative h-[614px] flex items-center overflow-hidden bg-primary">
+<img class="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay" data-alt="Modern high-tech clinical research laboratory with blue ambient lighting and sophisticated medical equipment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3jolQAZWou4pHn8O3ug1grEtzrPotYa2SHu6IMAKOXyzoY0RDZ1q9VFXrzYZXsOBxHELKc3j-RUgyjDW3y-o5C7hnErYWqoH2KjZ8lQeQpU7JxyaaGcqCJ3ZiSrujBu1OrERYZvOgkvCoAly-hEPsKod3qB97bPnAM8qIyFHo1IxME-1l_5OSIVkIuDEvwIZNaDcQ90QLd62IwDYCBR38OE0BqKSZcczqFxvzak7ce42dqGUjc7eTtkHxpPdEUOLRXBbv1jGQc7Px"/>
+<div class="absolute inset-0 bg-gradient-to-r from-primary via-primary/80 to-transparent"></div>
+<div class="relative container mx-auto px-8 z-10">
+<div class="max-w-3xl">
+<span class="inline-block px-4 py-1 rounded-full bg-primary-container text-on-primary-container text-xs font-bold tracking-widest uppercase mb-6">关于我们</span>
+<h1 class="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight">
+                        重塑临床医学的<br/><span class="text-primary-fixed">卓越标准</span>
+</h1>
+<p class="text-xl text-blue-100/90 leading-relaxed max-w-2xl font-light">
+                        Clinical Precision 致力于通过最前沿的数字化仿真技术，为下一代医学专业人士提供一个严谨、精确且具有高度互动性的临床实训环境。
+                    </p>
+</div>
+</div>
+</section>
+<!-- Center Overview: Mission & Philosophy -->
+<section class="py-24 bg-surface">
+<div class="container mx-auto px-8">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+<div class="lg:col-span-5 space-y-8">
+<div>
+<h2 class="text-sm font-black text-tertiary uppercase tracking-widest mb-4">核心使命</h2>
+<h3 class="text-3xl font-bold text-on-surface leading-snug">以数字精度驱动医学教育的未来</h3>
+</div>
+<p class="text-on-surface-variant leading-loose">
+                            我们的机构愿景植根于对医学严谨性的不懈追求。在数字化的今天，我们不仅仅是在建立一个教学平台，而是在构建一个连接理论与临床实践的“数字实验室”。通过高保真模拟与实时数据反馈，我们帮助医生在进入真实手术室前，就已经具备了处理复杂情况的本能。
+                        </p>
+<div class="grid grid-cols-2 gap-6">
+<div class="p-6 bg-surface-container-low rounded-xl border-l-4 border-primary">
+<div class="text-3xl font-bold text-primary mb-1">99.8%</div>
+<div class="text-xs font-bold text-on-surface-variant uppercase tracking-tighter">仿真准确度</div>
+</div>
+<div class="p-6 bg-surface-container-low rounded-xl border-l-4 border-tertiary">
+<div class="text-3xl font-bold text-tertiary mb-1">50+</div>
+<div class="text-xs font-bold text-on-surface-variant uppercase tracking-tighter">合作临床院校</div>
+</div>
+</div>
+</div>
+<div class="lg:col-span-7">
+<div class="relative rounded-2xl overflow-hidden shadow-2xl">
+<img class="w-full aspect-video object-cover" data-alt="A scientist using high-end VR goggles for medical simulation in a clean white contemporary research facility" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoc0TTd12irEY8ilm8_LuhUEwBT_Revp2ANbj6nux5O_L2Lw2K3FhD5r8ckPSL7L-ZFU98GBoKBnEQB5qPt930s1vcJugC99ad_xfVdGGCK1euRTWtDpo8vExfawo6GfEbf_vxHXpUdNZrpWGYB_aCnoviQods-HdHARd13k7n3GfYBwhrTXBAQojq2a5cs631qcIXwqRcdb13IcdYLehTrkxoOuovrQO97cNlAw0NjKywgjxylN-IinpV0o2ufjnwq70tt2cOEiyW"/>
+<div class="absolute bottom-0 left-0 right-0 p-8 glass-panel border-t border-white/20">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined">biotech</span>
+</div>
+<div>
+<div class="text-lg font-bold text-on-surface">卓越技术认证</div>
+<div class="text-sm text-on-surface-variant">2024年全球医学数字化创新奖项获得者</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Timeline / Growth Path -->
+<section class="py-24 bg-surface-container-low">
+<div class="container mx-auto px-8">
+<div class="text-center max-w-2xl mx-auto mb-16">
+<h2 class="text-3xl font-bold text-on-surface mb-4">发展历程</h2>
+<div class="h-1 w-20 bg-primary mx-auto"></div>
+</div>
+<div class="relative">
+<div class="hidden md:block absolute top-1/2 left-0 w-full h-px bg-outline-variant/30 -translate-y-1/2"></div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-8 relative z-10">
+<!-- Step 1 -->
+<div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm border border-outline-variant/10">
+<div class="text-primary font-black text-xl mb-4">2018</div>
+<h4 class="font-bold text-lg mb-2">蓝图绘就</h4>
+<p class="text-sm text-on-surface-variant leading-relaxed">核心算法实验室在苏黎世成立，开始研发第一代血流动力学模拟引擎。</p>
+</div>
+<!-- Step 2 -->
+<div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm border border-outline-variant/10">
+<div class="text-primary font-black text-xl mb-4">2020</div>
+<h4 class="font-bold text-lg mb-2">临床对接</h4>
+<p class="text-sm text-on-surface-variant leading-relaxed">与三家国际顶级医学院达成合作，将模拟场景引入住院医师培训课程。</p>
+</div>
+<!-- Step 3 -->
+<div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm border border-outline-variant/10">
+<div class="text-primary font-black text-xl mb-4">2022</div>
+<h4 class="font-bold text-lg mb-2">Nexus 平台发布</h4>
+<p class="text-sm text-on-surface-variant leading-relaxed">整合AR/VR技术的全新临床模拟平台上线，实现全球化协作。</p>
+</div>
+<!-- Step 4 -->
+<div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm border border-outline-variant/10 ring-2 ring-primary/20">
+<div class="text-primary font-black text-xl mb-4">2024</div>
+<h4 class="font-bold text-lg mb-2">精度飞跃</h4>
+<p class="text-sm text-on-surface-variant leading-relaxed">推出AI驱动的个性化反馈系统，成为行业标准的定义者。</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Expert Team Section -->
+<section class="py-24 bg-surface">
+<div class="container mx-auto px-8">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+<div>
+<h2 class="text-sm font-black text-tertiary uppercase tracking-widest mb-4">核心领导团队</h2>
+<h3 class="text-4xl font-bold text-on-surface">汇集医学与技术的巅峰智慧</h3>
+</div>
+<p class="max-w-md text-on-surface-variant">
+                        我们的团队由资深临床专家、医学教育家和顶级软件工程师组成，致力于打破传统教学的边界。
+                    </p>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+<!-- Member 1 -->
+<div class="group">
+<div class="relative aspect-[3/4] rounded-2xl overflow-hidden mb-6">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 transform group-hover:scale-105" data-alt="A professional female doctor in white coat with a stethoscope around her neck smiling warmly against a soft blue background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyN_72y4DdT76DjqKVJFS7vlwW1By9QH0eOTZesOdY1NehLCGxgozUU4i0mhZ7kAlvFNumb1TmzCgpeA3ANMlHYSls8e_dOv-2-41pbvIen0Jnv4E4O0q3ircKn4UzvUqeGoesfhKBTO_xSm5zEe_b6ozJccWQVsmKJN1qiA5GlrrcTKnfm5AXEZHqGVNZImI7w440mBB_8GdtKtZEcaUHovW0ebdC30oxZtUatgpMsKlnfFtnKSaQvNaimAjCoSXLMn0ZC0Qa4ZAi"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+<p class="text-white text-xs leading-relaxed">前哈佛医学院临床模拟中心主任，拥有超过25年的临床实训经验。</p>
+</div>
+</div>
+<h4 class="text-xl font-bold text-on-surface">林清博士</h4>
+<p class="text-sm text-primary font-semibold mb-2">首席执行官 &amp; 联合创始人</p>
+</div>
+<!-- Member 2 -->
+<div class="group">
+<div class="relative aspect-[3/4] rounded-2xl overflow-hidden mb-6">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 transform group-hover:scale-105" data-alt="A middle-aged male scientist in a modern lab setting with smart glasses, looking focused and authoritative" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWLyKAFSRVoxTLhnx71KhqnD6sZbMhHHE109vZXOVIkkRN_kLgz5XBkfzeNpit-2tMkU7LrwhgKUANDuhlyceXdc0LtZ9TXkUnD3WKvejI_xDe2-QXXd76qahu-QwUORetaeVZQs8i76jWXAphoDNimwSjA8lcnPgGun98HNysSuLUXYJwZpLcpaKNLP1RR2wwx5do-OXIF-cZDyy0USsUVSGxMuhgbtIKrR5_Lq70mp6Q2kT-Uxruqol9N5-HD-P4JQJEgIavkldf"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+<p class="text-white text-xs leading-relaxed">深耕生物医学影像与三维重建技术20载，主导核心模拟引擎开发。</p>
+</div>
+</div>
+<h4 class="text-xl font-bold text-on-surface">陈敬业 教授</h4>
+<p class="text-sm text-primary font-semibold mb-2">首席技术官</p>
+</div>
+<!-- Member 3 -->
+<div class="group">
+<div class="relative aspect-[3/4] rounded-2xl overflow-hidden mb-6">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 transform group-hover:scale-105" data-alt="A professional medical educator standing in front of a lecture screen showing human anatomy" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAc4CHiMazZxjuB4gT1Ewfs2xIrq2ZqmgakVGZ9TanPPKC6ZQKDS-iAg9QnJ1O49dGn73uHHEmPo-Nfacxzy4inhcDpSoY0iVOhKkInH4GSWFE3Nwydf7KFinENu-NKKG_ALv06cK_wl0-TSae-CJg8I_JOi7slWVXeeF9F_kKnQtL_-101azNkZW9c-o5ohMP6HIQ3JPkTdW8vLHb_GxXGf3E52fj76TqKCo-r1i1Mml1nrEqskBwc_8ooVaz55P7Lvxdc1NUnMkkB"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+<p class="text-white text-xs leading-relaxed">专注于PBL教学法与数字化评估体系的研究，致力于提升学生实践效能。</p>
+</div>
+</div>
+<h4 class="text-xl font-bold text-on-surface">Sarah Mitchell</h4>
+<p class="text-sm text-primary font-semibold mb-2">教学研发总监</p>
+</div>
+<!-- Member 4 -->
+<div class="group">
+<div class="relative aspect-[3/4] rounded-2xl overflow-hidden mb-6">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 transform group-hover:scale-105" data-alt="A young tech professional with a warm smile, wearing a dark polo shirt against a clean neutral wall" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAL0tupe639ebNyTtHxS_UPJAtAmnuh-i83Kgi9OGyCbRCMW75708CN4r5jlX8-75mcAM0tCY4-DxCO4x21oAIgVPMrd_aHDYEjqX-p0uXOLeK323mw_v8Gf4VzzfQ78UyLAhHsvAiNz-LOJ9BGYFoX6wihTbzICHu9-xZL0ayqc_RmK2tyQS0cHzizVJwplDnl0lvUQdj1cjBP2cOZ7AObP1w8pIWa_UNL0kCvRimsHcQDanPe7wB7iojrQxalrUuOZ-NE5MxHSgcx"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+<p class="text-white text-xs leading-relaxed">前全球顶尖科技公司资深UI设计师，负责打造直观、沉浸式的交互体验。</p>
+</div>
+</div>
+<h4 class="text-xl font-bold text-on-surface">王嘉禾</h4>
+<p class="text-sm text-primary font-semibold mb-2">产品设计主管</p>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section: Call to Institutional Vision -->
+<section class="py-24 bg-primary text-white text-center">
+<div class="container mx-auto px-8 max-w-4xl">
+<h2 class="text-4xl font-bold mb-8">准备好与我们共同开启医学教育的新篇章了吗？</h2>
+<p class="text-xl text-blue-100 mb-12 font-light leading-relaxed">
+                    加入全球领先的数字化实训生态系统，为您的机构注入精准、高效且充满活力的教学工具。
+                </p>
+<div class="flex flex-col sm:flex-row items-center justify-center gap-6">
+<button class="w-full sm:w-auto px-10 py-4 bg-white text-primary font-bold rounded-full hover:bg-blue-50 transition-all shadow-xl text-lg">立即咨询合作</button>
+<button class="w-full sm:w-auto px-10 py-4 border-2 border-white/30 text-white font-bold rounded-full hover:bg-white/10 transition-all text-lg">浏览技术文档</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-slate-50 dark:bg-slate-950 w-full py-12 px-8">
+<div class="bg-slate-200 dark:bg-slate-800 h-[1px] w-full mb-8"></div>
+<div class="grid grid-cols-1 md:grid-cols-2 items-center gap-4 max-w-7xl mx-auto">
+<div class="space-y-4">
+<div class="font-manrope font-black text-blue-900 dark:text-blue-200 text-xl tracking-tight">Clinical Precision</div>
+<p class="font-inter text-xs leading-relaxed text-slate-500 dark:text-slate-500 max-w-sm">© 2024 The Clinical Precision Framework. Institutional Laboratory Division. 致力于通过模拟技术提升医疗安全与专业水平。</p>
+</div>
+<div class="flex flex-wrap md:justify-end gap-x-8 gap-y-4">
+<a class="font-inter text-xs leading-relaxed text-slate-500 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-all" href="#">Contact Support</a>
+<a class="font-inter text-xs leading-relaxed text-slate-500 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-all" href="#">Privacy Policy</a>
+<a class="font-inter text-xs leading-relaxed text-slate-500 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-all" href="#">Terms of Service</a>
+<a class="font-inter text-xs leading-relaxed text-slate-500 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-semibold text-blue-700" href="#">Faculty Portal</a>
+</div>
+</div>
+</footer>
+</body></html>

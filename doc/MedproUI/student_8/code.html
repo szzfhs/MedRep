@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#727784",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "primary-fixed-dim": "#acc7ff",
+                        "on-tertiary-fixed": "#351000",
+                        "surface": "#f8f9fa",
+                        "surface-container-highest": "#e1e3e4",
+                        "surface-bright": "#f8f9fa",
+                        "secondary-container": "#cbe7f5",
+                        "inverse-on-surface": "#f0f1f2",
+                        "tertiary-container": "#983c00",
+                        "secondary-fixed": "#cbe7f5",
+                        "primary-fixed": "#d7e2ff",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed": "#001a40",
+                        "surface-variant": "#e1e3e4",
+                        "secondary": "#48626e",
+                        "on-surface-variant": "#424752",
+                        "background": "#f8f9fa",
+                        "on-primary-fixed-variant": "#004491",
+                        "surface-container-high": "#e7e8e9",
+                        "surface-container-low": "#f3f4f5",
+                        "on-secondary-container": "#4e6874",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#d9dadb",
+                        "on-error": "#ffffff",
+                        "on-surface": "#191c1d",
+                        "error": "#ba1a1a",
+                        "primary": "#003f87",
+                        "tertiary-fixed-dim": "#ffb694",
+                        "surface-tint": "#115cb9",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-container": "#0056b3",
+                        "secondary-fixed-dim": "#afcbd8",
+                        "inverse-surface": "#2e3132",
+                        "on-secondary-fixed-variant": "#304a55",
+                        "tertiary": "#722b00",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-container": "#ffc2a7",
+                        "on-secondary-fixed": "#021f29",
+                        "on-primary-container": "#bbd0ff",
+                        "surface-container": "#edeeef",
+                        "outline-variant": "#c2c6d4",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed": "#ffdbcc",
+                        "on-background": "#191c1d",
+                        "inverse-primary": "#acc7ff",
+                        "on-secondary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; color: #191c1d; }
+        .font-headline { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .vitals-shadow { box-shadow: 0 12px 40px rgba(0, 63, 135, 0.06); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e1e3e4; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-surface selection:bg-primary/10">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-blue-50/10 dark:border-blue-900/20 shadow-sm dark:shadow-none flex justify-between items-center px-8 h-16">
+<div class="flex items-center gap-8">
+<div class="text-xl font-black text-blue-900 dark:text-blue-100 font-['Manrope'] tracking-tight">Digital Laboratory</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors font-['Manrope'] font-bold tracking-tight" href="#">首页</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors font-['Manrope'] font-bold tracking-tight" href="#">实验大厅</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors font-['Manrope'] font-bold tracking-tight" href="#">课程中心</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors font-['Manrope'] font-bold tracking-tight" href="#">资源中心</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors font-['Manrope'] font-bold tracking-tight" href="#">数据仪表盘</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative group hidden sm:block">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 text-sm">search</span>
+<input class="pl-9 pr-4 py-1.5 bg-surface-container-high border-none rounded-full text-sm focus:ring-2 focus:ring-primary/20 w-64 transition-all" placeholder="搜索资源..." type="text"/>
+</div>
+<button class="p-2 text-slate-600 hover:bg-blue-50/50 rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-slate-600 hover:bg-blue-50/50 rounded-full transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<img alt="学生个人头像" class="w-8 h-8 rounded-full border border-blue-100" data-alt="professional student avatar, clear medical laboratory background, soft daylight, minimalist clinical style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAU1UMFyOgYeUi5sjkHiroiqCvUnEVOv3qll2s2ke__qOF91Q3kKo1SV5DDyTgnX9_xc4u-Y6hxg8aP_5jPj5KMJaH9OdMvhaeyB3xl7GTXPD-Cs643UjNpvCTt5cKP5Gs438dpIuxABoQWyKwduMweEhyZfbvPHLNEzblyH6LE2NwrzZS0m30zBaCnZVy4ELSsp5fMa-_duQ1GkMLSdIs-wLXmWKYT3r8bStTLikhd8Zy4kf2goIuauqqBVPrhDhv3ZfUFfP_-mVvE"/>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-slate-50 dark:bg-slate-950 flex flex-col border-r border-slate-200 dark:border-slate-800 z-40">
+<div class="p-6">
+<div class="flex items-center gap-3 mb-8">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">biotech</span>
+</div>
+<div>
+<div class="font-headline text-sm font-bold text-primary tracking-tight">Precision Portal</div>
+<div class="text-[10px] text-slate-400 uppercase tracking-widest">Clinical Precision v1.0</div>
+</div>
+</div>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 px-4 py-3 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-xl transition-all duration-200 font-['Inter'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined text-xl">dashboard</span>
+<span>个人工作台</span>
+</a>
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 px-4 py-3 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-xl transition-all duration-200 font-['Inter'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined text-xl">science</span>
+<span>实验大厅</span>
+</a>
+<div class="pt-2 pb-1 px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">我的学习</div>
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 px-4 py-3 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-xl transition-all duration-200 font-['Inter'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined text-xl">menu_book</span>
+<span>我的课程</span>
+</a>
+<div class="relative">
+<a class="flex items-center gap-3 bg-blue-100/50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border-r-4 border-blue-700 px-4 py-3 rounded-l-xl transition-all duration-200 font-['Inter'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined text-xl">description</span>
+<span>实验报告</span>
+</a>
+<div class="ml-10 mt-1 flex flex-col gap-1 border-l border-slate-200">
+<a class="pl-4 py-2 text-xs text-slate-500 hover:text-primary transition-colors" href="#">在线撰写</a>
+<a class="pl-4 py-2 text-xs text-primary font-semibold transition-colors border-l-2 border-primary -ml-[1.5px]" href="#">报告成绩</a>
+</div>
+</div>
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 px-4 py-3 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-xl transition-all duration-200 font-['Inter'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined text-xl">analytics</span>
+<span>学情档案</span>
+</a>
+</nav>
+</div>
+<div class="mt-auto p-4 m-4 bg-primary-container/10 rounded-2xl">
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined text-primary text-lg">info</span>
+<span class="text-xs font-bold text-primary tracking-tight">学期进度</span>
+</div>
+<div class="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-3/4 rounded-full"></div>
+</div>
+<div class="mt-2 text-[10px] text-slate-500 flex justify-between">
+<span>第 12 周</span>
+<span>75%</span>
+</div>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-64 pt-16 min-h-screen p-8">
+<div class="max-w-7xl mx-auto space-y-8">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<div class="flex items-center gap-2 mb-2">
+<span class="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded uppercase tracking-wider">Reports &amp; Grading</span>
+</div>
+<h1 class="text-3xl font-extrabold text-on-surface font-headline tracking-tight">实验报告成绩列表</h1>
+<p class="text-slate-500 mt-1 font-body text-sm">实时查看临床模拟实验评分与导师专业反馈。</p>
+</div>
+<div class="flex flex-col sm:flex-row gap-3">
+<div class="relative group">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 text-lg">search</span>
+<input class="pl-10 pr-4 py-2.5 bg-surface-container-high border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 w-full sm:w-64 transition-all font-body" placeholder="按实验名称搜索..." type="text"/>
+</div>
+<div class="relative">
+<select class="appearance-none pl-10 pr-10 py-2.5 bg-surface-container-high border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 w-full font-body text-on-surface-variant cursor-pointer">
+<option>所有课程</option>
+<option>临床解剖学模拟</option>
+<option>急救医学实操</option>
+<option>药理学实验案例</option>
+<option>神经科学基础</option>
+</select>
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 text-lg pointer-events-none">filter_list</span>
+<span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 text-lg pointer-events-none">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Dashboard Stats (Visual Hierarchy Enhancement) -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<div class="bg-surface-container-lowest p-6 rounded-xl vitals-shadow flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">assignment_turned_in</span>
+</div>
+<div>
+<div class="text-xs font-bold text-slate-400 uppercase tracking-widest font-label">已提交报告</div>
+<div class="text-2xl font-extrabold text-on-surface font-headline">24</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl vitals-shadow flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center text-orange-600">
+<span class="material-symbols-outlined">pending_actions</span>
+</div>
+<div>
+<div class="text-xs font-bold text-slate-400 uppercase tracking-widest font-label">待批阅</div>
+<div class="text-2xl font-extrabold text-on-surface font-headline">3</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl vitals-shadow flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center text-green-600">
+<span class="material-symbols-outlined">insights</span>
+</div>
+<div>
+<div class="text-xs font-bold text-slate-400 uppercase tracking-widest font-label">平均分</div>
+<div class="text-2xl font-extrabold text-on-surface font-headline">92.5</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl vitals-shadow flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center text-purple-600">
+<span class="material-symbols-outlined">grade</span>
+</div>
+<div>
+<div class="text-xs font-bold text-slate-400 uppercase tracking-widest font-label">最高得分</div>
+<div class="text-2xl font-extrabold text-on-surface font-headline">100</div>
+</div>
+</div>
+</div>
+<!-- Data Table Section -->
+<div class="bg-surface-container-lowest rounded-xl vitals-shadow overflow-hidden border border-slate-100">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low">
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest font-label">实验名称</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest font-label">所属课程</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest font-label text-center">得分 (分/总)</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest font-label">提交时间</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest font-label">批改状态</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest font-label text-right">操作</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-50">
+<!-- Row 1 -->
+<tr class="hover:bg-slate-50/50 transition-colors group">
+<td class="px-6 py-5">
+<div class="font-headline font-bold text-on-surface text-sm">冠状动脉解剖及变异观察</div>
+<div class="text-[10px] text-slate-400 font-mono mt-1">ID: LAB-2024-0891</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                                        临床解剖学模拟
+                                    </span>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-col items-center">
+<span class="text-sm font-bold text-primary">95/100</span>
+<div class="w-16 h-1 bg-slate-100 rounded-full mt-1.5 overflow-hidden">
+<div class="h-full bg-primary w-[95%]"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="text-xs text-on-surface-variant font-medium">2024-05-18</div>
+<div class="text-[10px] text-slate-400 mt-0.5">14:30:22</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-green-50 text-green-700 uppercase tracking-wider border border-green-100">已批改</span>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="inline-flex items-center gap-1 text-xs font-bold text-primary hover:bg-primary/5 px-3 py-1.5 rounded-lg transition-all">
+                                        查看详情
+                                        <span class="material-symbols-outlined text-sm">arrow_forward_ios</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-slate-50/50 transition-colors group">
+<td class="px-6 py-5">
+<div class="font-headline font-bold text-on-surface text-sm">突发性心律失常急救流程仿真</div>
+<div class="text-[10px] text-slate-400 font-mono mt-1">ID: LAB-2024-0892</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                                        急救医学实操
+                                    </span>
+</td>
+<td class="px-6 py-5 text-center">
+<span class="text-sm font-bold text-slate-400">— / 100</span>
+</td>
+<td class="px-6 py-5">
+<div class="text-xs text-on-surface-variant font-medium">2024-05-20</div>
+<div class="text-[10px] text-slate-400 mt-0.5">09:12:45</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-orange-50 text-orange-700 uppercase tracking-wider border border-orange-100">待批阅</span>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="inline-flex items-center gap-1 text-xs font-bold text-slate-400 cursor-not-allowed px-3 py-1.5">
+                                        暂不可见
+                                    </button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-slate-50/50 transition-colors group">
+<td class="px-6 py-5">
+<div class="font-headline font-bold text-on-surface text-sm">抗生素对耐药菌群抑制实验</div>
+<div class="text-[10px] text-slate-400 font-mono mt-1">ID: LAB-2024-0885</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                        药理学实验案例
+                                    </span>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-col items-center">
+<span class="text-sm font-bold text-primary">88/100</span>
+<div class="w-16 h-1 bg-slate-100 rounded-full mt-1.5 overflow-hidden">
+<div class="h-full bg-primary w-[88%]"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="text-xs text-on-surface-variant font-medium">2024-05-15</div>
+<div class="text-[10px] text-slate-400 mt-0.5">16:45:10</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-green-50 text-green-700 uppercase tracking-wider border border-green-100">已批改</span>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="inline-flex items-center gap-1 text-xs font-bold text-primary hover:bg-primary/5 px-3 py-1.5 rounded-lg transition-all">
+                                        查看详情
+                                        <span class="material-symbols-outlined text-sm">arrow_forward_ios</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-slate-50/50 transition-colors group">
+<td class="px-6 py-5">
+<div class="font-headline font-bold text-on-surface text-sm">人类大脑神经元突触模型构建</div>
+<div class="text-[10px] text-slate-400 font-mono mt-1">ID: LAB-2024-0870</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                                        神经科学基础
+                                    </span>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-col items-center">
+<span class="text-sm font-bold text-primary">92/100</span>
+<div class="w-16 h-1 bg-slate-100 rounded-full mt-1.5 overflow-hidden">
+<div class="h-full bg-primary w-[92%]"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="text-xs text-on-surface-variant font-medium">2024-05-10</div>
+<div class="text-[10px] text-slate-400 mt-0.5">10:05:33</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-green-50 text-green-700 uppercase tracking-wider border border-green-100">已批改</span>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="inline-flex items-center gap-1 text-xs font-bold text-primary hover:bg-primary/5 px-3 py-1.5 rounded-lg transition-all">
+                                        查看详情
+                                        <span class="material-symbols-outlined text-sm">arrow_forward_ios</span>
+</button>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-slate-50/50 transition-colors group">
+<td class="px-6 py-5">
+<div class="font-headline font-bold text-on-surface text-sm">腹腔镜胆囊切除术路径设计</div>
+<div class="text-[10px] text-slate-400 font-mono mt-1">ID: LAB-2024-0895</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                                        临床解剖学模拟
+                                    </span>
+</td>
+<td class="px-6 py-5 text-center">
+<span class="text-sm font-bold text-slate-400">— / 100</span>
+</td>
+<td class="px-6 py-5">
+<div class="text-xs text-on-surface-variant font-medium">2024-05-22</div>
+<div class="text-[10px] text-slate-400 mt-0.5">11:55:01</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-orange-50 text-orange-700 uppercase tracking-wider border border-orange-100">待批阅</span>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="inline-flex items-center gap-1 text-xs font-bold text-slate-400 cursor-not-allowed px-3 py-1.5">
+                                        暂不可见
+                                    </button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="px-6 py-4 bg-surface-container-low flex items-center justify-between">
+<span class="text-xs text-slate-500">显示第 1 至 5 条，共 24 条实验记录</span>
+<div class="flex items-center gap-2">
+<button class="p-1.5 text-slate-400 hover:bg-slate-200 rounded-md transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-lg">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center text-xs font-bold bg-primary text-white rounded-md">1</button>
+<button class="w-8 h-8 flex items-center justify-center text-xs font-medium text-slate-600 hover:bg-slate-200 rounded-md">2</button>
+<button class="w-8 h-8 flex items-center justify-center text-xs font-medium text-slate-600 hover:bg-slate-200 rounded-md">3</button>
+<span class="text-slate-400 px-1">...</span>
+<button class="w-8 h-8 flex items-center justify-center text-xs font-medium text-slate-600 hover:bg-slate-200 rounded-md">5</button>
+<button class="p-1.5 text-slate-600 hover:bg-slate-200 rounded-md transition-colors">
+<span class="material-symbols-outlined text-lg">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Contextual Insight / Floating Support Section -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="md:col-span-2 bg-gradient-to-br from-primary to-primary-container rounded-2xl p-8 relative overflow-hidden text-white vitals-shadow">
+<div class="relative z-10">
+<h3 class="text-xl font-bold font-headline mb-2">学期综述评分趋势</h3>
+<p class="text-primary-container text-sm max-w-md">基于您最近5次实验表现，您的临床操作精准度提高了12%。继续保持对病理细节的关注。</p>
+<div class="mt-6 flex items-end gap-3 h-24">
+<div class="flex-1 bg-white/20 rounded-t-lg transition-all hover:bg-white/40" style="height: 60%"></div>
+<div class="flex-1 bg-white/20 rounded-t-lg transition-all hover:bg-white/40" style="height: 75%"></div>
+<div class="flex-1 bg-white/20 rounded-t-lg transition-all hover:bg-white/40" style="height: 85%"></div>
+<div class="flex-1 bg-white/30 rounded-t-lg transition-all hover:bg-white/50" style="height: 92%"></div>
+<div class="flex-1 bg-white rounded-t-lg" style="height: 95%"></div>
+</div>
+</div>
+<div class="absolute right-[-20px] bottom-[-20px] opacity-10 pointer-events-none">
+<span class="material-symbols-outlined text-[200px]" style="font-variation-settings: 'FILL' 1;">analytics</span>
+</div>
+</div>
+<div class="bg-surface-container-highest rounded-2xl p-6 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-tertiary">warning</span>
+<span class="text-sm font-bold text-on-surface font-headline">待办提醒</span>
+</div>
+<ul class="space-y-3">
+<li class="flex items-start gap-3">
+<div class="w-1.5 h-1.5 rounded-full bg-primary mt-1.5"></div>
+<div class="text-xs text-on-surface-variant font-medium">您有 2 份待完成的撰写任务</div>
+</li>
+<li class="flex items-start gap-3">
+<div class="w-1.5 h-1.5 rounded-full bg-primary mt-1.5"></div>
+<div class="text-xs text-on-surface-variant font-medium">本周五前需提交解剖实验反馈</div>
+</li>
+</ul>
+</div>
+<button class="w-full py-2.5 mt-4 bg-surface-container-lowest border border-slate-200 text-xs font-bold text-on-surface rounded-xl hover:bg-white transition-colors">
+                        查看全部待办
+                    </button>
+</div>
+</div>
+</div>
+</main>
+</body></html>

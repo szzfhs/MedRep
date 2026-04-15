@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Clinical Nexus 临床精准虚拟仿真系统 - 课程编辑器</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline-variant": "#c2c6d4",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "on-background": "#191c1d",
+                        "secondary-fixed-dim": "#afcbd8",
+                        "on-error": "#ffffff",
+                        "primary-container": "#0056b3",
+                        "on-secondary-fixed-variant": "#304a55",
+                        "on-secondary-container": "#4e6874",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#115cb9",
+                        "secondary-fixed": "#cbe7f5",
+                        "secondary-container": "#cbe7f5",
+                        "on-tertiary-container": "#ffc2a7",
+                        "on-secondary-fixed": "#021f29",
+                        "on-primary-fixed": "#001a40",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#e1e3e4",
+                        "primary-fixed-dim": "#acc7ff",
+                        "primary-fixed": "#d7e2ff",
+                        "on-primary-container": "#bbd0ff",
+                        "tertiary-fixed-dim": "#ffb694",
+                        "error": "#ba1a1a",
+                        "surface-dim": "#d9dadb",
+                        "surface": "#f8f9fa",
+                        "outline": "#727784",
+                        "surface-container-low": "#f3f4f5",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e7e8e9",
+                        "primary": "#003f87",
+                        "inverse-primary": "#acc7ff",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#f8f9fa",
+                        "on-surface": "#191c1d",
+                        "inverse-surface": "#2e3132",
+                        "surface-container": "#edeeef",
+                        "surface-container-highest": "#e1e3e4",
+                        "on-primary-fixed-variant": "#004491",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#ffdbcc",
+                        "tertiary": "#722b00",
+                        "on-tertiary": "#ffffff",
+                        "inverse-on-surface": "#f0f1f2",
+                        "on-surface-variant": "#424752",
+                        "on-tertiary-fixed": "#351000",
+                        "tertiary-container": "#983c00",
+                        "surface-bright": "#f8f9fa",
+                        "secondary": "#48626e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-headline { font-family: 'Manrope', sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .nav-active-indicator {
+            position: relative;
+        }
+        .nav-active-indicator::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #003f87;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-800/50 shadow-sm flex justify-between items-center px-6 py-3">
+<div class="flex items-center gap-10">
+<span class="text-xl font-bold tracking-tight text-blue-900 dark:text-blue-100">Clinical Nexus 临床精准虚拟仿真系统</span>
+<div class="hidden md:flex gap-8">
+<a class="text-slate-600 dark:text-slate-400 hover:text-blue-600 text-sm font-medium transition-colors" href="#">首页</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-blue-600 text-sm font-medium transition-colors" href="#">实验大厅</a>
+<a class="text-blue-700 dark:text-blue-400 font-bold text-sm nav-active-indicator" href="#">课程中心</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-blue-600 text-sm font-medium transition-colors" href="#">资源中心</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-blue-600 text-sm font-medium transition-colors" href="#">数据仪表盘</a>
+</div>
+</div>
+<div class="flex items-center gap-5">
+<div class="flex items-center gap-3">
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-white px-5 py-2 rounded-full font-bold text-sm hover:opacity-90 transition-all shadow-md">新建实验</button>
+<div class="flex items-center gap-2 pl-2 border-l border-slate-200">
+<img alt="Teacher Profile Avatar" class="w-8 h-8 rounded-full border border-slate-200 shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIPY0MEu44zWA5aBmPQDq0KYFbaQaHID1cVpTXftj7TBf56bOMQr6ZyNl-5c_kGgAYGXreSm0pm-y8BJdhdKh0ieI6GUaAIEaH9y5znaS1oOjKabyjIMykdmXgs1Q2Mrdd1lFumZG0Z1lBVwmAva_DTlsdDzRYF2mVxrz0X7goqU1S-aUjXgcHIZPBCPEy6oAU1lcbbhVYlrwXz3QLSOapH6MA4E5m6fjbVDF3LXUP4G-iiYX1k6a6mdBE86MI-fYReWc_3fPLDuOp"/>
+</div>
+</div>
+</nav>
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 pt-16 flex flex-col bg-slate-50 dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 overflow-y-auto">
+<div class="p-6">
+<div class="flex items-center gap-3 mb-1">
+<div class="w-8 h-8 bg-primary rounded flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-sm">medical_services</span>
+</div>
+<div>
+<h2 class="text-lg font-extrabold text-blue-900 dark:text-blue-50 leading-tight">Medical Sim</h2>
+<p class="text-[10px] uppercase tracking-wider font-bold text-slate-500">教师控制台</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-3 space-y-1">
+<!-- 教学工作台 -->
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 px-4 py-2.5 rounded-lg hover:bg-slate-200/50 transition-all font-semibold text-sm" href="#">
+<span class="material-symbols-outlined text-xl">dashboard</span>
+<span>教学工作台</span>
+</a>
+<!-- 报告批阅 -->
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 px-4 py-2.5 rounded-lg hover:bg-slate-200/50 transition-all font-semibold text-sm" href="#">
+<span class="material-symbols-outlined text-xl">fact_check</span>
+<span>报告批阅</span>
+</a>
+<!-- 实验管理 -->
+<div class="space-y-1">
+<button class="w-full flex items-center justify-between text-slate-600 dark:text-slate-400 px-4 py-2.5 rounded-lg hover:bg-slate-200/50 transition-all font-semibold text-sm">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-xl">science</span>
+<span>实验管理</span>
+</div>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+</div>
+<!-- 课程建设 (Active/Expanded) -->
+<div class="space-y-1">
+<div class="flex items-center justify-between text-primary bg-primary/5 px-4 py-2.5 rounded-lg font-bold text-sm">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-xl">auto_stories</span>
+<span>课程建设</span>
+</div>
+<span class="material-symbols-outlined text-sm">expand_less</span>
+</div>
+<div class="ml-12 space-y-1 pt-1">
+<a class="block py-2 text-primary font-bold text-sm relative before:content-[''] before:absolute before:-left-4 before:top-1/2 before:-translate-y-1/2 before:w-1.5 before:h-1.5 before:bg-primary before:rounded-full" href="#">课程编辑器</a>
+<a class="block py-2 text-slate-500 hover:text-primary transition-colors text-sm font-medium" href="#">任务发布</a>
+</div>
+</div>
+<!-- 学情监控 -->
+<div class="space-y-1">
+<button class="w-full flex items-center justify-between text-slate-600 dark:text-slate-400 px-4 py-2.5 rounded-lg hover:bg-slate-200/50 transition-all font-semibold text-sm">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-xl">monitoring</span>
+<span>学情监控</span>
+</div>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+</div>
+<!-- 素材库 -->
+<a class="flex items-center gap-3 text-slate-600 dark:text-slate-400 px-4 py-2.5 rounded-lg hover:bg-slate-200/50 transition-all font-semibold text-sm" href="#">
+<span class="material-symbols-outlined text-xl">inventory_2</span>
+<span>素材库</span>
+</a>
+</nav>
+<div class="p-6 border-t border-slate-100 dark:border-slate-900 space-y-4">
+<button class="w-full bg-primary text-white py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:brightness-110 transition-all shadow-sm">启动实验环境</button>
+<div class="flex flex-col gap-2">
+<a class="flex items-center gap-2 text-slate-500 text-xs font-bold hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined text-sm">help_outline</span> 技术支持</a>
+<a class="flex items-center gap-2 text-slate-500 text-xs font-bold hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined text-sm">archive</span> 归档</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 pt-16 min-h-screen bg-surface">
+<div class="max-w-7xl mx-auto p-8">
+<!-- Page Header -->
+<header class="mb-10 flex justify-between items-end">
+<div>
+<h1 class="text-3xl font-extrabold text-on-surface mb-2">高级临床诊断学：心血管系统</h1>
+<nav class="flex items-center gap-2 text-label-md font-medium text-on-surface-variant">
+<span>课程库</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="text-primary">编辑课程大纲</span>
+</nav>
+</div>
+<div class="flex gap-4">
+<button class="px-6 py-2.5 rounded-full bg-surface-container-highest text-on-surface font-semibold hover:bg-surface-container-high transition-colors">
+                        预览课程
+                    </button>
+<button class="px-8 py-2.5 rounded-full bg-gradient-to-r from-primary to-primary-container text-white font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
+                        发布更新
+                    </button>
+</div>
+</header>
+<div class="grid grid-cols-12 gap-8">
+<!-- Left Column: Core Editor & Path -->
+<div class="col-span-12 lg:col-span-8 space-y-8">
+<!-- Basic Info Bento Section -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="md:col-span-2 bg-surface-container-lowest p-6 rounded-xl shadow-sm">
+<h3 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">info</span> 基本信息设置
+                            </h3>
+<div class="space-y-4">
+<div>
+<label class="block text-xs font-bold text-on-surface-variant mb-1 ml-1">课程标题</label>
+<input class="w-full bg-surface-container-high border-none rounded-md px-4 py-3 focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all" type="text" value="高级临床诊断学：心血管系统"/>
+</div>
+<div>
+<label class="block text-xs font-bold text-on-surface-variant mb-1 ml-1">课程描述</label>
+<textarea class="w-full bg-surface-container-high border-none rounded-md px-4 py-3 focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all" rows="3">本课程旨在深化医学专业学生对复杂心血管病理生理学的理解，通过高保真模拟教学提升临床决策能力。</textarea>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm flex flex-col items-center justify-center border-2 border-dashed border-outline-variant/30 group hover:border-primary/50 transition-colors cursor-pointer relative overflow-hidden">
+<img class="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:scale-110 transition-transform" data-alt="high-tech medical heart scan visualization with neon blue and white anatomical details" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCi-G8UqHeCb_Ajl-mxzE1x6_DrtivY6ZkIa1H9gvIeQj53ourT1UUa2CmEjrOK269zb2HKb_4f1nUibC3tm-vS76kI2u60Dc_4L2n9QKQJuzg2UZoD4NMtasHUN0gCNTzkpAXGswCm0_947lnPV68n6fTxSj9HboG5UO33rtpx2CTlXDWqCVYOLQ_SnqcQYDlWiRthwIeV2wrW43m0PsMV3F5seWbt3kLzA7MGC1rWBQB84SZGyfQTmtBsYYBsHUs8dL2SfQpQ5d-f"/>
+<div class="relative z-10 text-center">
+<span class="material-symbols-outlined text-3xl text-primary mb-2">add_a_photo</span>
+<p class="text-xs font-bold text-on-surface-variant">更换课程封面</p>
+<p class="text-[10px] text-slate-400 mt-1">推荐尺寸: 1600x900px</p>
+</div>
+</div>
+</section>
+<!-- Outline Editor (Chapter-Section-Point) -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+<div class="p-6 border-b border-surface-container">
+<div class="flex justify-between items-center">
+<h3 class="text-sm font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">format_list_bulleted</span> 课程大纲编辑器
+                                </h3>
+<button class="text-primary font-bold text-xs flex items-center gap-1 hover:underline">
+<span class="material-symbols-outlined text-sm">add_circle</span> 新增章节
+                                </button>
+</div>
+</div>
+<div class="divide-y divide-surface-container">
+<!-- Chapter 1 -->
+<div class="p-6 bg-surface-container-low/30">
+<div class="flex items-center gap-4 mb-6">
+<div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">01</div>
+<input class="flex-1 text-lg font-bold bg-transparent border-none p-0 focus:ring-0" type="text" value="第一章：心电图诊断深度解析"/>
+<span class="material-symbols-outlined text-slate-400 cursor-move">drag_indicator</span>
+</div>
+<!-- Section 1.1 -->
+<div class="ml-12 space-y-4">
+<div class="bg-surface-container-lowest rounded-lg p-4 border border-outline-variant/10 shadow-sm relative group">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<span class="text-xs font-bold text-primary">1.1</span>
+<h4 class="font-bold text-on-surface">心律失常的电生理机制</h4>
+</div>
+<div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1 hover:bg-slate-100 rounded"><span class="material-symbols-outlined text-sm text-slate-400">edit</span></button>
+<button class="p-1 hover:bg-slate-100 rounded"><span class="material-symbols-outlined text-sm text-slate-400">delete</span></button>
+</div>
+</div>
+<!-- Knowledge Points & Resources -->
+<div class="space-y-2 ml-4">
+<div class="flex items-center justify-between p-2 rounded bg-surface-container/50 text-xs">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-blue-500">play_circle</span>
+<span class="font-medium">知识点：折返激动原理视频</span>
+</div>
+<span class="text-[10px] text-slate-400">12:45 mins</span>
+</div>
+<div class="flex items-center justify-between p-2 rounded bg-surface-container/50 text-xs">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-orange-500">biotech</span>
+<span class="font-medium">虚拟实验：窦房结电位传导模拟</span>
+</div>
+<span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-[9px] font-bold">交互式</span>
+</div>
+<button class="mt-2 w-full py-2 border border-dashed border-outline-variant/50 rounded-md text-[10px] font-bold text-slate-400 hover:text-primary hover:border-primary transition-all flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-xs">add</span> 关联新资源
+                                            </button>
+</div>
+</div>
+<!-- Section 1.2 -->
+<div class="bg-surface-container-lowest rounded-lg p-4 border border-outline-variant/10 shadow-sm relative group">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<span class="text-xs font-bold text-primary">1.2</span>
+<h4 class="font-bold text-on-surface">心肌梗死的心电图定位诊断</h4>
+</div>
+</div>
+<div class="space-y-2 ml-4">
+<div class="flex items-center justify-between p-2 rounded bg-surface-container/50 text-xs">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-red-500">picture_as_pdf</span>
+<span class="font-medium">讲义：STEMI定位诊断图谱</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Settings & Logic -->
+<div class="col-span-12 lg:col-span-4 space-y-8">
+<!-- Learning Path Settings -->
+<section class="bg-surface-container-lowest p-6 rounded-xl shadow-sm">
+<h3 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">route</span> 学习路径设置
+                        </h3>
+<div class="space-y-6">
+<div class="flex items-start gap-3">
+<div class="mt-1">
+<input checked="" class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+</div>
+<div>
+<p class="text-sm font-bold text-on-surface">线性解锁模式</p>
+<p class="text-xs text-on-surface-variant leading-relaxed">学生必须按顺序完成章节学习，无法跨章挑战。</p>
+</div>
+</div>
+<div class="p-4 bg-surface-container rounded-lg space-y-4">
+<p class="text-[11px] font-bold text-slate-500 uppercase tracking-widest">当前章节条件</p>
+<div class="space-y-3">
+<div class="flex items-center justify-between">
+<span class="text-xs font-medium">看视频时间 &gt; 80%</span>
+<span class="material-symbols-outlined text-green-500 text-sm">check_circle</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs font-medium">完成实验操作</span>
+<span class="material-symbols-outlined text-green-500 text-sm">check_circle</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs font-medium">测验分数 ≥ 60</span>
+<span class="material-symbols-outlined text-slate-300 text-sm">radio_button_unchecked</span>
+</div>
+</div>
+<button class="w-full py-2 bg-surface-container-lowest rounded border border-outline-variant/30 text-xs font-bold text-primary">
+                                    配置解锁规则
+                                </button>
+</div>
+</div>
+</section>
+<!-- Resource Association Zone (Recent) -->
+<section class="bg-surface-container-lowest p-6 rounded-xl shadow-sm">
+<h3 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">database</span> 最近使用的资源
+                        </h3>
+<div class="space-y-3">
+<div class="flex items-center gap-3 p-3 bg-surface hover:bg-surface-container transition-colors rounded-lg cursor-pointer">
+<div class="w-10 h-10 rounded bg-blue-100 flex items-center justify-center text-blue-600">
+<span class="material-symbols-outlined">video_library</span>
+</div>
+<div class="flex-1 overflow-hidden">
+<p class="text-xs font-bold text-on-surface truncate">心脏杂音听诊教学视频</p>
+<p class="text-[10px] text-slate-400">MP4 • 240MB</p>
+</div>
+</div>
+<div class="flex items-center gap-3 p-3 bg-surface hover:bg-surface-container transition-colors rounded-lg cursor-pointer">
+<div class="w-10 h-10 rounded bg-green-100 flex items-center justify-center text-green-600">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div class="flex-1 overflow-hidden">
+<p class="text-xs font-bold text-on-surface truncate">2024心力衰竭诊治指南</p>
+<p class="text-[10px] text-slate-400">PDF • 12MB</p>
+</div>
+</div>
+<div class="flex items-center gap-3 p-3 bg-surface hover:bg-surface-container transition-colors rounded-lg cursor-pointer">
+<div class="w-10 h-10 rounded bg-purple-100 flex items-center justify-center text-purple-600">
+<span class="material-symbols-outlined">science</span>
+</div>
+<div class="flex-1 overflow-hidden">
+<p class="text-xs font-bold text-on-surface truncate">临床病例模拟：急性心梗</p>
+<p class="text-[10px] text-slate-400">Interactive Lab</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-4 py-3 bg-secondary-container text-on-secondary-container rounded-xl font-bold text-xs hover:brightness-95 transition-all">
+                            进入资源库中心
+                        </button>
+</section>
+<!-- Vitals Monitor Style Stats -->
+<section class="bg-inverse-surface p-6 rounded-xl shadow-lg border-l-4 border-inverse-primary">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-xs font-bold text-inverse-primary uppercase tracking-widest">实时教学负荷</h3>
+<span class="flex h-2 w-2 rounded-full bg-green-400 animate-pulse"></span>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<p class="text-[10px] text-slate-400 uppercase">预计学时</p>
+<p class="text-2xl font-headline font-bold text-white">24.5<span class="text-xs ml-1 font-normal text-slate-500">h</span></p>
+</div>
+<div>
+<p class="text-[10px] text-slate-400 uppercase">资源总数</p>
+<p class="text-2xl font-headline font-bold text-white">48<span class="text-xs ml-1 font-normal text-slate-500">items</span></p>
+</div>
+</div>
+<div class="mt-4 pt-4 border-t border-slate-700">
+<p class="text-[10px] text-slate-400 mb-2">难度分布 (Bloom's Taxonomy)</p>
+<div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden flex">
+<div class="h-full bg-blue-500" style="width: 30%"></div>
+<div class="h-full bg-green-500" style="width: 50%"></div>
+<div class="h-full bg-orange-500" style="width: 20%"></div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action for Quick Add Section (Bottom Right) -->
+<div class="fixed bottom-8 right-8 z-40">
+<button class="w-14 h-14 rounded-full bg-primary text-white shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all group">
+<span class="material-symbols-outlined text-3xl">add</span>
+<div class="absolute right-full mr-4 bg-inverse-surface text-white text-[10px] py-1 px-3 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity font-bold">
+                快速添加内容章节
+            </div>
+</button>
+</div>
+</body></html>

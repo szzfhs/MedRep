@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>基础外科技术 | Clinical Nexus</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;family=Inter:wght@400;500;600&amp;family=Noto+Sans+SC:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface": "#f8f9fa",
+                    "on-secondary-fixed-variant": "#304a55",
+                    "primary-fixed-dim": "#acc7ff",
+                    "on-tertiary-container": "#ffc2a7",
+                    "tertiary-fixed-dim": "#ffb694",
+                    "primary-fixed": "#d7e2ff",
+                    "outline": "#727784",
+                    "on-tertiary-fixed": "#351000",
+                    "on-tertiary": "#ffffff",
+                    "background": "#f8f9fa",
+                    "secondary": "#48626e",
+                    "on-surface-variant": "#424752",
+                    "surface-container-low": "#f3f4f5",
+                    "surface-container": "#edeeef",
+                    "secondary-container": "#cbe7f5",
+                    "on-background": "#191c1d",
+                    "on-primary-fixed-variant": "#004491",
+                    "on-primary-fixed": "#001a40",
+                    "inverse-surface": "#2e3132",
+                    "surface-container-high": "#e7e8e9",
+                    "tertiary": "#722b00",
+                    "error": "#ba1a1a",
+                    "on-error": "#ffffff",
+                    "on-tertiary-fixed-variant": "#7b2f00",
+                    "on-error-container": "#93000a",
+                    "inverse-primary": "#acc7ff",
+                    "surface-bright": "#f8f9fa",
+                    "primary-container": "#0056b3",
+                    "error-container": "#ffdad6",
+                    "surface-dim": "#d9dadb",
+                    "surface-container-highest": "#e1e3e4",
+                    "tertiary-fixed": "#ffdbcc",
+                    "on-surface": "#191c1d",
+                    "on-secondary": "#ffffff",
+                    "tertiary-container": "#983c00",
+                    "surface-container-lowest": "#ffffff",
+                    "outline-variant": "#c2c6d4",
+                    "on-secondary-container": "#4e6874",
+                    "primary": "#003f87",
+                    "secondary-fixed": "#cbe7f5",
+                    "inverse-on-surface": "#f0f1f2",
+                    "on-primary": "#ffffff",
+                    "surface-tint": "#115cb9",
+                    "secondary-fixed-dim": "#afcbd8",
+                    "surface-variant": "#e1e3e4",
+                    "on-secondary-fixed": "#021f29",
+                    "on-primary-container": "#bbd0ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope", "Noto Sans SC"],
+                    "body": ["Inter", "Noto Sans SC"],
+                    "label": ["Inter", "Noto Sans SC"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .vitals-gradient {
+            background: linear-gradient(135deg, #003f87 0%, #0056b3 100%);
+        }
+        body { font-family: 'Inter', 'Noto Sans SC', sans-serif; }
+        h1, h2, h3, h4 { font-family: 'Manrope', 'Noto Sans SC', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- TopNavBar -->
+<nav class="bg-white/70 dark:bg-slate-900/70 backdrop-blur-md shadow-sm dark:shadow-none docked full-width top-0 z-50 sticky">
+<div class="flex justify-between items-center w-full px-6 py-3 max-w-full mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-extrabold text-blue-900 dark:text-blue-100 tracking-tighter">Clinical Nexus</span>
+<div class="hidden md:flex items-center space-x-6">
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-blue-600 font-manrope font-bold text-sm tracking-tight transition-colors duration-200" href="#">首页</a>
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-blue-600 font-manrope font-bold text-sm tracking-tight transition-colors duration-200" href="#">实验大厅</a>
+<a class="text-[#0056B3] dark:text-blue-400 border-b-2 border-[#0056B3] pb-1 font-manrope font-extrabold text-sm tracking-tight" href="#">课程中心</a>
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-blue-600 font-manrope font-bold text-sm tracking-tight transition-colors duration-200" href="#">资源中心</a>
+<a class="text-slate-600 dark:text-slate-400 font-medium hover:text-blue-600 font-manrope font-bold text-sm tracking-tight transition-colors duration-200" href="#">关于我们</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex items-center bg-slate-100 dark:bg-slate-800 rounded-full px-4 py-1.5">
+<span class="material-symbols-outlined text-slate-500 text-sm mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm text-slate-700 w-48" placeholder="搜索实验..." type="text"/>
+</div>
+<button class="material-symbols-outlined text-slate-600 hover:bg-slate-50 p-2 rounded-full transition-all">notifications</button>
+<button class="material-symbols-outlined text-slate-600 hover:bg-slate-50 p-2 rounded-full transition-all">help</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-slate-200">
+<img alt="User profile" data-alt="professional portrait of a medical doctor in white coat with a friendly expression and clinical background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXXtv1nPiEHaioAp82Gcc1atsu5d7Ed91DU6U6XaOzCY6w4xH07INMeXaNZ-ffqGbBz9dNTwHvseviyPCeyxs-jUx3mDF5qV08WiITM3IKbd7jWM46uvdB5eH-37uAZkbo1gdq79JzCPsCsz8caYJHVK7Gw4V39sA_my7WxP8dTDZnICIY4eXi2lF3cHvtrkQ_u6Vq4Hd3bZTGiGa_UU-8z6k12Mmgo39TzZ28JO2NiXvdr_6u7kyobu9bmYWXNFefshPgB3G3tKpB"/>
+</div>
+</div>
+</div>
+</nav>
+<main class="max-w-7xl mx-auto px-6 py-8">
+<!-- Hero Section: Course Header -->
+<header class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
+<div class="lg:col-span-8 flex flex-col justify-center">
+<div class="flex items-center gap-2 mb-4">
+<span class="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full tracking-widest uppercase">临床大师课程</span>
+<span class="text-on-surface-variant text-xs font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span> 12 周
+                    </span>
+</div>
+<h1 class="text-5xl font-extrabold text-on-surface tracking-tight leading-tight mb-6">
+                    基础外科技术：<br/><span class="text-primary-container">手术操作基石</span>
+</h1>
+<p class="text-lg text-on-surface-variant max-w-2xl leading-relaxed mb-8">
+                    本课程采用沉浸式模拟教学，旨在助力医学生完成从理论到手术室实践的跨越。通过高保真数字实验室实验，系统掌握缝合技术、无菌场维护及手术器械使用。
+                </p>
+<div class="flex flex-wrap gap-4">
+<button class="vitals-gradient text-white px-8 py-3.5 rounded-full font-bold shadow-lg flex items-center gap-2 hover:scale-105 active:scale-95 transition-all">
+                        登录并加入课程 <span class="material-symbols-outlined">login</span>
+</button>
+<button class="bg-surface-container-highest text-on-surface px-8 py-3.5 rounded-full font-bold flex items-center gap-2 hover:bg-surface-container-high transition-all">
+                        预览大纲 <span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+</div>
+<div class="lg:col-span-4">
+<div class="aspect-[4/5] rounded-xl overflow-hidden relative shadow-2xl">
+<img class="w-full h-full object-cover" data-alt="close-up of surgical tools and sterile blue medical fabric in a modern clean operating room environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6GayJaqQDAjYxuPZUjlJSJ5rvaGm_I1KPaYAxSO9uzhoUMJhR8OpCd4F5NRILxGGpjCK722E2Tv-pS4saLipKIXVtNmtE7y2zyGaTFW9aV4Ev-FDcn0CM2N7dGPfanLuGThQdztDFhBskbt3azhc_odosN-NrGO_fjbgqMhJxYt0BV3h9vYvzDHtAEqYArDXluxFOHrQ1kDs_AesnL1iHPZMsK-H1pwdtCF2IyE8BC8t30Gn6hg6JszdtkpIFLAzEr37110-QrnSR"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent flex flex-col justify-end p-6">
+<div class="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20">
+<div class="flex justify-between items-end">
+<div>
+<p class="text-white/80 text-xs font-medium uppercase tracking-tighter mb-1">当前注册人数</p>
+<p class="text-white text-2xl font-bold">1,482 名学员</p>
+</div>
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-primary-container bg-slate-300"></div>
+<div class="w-8 h-8 rounded-full border-2 border-primary-container bg-slate-400"></div>
+<div class="w-8 h-8 rounded-full border-2 border-primary-container bg-slate-500"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- Course Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+<!-- Learning Objectives -->
+<section class="md:col-span-2 bg-surface-container-lowest rounded-xl p-8 border border-outline-variant/15">
+<div class="flex items-center gap-2 mb-6">
+<h2 class="text-xl font-bold font-headline uppercase tracking-wide text-primary">核心能力</h2>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
+<div class="flex gap-4">
+<div class="w-10 h-10 shrink-0 bg-blue-50 flex items-center justify-center rounded-lg">
+<span class="material-symbols-outlined text-blue-700" style="font-variation-settings: 'FILL' 1;">architecture</span>
+</div>
+<div>
+<h4 class="font-bold text-sm mb-1">器械使用</h4>
+<p class="text-xs text-on-surface-variant">标准手术器械集的辨识与符合人体工程学的操作规范。</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="w-10 h-10 shrink-0 bg-blue-50 flex items-center justify-center rounded-lg">
+<span class="material-symbols-outlined text-blue-700" style="font-variation-settings: 'FILL' 1;">sanitizer</span>
+</div>
+<div>
+<h4 class="font-bold text-sm mb-1">无菌操作</h4>
+<p class="text-xs text-on-surface-variant">维护无菌区完整性及外科刷手洗手流程规范。</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="w-10 h-10 shrink-0 bg-blue-50 flex items-center justify-center rounded-lg">
+<span class="material-symbols-outlined text-blue-700" style="font-variation-settings: 'FILL' 1;">gesture</span>
+</div>
+<div>
+<h4 class="font-bold text-sm mb-1">结扎技术</h4>
+<p class="text-xs text-on-surface-variant">精通单手、双手打结及持针器打结技术。</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="w-10 h-10 shrink-0 bg-blue-50 flex items-center justify-center rounded-lg">
+<span class="material-symbols-outlined text-blue-700" style="font-variation-settings: 'FILL' 1;">healing</span>
+</div>
+<div>
+<h4 class="font-bold text-sm mb-1">切口缝合</h4>
+<p class="text-xs text-on-surface-variant">应用单纯间断、褥式及皮内缝合等多种闭合技术。</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Quick Stats -->
+<aside class="bg-inverse-surface rounded-xl p-8 flex flex-col justify-between text-white">
+<div>
+<h3 class="text-inverse-primary text-xs font-bold uppercase tracking-widest mb-6">模拟指标</h3>
+<div class="space-y-6">
+<div>
+<p class="text-white/60 text-xs mb-1">难度等级</p>
+<div class="flex items-center gap-1">
+<span class="text-lg font-bold">中级</span>
+<div class="flex gap-0.5 ml-2">
+<div class="w-3 h-3 rounded-full bg-inverse-primary"></div>
+<div class="w-3 h-3 rounded-full bg-inverse-primary"></div>
+<div class="w-3 h-3 rounded-full bg-white/20"></div>
+</div>
+</div>
+</div>
+<div>
+<p class="text-white/60 text-xs mb-1">课程完成率</p>
+<p class="text-2xl font-bold">88.4%</p>
+<div class="w-full bg-white/10 h-1 mt-2 rounded-full overflow-hidden">
+<div class="bg-inverse-primary h-full w-[88%]"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-8 border-t border-white/10">
+<p class="text-white/60 text-xs italic">"本课程提供了目前在线上最真实、最先进的无菌场模拟实验。"</p>
+<p class="text-xs font-bold mt-2">— Elena Vance 博士, 主任医师</p>
+</div>
+</aside>
+</div>
+<div class="flex flex-col lg:flex-row gap-12">
+<!-- Syllabus Section -->
+<div class="lg:w-2/3">
+<div class="flex items-center justify-between mb-8">
+<h2 class="text-2xl font-extrabold font-headline tracking-tight">课程大纲</h2>
+<span class="text-sm font-medium text-primary">4 章节 • 12 课时</span>
+</div>
+<div class="space-y-4">
+<!-- Chapter 1 -->
+<div class="bg-surface-container-low rounded-xl overflow-hidden">
+<button class="w-full px-6 py-4 flex items-center justify-between bg-white/50 border-b border-outline-variant/10">
+<div class="flex items-center gap-4">
+<span class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs">01</span>
+<h3 class="font-bold text-on-surface">手术环境概论</h3>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">expand_more</span>
+</button>
+<div class="p-6 space-y-4">
+<div class="flex items-center justify-between group cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400">play_circle</span>
+<span class="text-sm font-medium text-slate-700 group-hover:text-primary transition-colors">手术室布局与无菌分区</span>
+</div>
+<span class="text-[10px] uppercase font-bold text-slate-400 tracking-tighter">12:40</span>
+</div>
+<div class="flex items-center justify-between group cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400">article</span>
+<span class="text-sm font-medium text-slate-700 group-hover:text-primary transition-colors">安全协议与 WHO 核查表</span>
+</div>
+<span class="text-[10px] uppercase font-bold text-slate-400 tracking-tighter">阅读</span>
+</div>
+<div class="flex items-center justify-between group cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">science</span>
+<span class="text-sm font-bold text-slate-700 group-hover:text-primary transition-colors">模拟实验：穿无菌手术衣程序</span>
+</div>
+<span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded uppercase">实验</span>
+</div>
+</div>
+</div>
+<!-- Chapter 2 -->
+<div class="bg-surface-container-low rounded-xl overflow-hidden">
+<button class="w-full px-6 py-4 flex items-center justify-between hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-4">
+<span class="w-8 h-8 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xs">02</span>
+<h3 class="font-bold text-on-surface">组织处理与拉钩显露</h3>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">expand_more</span>
+</button>
+</div>
+<!-- Chapter 3 -->
+<div class="bg-surface-container-low rounded-xl overflow-hidden">
+<button class="w-full px-6 py-4 flex items-center justify-between hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-4">
+<span class="w-8 h-8 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xs">03</span>
+<h3 class="font-bold text-on-surface">止血技术要点</h3>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">expand_more</span>
+</button>
+</div>
+<!-- Chapter 4 -->
+<div class="bg-surface-container-low rounded-xl overflow-hidden">
+<button class="w-full px-6 py-4 flex items-center justify-between hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-4">
+<span class="w-8 h-8 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xs">04</span>
+<h3 class="font-bold text-on-surface">高级缝合模式</h3>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">expand_more</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Associated Simulation Labs -->
+<aside class="lg:w-1/3">
+<h2 class="text-xl font-bold font-headline mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">vital_signs</span>
+                    必修实验
+                </h2>
+<div class="space-y-6">
+<!-- Lab Card 1 -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/15 hover:shadow-xl transition-all">
+<div class="h-32 bg-slate-200 relative overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="microscopic view of skin tissue for surgical practice simulation training" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBADXyI1Ff_Oeca93ZhZlEGf-JYb0JliKH_Y9x1TMvDMw6RdXA1k8xew-WFNLW-Ux9iQiwAmuOHukriHc0dVeDbllkCl4WiIuEFbFMJqG-QAeRQOVGzb5KC2zlstpVrZDXTlgSL3j_cjqt3jNmCRkAPHSHIH225Dx10Fp543f4SmJr0h_PJ1hTnDuS6SkoSEe0mG1TdW5jtOy-gCf78DZ2ZEAS9jLlLvJA1UJxSiiAEcoLCNWb9npvPdeTpQEbat-HM_dWIySCYSjjU"/>
+<div class="absolute inset-0 bg-primary/20 backdrop-grayscale-[0.5]"></div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-bold text-on-surface text-sm">血管结扎模拟</h4>
+<span class="text-[10px] font-black text-primary bg-primary/5 px-2 py-0.5 rounded">核心</span>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed mb-4">
+                                模拟高张力状态下的血管结扎，提供关于打结牢固度及组织应力的实时反馈。
+                            </p>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-slate-400">timer</span>
+<span class="text-[10px] font-bold text-slate-500">45 分钟</span>
+</div>
+<button class="text-xs font-bold text-primary flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                                    详情 <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Lab Card 2 -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/15 hover:shadow-xl transition-all">
+<div class="h-32 bg-slate-200 relative overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="high-tech surgical robotic arm in a brightly lit medical training facility" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1Es0GI1YdtmPA7DOhAClUG0DzIdxKIPoQJIAb5LnZX2AnGHCb5nBTNAXWI32ytqfoCi7DU_EnXZbij9EBpxc1hMw11Rw6imlpN7RIhfddqjtGqn8pWXaFpay7GinL2xrHi-iJkReXmYUxrfWU2YiGD84Qq8Y3-AESuQWJ8-EMbrHVuMqQyroRXYK52pbl9Ls0d1TIWvmmCTydKDX5cE_2SjXDJsUvOdSgE_147_mdlYiBskdUWLo33elY-UW3HDOgmr68nHNewhNH"/>
+<div class="absolute inset-0 bg-primary/20 backdrop-grayscale-[0.5]"></div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-bold text-on-surface text-sm">无菌区移动导航</h4>
+<span class="text-[10px] font-black text-slate-400 px-2 py-0.5 rounded border border-slate-200">选修</span>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed mb-4">
+                                3D 空间模拟实验，专注于在拥挤的手术室环境中保持无菌边界。
+                            </p>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-slate-400">timer</span>
+<span class="text-[10px] font-bold text-slate-500">20 分钟</span>
+</div>
+<button class="text-xs font-bold text-primary flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                                    详情 <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</main>
+<!-- Sticky Bottom CTA for unlogged users -->
+<div class="fixed bottom-8 left-0 right-0 px-6 z-40 pointer-events-none">
+<div class="max-w-4xl mx-auto bg-white/80 backdrop-blur-xl border border-primary/20 rounded-2xl shadow-2xl p-6 pointer-events-auto flex flex-col md:flex-row items-center justify-between gap-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl vitals-gradient flex items-center justify-center text-white shadow-lg">
+<span class="material-symbols-outlined text-2xl">school</span>
+</div>
+<div>
+<h4 class="font-bold text-on-surface tracking-tight">准备好开启您的临床之旅了吗？</h4>
+<p class="text-sm text-on-surface-variant">加入 1,400 多名学员，共同开启职业认证课程。</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-6 py-2.5 text-sm font-bold text-primary hover:bg-slate-50 rounded-full transition-colors">查看示例</button>
+<button class="vitals-gradient text-white px-8 py-3 rounded-full font-bold shadow-md hover:shadow-primary/20 hover:-translate-y-0.5 active:translate-y-0 transition-all">
+                    登录并加入课程
+                </button>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="bg-white dark:bg-slate-900 w-full py-8 border-t border-slate-100 dark:border-slate-800 mt-24">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 max-w-7xl mx-auto">
+<div class="mb-4 md:mb-0">
+<span class="font-manrope font-bold text-blue-900 text-lg">Clinical Nexus</span>
+<p class="font-inter text-xs text-slate-500 dark:text-slate-400 mt-1">© 2024 大学虚拟模拟实验室。版权所有。</p>
+</div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="font-inter text-xs text-slate-500 dark:text-slate-400 hover:text-blue-500 transition-colors" href="#">隐私政策</a>
+<a class="font-inter text-xs text-slate-500 dark:text-slate-400 hover:text-blue-500 transition-colors" href="#">服务条款</a>
+<a class="font-inter text-xs text-slate-500 dark:text-slate-400 hover:text-blue-500 transition-colors" href="#">机构联系</a>
+<a class="font-inter text-xs text-slate-500 dark:text-slate-400 hover:text-blue-500 transition-colors" href="#">技术支持</a>
+</div>
+</div>
+</footer>
+</body></html>

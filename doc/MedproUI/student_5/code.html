@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>实验大厅 - Digital Laboratory</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface": "#191c1d",
+                    "inverse-primary": "#acc7ff",
+                    "primary-fixed": "#d7e2ff",
+                    "on-primary-fixed-variant": "#004491",
+                    "on-secondary-fixed": "#021f29",
+                    "tertiary-fixed": "#ffdbcc",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-highest": "#e1e3e4",
+                    "background": "#f8f9fa",
+                    "surface-container-low": "#f3f4f5",
+                    "surface": "#f8f9fa",
+                    "surface-container": "#edeeef",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-fixed": "#351000",
+                    "error": "#ba1a1a",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed-dim": "#afcbd8",
+                    "secondary-container": "#cbe7f5",
+                    "on-background": "#191c1d",
+                    "tertiary-container": "#983c00",
+                    "surface-tint": "#115cb9",
+                    "on-secondary-container": "#4e6874",
+                    "inverse-surface": "#2e3132",
+                    "tertiary": "#722b00",
+                    "on-error-container": "#93000a",
+                    "outline-variant": "#c2c6d4",
+                    "surface-bright": "#f8f9fa",
+                    "on-tertiary-container": "#ffc2a7",
+                    "on-surface-variant": "#424752",
+                    "on-primary-container": "#bbd0ff",
+                    "surface-container-high": "#e7e8e9",
+                    "on-error": "#ffffff",
+                    "secondary-fixed": "#cbe7f5",
+                    "inverse-on-surface": "#f0f1f2",
+                    "primary-fixed-dim": "#acc7ff",
+                    "primary-container": "#0056b3",
+                    "outline": "#727784",
+                    "on-primary-fixed": "#001a40",
+                    "primary": "#003f87",
+                    "on-primary": "#ffffff",
+                    "on-secondary-fixed-variant": "#304a55",
+                    "surface-variant": "#e1e3e4",
+                    "surface-dim": "#d9dadb",
+                    "on-tertiary-fixed-variant": "#7b2f00",
+                    "tertiary-fixed-dim": "#ffb694",
+                    "secondary": "#48626e"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-headline { font-family: 'Manrope', sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-slate-50/80 backdrop-blur-xl shadow-sm h-16 flex justify-between items-center px-8">
+<div class="flex items-center gap-8">
+<div class="text-xl font-bold tracking-tight text-blue-900">Digital Laboratory</div>
+<nav class="hidden md:flex gap-6 items-center">
+<a class="text-slate-600 hover:text-blue-600 font-inter text-sm transition-colors" href="#">首页</a>
+<a class="text-blue-700 border-b-2 border-blue-700 pb-1 font-semibold font-inter text-sm" href="#">实验大厅</a>
+<a class="text-slate-600 hover:text-blue-600 font-inter text-sm transition-colors" href="#">课程中心</a>
+<a class="text-slate-600 hover:text-blue-600 font-inter text-sm transition-colors" href="#">资源中心</a>
+<a class="text-slate-600 hover:text-blue-600 font-inter text-sm transition-colors" href="#">数据仪表盘</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<input class="bg-surface-container-high border-none rounded-full py-1.5 pl-10 pr-4 text-sm w-64 focus:ring-2 focus:ring-primary/20" placeholder="搜索实验项目..." type="text"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-lg">search</span>
+</div>
+<button class="p-2 hover:bg-slate-100/50 rounded-full transition-all active:opacity-80">
+<span class="material-symbols-outlined text-slate-600">notifications</span>
+</button>
+<button class="p-2 hover:bg-slate-100/50 rounded-full transition-all active:opacity-80">
+<span class="material-symbols-outlined text-slate-600">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-slate-200">
+<img alt="Student Profile Avatar" data-alt="close-up portrait of a professional medical student in a white coat with a friendly expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-ycpbnOgbXUHjsgtc8jmM1dtcbOABZca8mhi-y5gJOOoXetpbLEOJGWsuYl3AIjLrD_VSA_bGzdY3scJh7UjEnVTAO5c6DlkEv-5XHfmUgpitQJpef2ZJoRTvcNRywI86dPgcmgMNhnaF5LGIsWsc_-_he4l-A2YCRsir7Yq84RnOksRCGau3VUCMhIpXa-VNP5RGNuY-TUghu3vu-RDu_us3AOiDwuZCU9N3fyHAvephzAwlkRCrUMXP0efVmZg-X_SeNU0OyoTf"/>
+</div>
+</div>
+</header>
+<div class="flex pt-16 min-h-screen">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-slate-50 border-r border-slate-200/30 flex flex-col py-6 px-4 gap-2 overflow-y-auto">
+<div class="px-2 mb-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary-container rounded-xl flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">science</span>
+</div>
+<div>
+<div class="text-lg font-black text-blue-900 leading-tight">Clinical Precision</div>
+<div class="text-[10px] font-manrope font-semibold tracking-wide uppercase text-slate-500">Experimental Portal</div>
+</div>
+</div>
+</div>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-100 rounded-xl transition-transform duration-200 hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-manrope font-semibold text-xs tracking-wide uppercase">个人工作台</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-800 border-r-4 border-blue-700 rounded-l-xl transition-opacity active:opacity-90" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">science</span>
+<span class="font-manrope font-semibold text-xs tracking-wide uppercase">实验大厅</span>
+</a>
+<div class="mt-2">
+<div class="flex items-center gap-3 px-4 py-3 text-slate-500">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-manrope font-semibold text-xs tracking-wide uppercase">我的课程</span>
+</div>
+<div class="pl-12 flex flex-col gap-1">
+<a class="text-xs py-2 text-slate-500 hover:text-primary transition-colors" href="#">课程学习页</a>
+<a class="text-xs py-2 text-slate-500 hover:text-primary transition-colors" href="#">任务列表</a>
+</div>
+</div>
+<div class="mt-2">
+<div class="flex items-center gap-3 px-4 py-3 text-slate-500">
+<span class="material-symbols-outlined">description</span>
+<span class="font-manrope font-semibold text-xs tracking-wide uppercase">实验报告</span>
+</div>
+<div class="pl-12 flex flex-col gap-1">
+<a class="text-xs py-2 text-slate-500 hover:text-primary transition-colors" href="#">在线撰写</a>
+<a class="text-xs py-2 text-slate-500 hover:text-primary transition-colors" href="#">报告成绩</a>
+</div>
+</div>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-100 rounded-xl transition-transform duration-200 hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-manrope font-semibold text-xs tracking-wide uppercase">学情档案</span>
+</a>
+<div class="mt-auto pt-6 border-t border-slate-200/50">
+<button class="w-full py-3 bg-gradient-to-br from-primary to-primary-container text-white rounded-xl font-semibold text-sm shadow-sm hover:shadow-md transition-all active:scale-95 mb-4">
+                    开始新实验
+                </button>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-100 rounded-xl transition-transform duration-200 hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-manrope font-semibold text-xs tracking-wide uppercase">退出登录</span>
+</a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="ml-64 flex-1 p-8 bg-surface">
+<!-- Header Section -->
+<div class="mb-8">
+<h1 class="text-3xl font-extrabold text-blue-900 tracking-tight mb-2">实验大厅</h1>
+<p class="text-slate-500 text-sm">探索 Clinical Nexus 虚拟实验室，提升您的临床实践技能</p>
+</div>
+<!-- Filter Section -->
+<section class="mb-10 bg-surface-container-low rounded-xl p-6 space-y-4">
+<div class="flex items-start gap-4">
+<span class="text-xs font-bold text-slate-400 mt-1 uppercase w-16">学科门类</span>
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-1.5 bg-primary text-white rounded-full text-xs font-semibold shadow-sm">全部</button>
+<button class="px-4 py-1.5 bg-white text-slate-600 hover:bg-slate-50 rounded-full text-xs font-medium border border-slate-200/50">基础医学</button>
+<button class="px-4 py-1.5 bg-white text-slate-600 hover:bg-slate-50 rounded-full text-xs font-medium border border-slate-200/50">临床医学</button>
+<button class="px-4 py-1.5 bg-white text-slate-600 hover:bg-slate-50 rounded-full text-xs font-medium border border-slate-200/50">口腔医学</button>
+<button class="px-4 py-1.5 bg-white text-slate-600 hover:bg-slate-50 rounded-full text-xs font-medium border border-slate-200/50">中医学</button>
+<button class="px-4 py-1.5 bg-white text-slate-600 hover:bg-slate-50 rounded-full text-xs font-medium border border-slate-200/50">护理学</button>
+</div>
+</div>
+<div class="h-px bg-slate-200/40"></div>
+<div class="flex items-start gap-4">
+<span class="text-xs font-bold text-slate-400 mt-1 uppercase w-16">实验类型</span>
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-1.5 bg-primary text-white rounded-full text-xs font-semibold shadow-sm">全部</button>
+<button class="px-4 py-1.5 bg-white text-slate-600 hover:bg-slate-50 rounded-full text-xs font-medium border border-slate-200/50">Web 3D</button>
+<button class="px-4 py-1.5 bg-white text-slate-600 hover:bg-slate-50 rounded-full text-xs font-medium border border-slate-200/50">VR 仿真</button>
+<button class="px-4 py-1.5 bg-white text-slate-600 hover:bg-slate-50 rounded-full text-xs font-medium border border-slate-200/50">EXE 客户端</button>
+</div>
+</div>
+<div class="h-px bg-slate-200/40"></div>
+<div class="flex items-start gap-4">
+<span class="text-xs font-bold text-slate-400 mt-1 uppercase w-16">难度级别</span>
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-1.5 bg-primary text-white rounded-full text-xs font-semibold shadow-sm">全部</button>
+<button class="px-4 py-1.5 bg-white text-slate-600 hover:bg-slate-50 rounded-full text-xs font-medium border border-slate-200/50">初级</button>
+<button class="px-4 py-1.5 bg-white text-slate-600 hover:bg-slate-50 rounded-full text-xs font-medium border border-slate-200/50">中级</button>
+<button class="px-4 py-1.5 bg-white text-slate-600 hover:bg-slate-50 rounded-full text-xs font-medium border border-slate-200/50">高级</button>
+</div>
+</div>
+</section>
+<!-- Grid Content -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden group hover:translate-y-[-4px] transition-all duration-300 shadow-sm hover:shadow-[0_12px_40px_rgba(0,63,135,0.06)]">
+<div class="aspect-video relative overflow-hidden">
+<img alt="心律失常反应训练" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Close-up of a medical monitor displaying an irregular heart rhythm (arrhythmia) in a clinical setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDD6AXMzk03ZfzeP-pyyhWnHGCRQgk4C1G6iXYILmRPiiJpWLXnVNpfsSehuuzhknqceQ-ACJEVqF7nRi93lk8zE_Q-0C1y9GDlwzwwQC9QFn2mCpunikBjC0fEN1FLYYHptSGalTbzGsVYKwMcKL-l_1DwX24-LIbHUqwO1I9TxxopIYEs0jfWd6LJRh_3rkDKh1fYJ-U28YigHjN7fy6zFSadNaLwoJ7ACmBpds_ISQHKtR40NY6TmLX4lyhudgY_3harviFo6ftQ"/>
+<div class="absolute top-3 left-3 flex gap-2">
+<span class="px-2 py-1 bg-primary/90 text-white text-[10px] font-bold rounded backdrop-blur-md uppercase tracking-wider">VR 仿真</span>
+<span class="px-2 py-1 bg-surface-container-lowest/90 text-primary text-[10px] font-bold rounded backdrop-blur-md uppercase tracking-wider">高级</span>
+</div>
+</div>
+<div class="p-5">
+<div class="text-[10px] font-bold text-tertiary-container uppercase tracking-widest mb-1">临床医学</div>
+<h3 class="text-lg font-bold text-blue-900 mb-3 leading-tight">心律失常反应训练</h3>
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-1.5 text-slate-500 text-xs">
+<span class="material-symbols-outlined text-sm">group</span>
+<span>1,820 人已参加</span>
+</div>
+<div class="h-1 w-16 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-2/3"></div>
+</div>
+</div>
+<button class="w-full py-2.5 bg-surface-container-high hover:bg-primary hover:text-white text-blue-900 rounded-full font-bold text-xs transition-all flex items-center justify-center gap-2">
+                            进入实验
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden group hover:translate-y-[-4px] transition-all duration-300 shadow-sm hover:shadow-[0_12px_40px_rgba(0,63,135,0.06)]">
+<div class="aspect-video relative overflow-hidden">
+<img alt="冠状动脉造影仿真" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="X-ray coronary angiogram showing the blood vessels of the heart with a contrast agent in a sterile lab" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOqBAIer_sKth1odrJ8jkRSYLANm16UE21RkXr62VQwNqZE1KPjLraXIO60DeLYUs1BjUeCnxv9B7k89OIP2sNuHoyrwgncd1OUbbp7Hhxy7RacrP60zKwQevI5ugjxG9PnnsQouKOwr1wcD-9hhscJgKe_sG2r3vxCZVYRl20961W6G_kMSJnFEvN0IAZVTJSx_VHzBuGoNpuGmLRkqWzb2TqBal8wHf29BVkvTpEMVyoI7nqt40P4icKfRETTRgJmPYj740NIswP"/>
+<div class="absolute top-3 left-3 flex gap-2">
+<span class="px-2 py-1 bg-primary/90 text-white text-[10px] font-bold rounded backdrop-blur-md uppercase tracking-wider">Web 3D</span>
+<span class="px-2 py-1 bg-surface-container-lowest/90 text-primary text-[10px] font-bold rounded backdrop-blur-md uppercase tracking-wider">中级</span>
+</div>
+</div>
+<div class="p-5">
+<div class="text-[10px] font-bold text-tertiary-container uppercase tracking-widest mb-1">临床医学</div>
+<h3 class="text-lg font-bold text-blue-900 mb-3 leading-tight">冠状动脉造影仿真</h3>
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-1.5 text-slate-500 text-xs">
+<span class="material-symbols-outlined text-sm">group</span>
+<span>2,150 人已参加</span>
+</div>
+<div class="h-1 w-16 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-3/4"></div>
+</div>
+</div>
+<button class="w-full py-2.5 bg-surface-container-high hover:bg-primary hover:text-white text-blue-900 rounded-full font-bold text-xs transition-all flex items-center justify-center gap-2">
+                            进入实验
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden group hover:translate-y-[-4px] transition-all duration-300 shadow-sm hover:shadow-[0_12px_40px_rgba(0,63,135,0.06)]">
+<div class="aspect-video relative overflow-hidden">
+<img alt="心脏瓣膜置换术虚拟实训" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Detailed 3D model of a human heart showing heart valve replacement surgery in progress with surgical tools" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZQCqtalTBdfixwu2E07_MRAIUxpBasEaCZ7ZrjPJddyMXN0rHUHOyLMVwbFlgdQ3MijMbs_oF865J8oVjdWYBnZbJmASKFdnqGRJlYcrhZt47SXGV0qmSZrrvTmVd9yXySmYY77koH_Soq62ky08oVfdORwUIk2ylWnBbeOIrqa90_kTPdurSC7JBarlTlakmMF6Hhk16O7r_x5Ivxbe0ofjUZ2PTM4VzIkjhg5GYUbmNsii9u6uYn4PMOpc9drglQOiXHDg20b70"/>
+<div class="absolute top-3 left-3 flex gap-2">
+<span class="px-2 py-1 bg-primary/90 text-white text-[10px] font-bold rounded backdrop-blur-md uppercase tracking-wider">VR 仿真</span>
+<span class="px-2 py-1 bg-surface-container-lowest/90 text-primary text-[10px] font-bold rounded backdrop-blur-md uppercase tracking-wider">高级</span>
+</div>
+</div>
+<div class="p-5">
+<div class="text-[10px] font-bold text-tertiary-container uppercase tracking-widest mb-1">临床医学</div>
+<h3 class="text-lg font-bold text-blue-900 mb-3 leading-tight">心脏瓣膜置换术虚拟实训</h3>
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-1.5 text-slate-500 text-xs">
+<span class="material-symbols-outlined text-sm">group</span>
+<span>960 人已参加</span>
+</div>
+<div class="h-1 w-16 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-1/3"></div>
+</div>
+</div>
+<button class="w-full py-2.5 bg-surface-container-high hover:bg-primary hover:text-white text-blue-900 rounded-full font-bold text-xs transition-all flex items-center justify-center gap-2">
+                            进入实验
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden group hover:translate-y-[-4px] transition-all duration-300 shadow-sm hover:shadow-[0_12px_40px_rgba(0,63,135,0.06)]">
+<div class="aspect-video relative overflow-hidden">
+<img alt="急性心肌梗死急救模拟" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Emergency room scenario with medical staff performing urgent care on a patient, high-stakes medical environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwInLK_XN5yxdGIQed6UrT7Tv63qkp09Z_CTC9l97ILu-HkMNfMzkCOyujvCdqE-aSF2HSqCvEl0yQVgoh8p4lQkj44S-uTix1J3Fkp5ycNi0wIphA3BB5UwsJZ7zyiwpSLzH2g4tcki-FdYA0poRd5EAv77ViIqAPNGrL5ADESNGPkIf8lgOSh_ScBhdE3jLX6HsI1VeRmnpbV5mUnod0HQv0bp5PCZvXuLWe01fcRi50goH0HXE3Kf8FrVZMzUsCL-qxPbSrRlsG"/>
+<div class="absolute top-3 left-3 flex gap-2">
+<span class="px-2 py-1 bg-primary/90 text-white text-[10px] font-bold rounded backdrop-blur-md uppercase tracking-wider">EXE 客户端</span>
+<span class="px-2 py-1 bg-surface-container-lowest/90 text-primary text-[10px] font-bold rounded backdrop-blur-md uppercase tracking-wider">高级</span>
+</div>
+</div>
+<div class="p-5">
+<div class="text-[10px] font-bold text-tertiary-container uppercase tracking-widest mb-1">临床医学</div>
+<h3 class="text-lg font-bold text-blue-900 mb-3 leading-tight">急性心肌梗死急救模拟</h3>
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-1.5 text-slate-500 text-xs">
+<span class="material-symbols-outlined text-sm">group</span>
+<span>3,400 人已参加</span>
+</div>
+<div class="h-1 w-16 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-full"></div>
+</div>
+</div>
+<button class="w-full py-2.5 bg-surface-container-high hover:bg-primary hover:text-white text-blue-900 rounded-full font-bold text-xs transition-all flex items-center justify-center gap-2">
+                            进入实验
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Card 5 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden group hover:translate-y-[-4px] transition-all duration-300 shadow-sm hover:shadow-[0_12px_40px_rgba(0,63,135,0.06)]">
+<div class="aspect-video relative overflow-hidden">
+<img alt="心电图(ECG)综合判读训练" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Close-up of a digital tablet screen showing a clean ECG heart rhythm line with medical annotations" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIyUwUj1t2NDiuQBhpZEIID1NhN4hfl0q6PYXkiqD2ObD5rjIkPNu7g5I5JSVS_iBllwRmMRKRz5KGC64i25PMvJuQ_uLkQrbsvC_6TTVvLEdNyHfhBIk3xWbQcWt5R8jBF22q1UDLTcojBEV9RFK-DX0823HN6JDgQopCxyCN87l-vVozgENq5Ka0tBVwzzRjLXP1l4HQcT8ZXbIOAtHX1FtEPGVcR9TxyVRB71d85zdp1c2J69N2ItC3mKcWu-s5_83RAY_rDnQJ"/>
+<div class="absolute top-3 left-3 flex gap-2">
+<span class="px-2 py-1 bg-primary/90 text-white text-[10px] font-bold rounded backdrop-blur-md uppercase tracking-wider">Web 3D</span>
+<span class="px-2 py-1 bg-surface-container-lowest/90 text-primary text-[10px] font-bold rounded backdrop-blur-md uppercase tracking-wider">初级</span>
+</div>
+</div>
+<div class="p-5">
+<div class="text-[10px] font-bold text-tertiary-container uppercase tracking-widest mb-1">基础医学</div>
+<h3 class="text-lg font-bold text-blue-900 mb-3 leading-tight">心电图(ECG)综合判读训练</h3>
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-1.5 text-slate-500 text-xs">
+<span class="material-symbols-outlined text-sm">group</span>
+<span>4,250 人已参加</span>
+</div>
+<div class="h-1 w-16 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-full"></div>
+</div>
+</div>
+<button class="w-full py-2.5 bg-surface-container-high hover:bg-primary hover:text-white text-blue-900 rounded-full font-bold text-xs transition-all flex items-center justify-center gap-2">
+                            进入实验
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Placeholder Card (Empty State Simulation) -->
+<div class="border-2 border-dashed border-slate-200/50 rounded-xl flex flex-col items-center justify-center p-8 text-center bg-slate-50/50">
+<span class="material-symbols-outlined text-4xl text-slate-300 mb-2">more_horiz</span>
+<p class="text-slate-400 text-xs font-medium">更多实验项目正在开发中</p>
+</div>
+</div>
+<!-- Vitals Monitor (Specialized Component) -->
+</main>
+</div>
+</body></html>

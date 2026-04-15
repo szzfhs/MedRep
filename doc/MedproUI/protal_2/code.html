@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error": "#ba1a1a",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-on-surface": "#f0f1f2",
+                    "tertiary-fixed": "#ffdbcc",
+                    "primary-fixed": "#d7e2ff",
+                    "on-secondary-fixed-variant": "#304a55",
+                    "on-surface": "#191c1d",
+                    "on-primary": "#ffffff",
+                    "surface-variant": "#e1e3e4",
+                    "on-primary-container": "#bbd0ff",
+                    "error-container": "#ffdad6",
+                    "inverse-primary": "#acc7ff",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed-dim": "#ffb694",
+                    "background": "#f8f9fa",
+                    "secondary-container": "#cbe7f5",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-low": "#f3f4f5",
+                    "secondary-fixed": "#cbe7f5",
+                    "primary-fixed-dim": "#acc7ff",
+                    "tertiary": "#722b00",
+                    "surface-dim": "#d9dadb",
+                    "outline-variant": "#c2c6d4",
+                    "on-primary-fixed-variant": "#004491",
+                    "tertiary-container": "#983c00",
+                    "surface-container": "#edeeef",
+                    "primary-container": "#0056b3",
+                    "on-surface-variant": "#424752",
+                    "surface-container-high": "#e7e8e9",
+                    "surface": "#f8f9fa",
+                    "on-primary-fixed": "#001a40",
+                    "on-secondary": "#ffffff",
+                    "surface-tint": "#115cb9",
+                    "on-secondary-fixed": "#021f29",
+                    "inverse-surface": "#2e3132",
+                    "secondary": "#48626e",
+                    "on-background": "#191c1d",
+                    "outline": "#727784",
+                    "on-secondary-container": "#4e6874",
+                    "surface-bright": "#f8f9fa",
+                    "on-tertiary-fixed-variant": "#7b2f00",
+                    "secondary-fixed-dim": "#afcbd8",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-container": "#ffc2a7",
+                    "primary": "#003f87",
+                    "on-tertiary-fixed": "#351000",
+                    "surface-container-highest": "#e1e3e4"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-icon { font-variation-settings: 'FILL' 1; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface flex h-screen overflow-hidden">
+<!-- SideNavBar -->
+<aside class="hidden md:flex flex-col h-full py-6 bg-slate-50 dark:bg-slate-950 h-screen w-64 border-r border-slate-200 dark:border-slate-800 font-['Inter'] text-sm font-medium z-50 shrink-0">
+<div class="px-6 mb-8">
+<h2 class="text-lg font-black text-blue-900 dark:text-white">实验室管理</h2>
+<p class="text-xs text-slate-500 mt-1 uppercase tracking-wider">临床医学中心</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center px-6 py-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 font-semibold border-r-4 border-blue-700 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined mr-3" style="font-variation-settings: 'FILL' 1;">science</span>
+                仿真实验
+            </a>
+<a class="flex items-center px-6 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined mr-3">biotech</span>
+                虚拟仿真应用
+            </a>
+<a class="flex items-center px-6 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined mr-3">search</span>
+                资源搜索
+            </a>
+<a class="flex items-center px-6 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined mr-3">help_center</span>
+                帮助中心
+            </a>
+</nav>
+<div class="mt-auto px-6 space-y-1 border-t border-slate-200 dark:border-slate-800 pt-6">
+<a class="flex items-center py-2 text-slate-500 hover:text-blue-700 transition-colors" href="#">
+<span class="material-symbols-outlined mr-3">settings</span>
+                设置
+            </a>
+<a class="flex items-center py-2 text-slate-500 hover:text-error transition-colors" href="#">
+<span class="material-symbols-outlined mr-3">logout</span>
+                退出
+            </a>
+</div>
+</aside>
+<div class="flex-1 flex flex-col min-w-0 bg-surface">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center px-6 py-3 w-full border-b border-slate-200/50 dark:border-slate-700/50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl docked full-width top-0 z-50 shadow-sm font-['Manrope'] font-bold tracking-tight">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold text-blue-900 dark:text-blue-100">虚拟实验大厅</span><nav class="hidden md:flex items-center gap-6 ml-4">
+<a class="text-sm font-semibold text-slate-600 hover:text-primary transition-colors" href="#">首页</a>
+<a class="text-sm font-semibold text-slate-600 hover:text-primary transition-colors" href="#">实验大厅</a>
+<a class="text-sm font-bold text-[#0056B3] hover:opacity-80 transition-colors" href="#">课程中心</a>
+<a class="text-sm font-semibold text-slate-600 hover:text-primary transition-colors" href="#">资源中心</a>
+<a class="text-sm font-semibold text-slate-600 hover:text-primary transition-colors" href="#">关于我们</a>
+</nav>
+<div class="hidden lg:flex items-center bg-slate-100 dark:bg-slate-800 rounded-full px-4 py-1.5 w-64">
+<span class="material-symbols-outlined text-slate-400 text-lg mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full text-on-surface" placeholder="搜索实验课程..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-5 py-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 font-semibold transition-colors duration-150 active:scale-95">注册</button>
+<button class="px-6 py-2 bg-gradient-to-br from-primary to-primary-container text-white rounded-full shadow-lg shadow-primary/20 hover:opacity-90 transition-all active:scale-95">登录</button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto p-6 md:p-10 space-y-8">
+<!-- Hero Section / Breadcrumb -->
+<section class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div class="space-y-1">
+<h1 class="text-3xl font-extrabold font-headline tracking-tight text-on-surface">仿真实验库</h1>
+<p class="text-on-surface-variant font-body">探索高精细度的临床医疗模拟与数字化科研实验环境</p>
+</div>
+<div class="flex gap-2 bg-surface-container-low p-1.5 rounded-full">
+<button class="px-4 py-1.5 bg-surface-container-lowest text-primary text-sm font-bold rounded-full shadow-sm">最新上传</button>
+<button class="px-4 py-1.5 text-on-surface-variant text-sm font-medium hover:bg-surface-container-high rounded-full transition-colors">最受欢迎</button>
+</div>
+</section>
+<!-- Disciplinary Filter Bento -->
+<section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+<button class="flex flex-col items-center justify-center p-4 bg-surface-container-lowest rounded-xl hover:bg-primary hover:text-on-primary transition-all group border border-transparent hover:border-primary/20">
+<span class="material-symbols-outlined mb-2 text-primary group-hover:text-on-primary">microbiology</span>
+<span class="text-xs font-bold font-headline">微生物学</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 bg-surface-container-lowest rounded-xl hover:bg-primary hover:text-on-primary transition-all group">
+<span class="material-symbols-outlined mb-2 text-primary group-hover:text-on-primary">cardiology</span>
+<span class="text-xs font-bold font-headline">临床技能</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 bg-surface-container-lowest rounded-xl hover:bg-primary hover:text-on-primary transition-all group">
+<span class="material-symbols-outlined mb-2 text-primary group-hover:text-on-primary">genetics</span>
+<span class="text-xs font-bold font-headline">分子生物</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 bg-surface-container-lowest rounded-xl hover:bg-primary hover:text-on-primary transition-all group">
+<span class="material-symbols-outlined mb-2 text-primary group-hover:text-on-primary">neurology</span>
+<span class="text-xs font-bold font-headline">神经科学</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 bg-surface-container-lowest rounded-xl hover:bg-primary hover:text-on-primary transition-all group">
+<span class="material-symbols-outlined mb-2 text-primary group-hover:text-on-primary">medication</span>
+<span class="text-xs font-bold font-headline">药理仿真</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 bg-surface-container-lowest rounded-xl hover:bg-primary hover:text-on-primary transition-all group">
+<span class="material-symbols-outlined mb-2 text-primary group-hover:text-on-primary">more_horiz</span>
+<span class="text-xs font-bold font-headline">全部学科</span>
+</button>
+</section>
+<!-- Experiment List Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+<!-- Experiment Card 1 -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden transition-all hover:shadow-2xl hover:shadow-primary/5">
+<div class="relative h-48 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="high-tech laboratory interior with blue lighting focus on microscope and scientific glass slides cinematic style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdlH06-yU99hwVr7i9N-hmOrqjWKUn4ZkVDLdVoKVJKNprLJHENklcCkFz1Kus9b7lsaOnHH6sKTFETUwVfCDz0E8B_vJ4oGlqbnPIY8v9ioSVL8qRDLpgEx_B692OkkqgVOqGmklpKwKJF8mv3cWySz--rdlOrbedFxof3ielK-Xgnlz_DEOGajogsfwrnDO_2JcaqIQFxfLO9SG1oDHX15-b28ZFbX9kwZI8kIxtKrPQebPDCvyNXwK0Hc-oZJqOXQL51VO1bi2H"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<span class="absolute top-4 right-4 px-3 py-1 bg-white/20 backdrop-blur-md text-white text-[10px] font-bold rounded-full uppercase tracking-widest border border-white/30">VR Enabled</span>
+</div>
+<div class="p-6 space-y-4">
+<div class="flex justify-between items-start">
+<h3 class="text-lg font-bold font-headline leading-tight text-on-surface">心血管循环系统病理生理仿真</h3>
+<span class="flex items-center text-primary">
+<span class="material-symbols-outlined text-sm">star</span>
+<span class="text-xs font-bold ml-1">4.9</span>
+</span>
+</div>
+<p class="text-sm text-on-surface-variant line-clamp-2">模拟不同病理状态下心血管循环的血流动力学变化，包含实时EKG监测。通过数字化模型进行高精度模拟。</p>
+<div class="flex items-center gap-4 text-[11px] font-bold text-slate-400 uppercase tracking-tighter">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> 45分钟</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">group</span> 12.4k 次进行</span>
+</div>
+<div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+<span class="text-primary font-bold text-sm">免费公开课</span>
+<button class="text-xs font-bold text-primary flex items-center gap-1 group-hover:gap-2 transition-all">
+                                开始实验 <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Experiment Card 2 -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden transition-all hover:shadow-2xl hover:shadow-primary/5">
+<div class="relative h-48 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="digital 3d render of complex protein structures and dna chains in a futuristic medical simulation environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKZrCN3FQLOC8Kf669GvjWqRkGE2BmE00SjoHKV71qSwDXdsQW-x4mB7cg70xWzWxp5vvsDaL782X-lNYjXQOxQMhznTc80q2x7iGCt210C2YSX5aM4gDkASCFriBLlUuCMGFkMKwVSyG8qJ9HG4qJTlbKlu0Zaqaz1kzlJB4Hr6rNs03wn6UdQiT3ujjQDwdZhdwo1sHPYYuZYQqOPB24C55akgiEGP5Zif4yu4vBBw1fKZ4uDUyYFoA_ZXFZeGp7dE-mN4vC2uUQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<span class="absolute top-4 right-4 px-3 py-1 bg-white/20 backdrop-blur-md text-white text-[10px] font-bold rounded-full uppercase tracking-widest border border-white/30">New</span>
+</div>
+<div class="p-6 space-y-4">
+<div class="flex justify-between items-start">
+<h3 class="text-lg font-bold font-headline leading-tight text-on-surface">分子细胞生物学：CRISPR编辑</h3>
+<span class="flex items-center text-primary">
+<span class="material-symbols-outlined text-sm">star</span>
+<span class="text-xs font-bold ml-1">4.8</span>
+</span>
+</div>
+<p class="text-sm text-on-surface-variant line-clamp-2">在原子级模拟器中操作CRISPR-Cas9复合体，完成特定基因序列的识别与剪切实验。</p>
+<div class="flex items-center gap-4 text-[11px] font-bold text-slate-400 uppercase tracking-tighter">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> 90分钟</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">group</span> 5.8k 次进行</span>
+</div>
+<div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+<span class="text-primary font-bold text-sm">专业进阶</span>
+<button class="text-xs font-bold text-primary flex items-center gap-1 group-hover:gap-2 transition-all">
+                                开始实验 <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Experiment Card 3 -->
+<div class="group bg-surface-container-lowest rounded-xl overflow-hidden transition-all hover:shadow-2xl hover:shadow-primary/5">
+<div class="relative h-48 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="hospital operating room scene with surgical robots and futuristic monitoring displays in cool tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCM6DqZ_D4iYQSKywWbwmoGmNn2E93QuR7Rb1AD8FqBaK-XOBZL6iod0jkpF_k0M8_z_YY7oxoXq5y8DTvkYu_a-3IN4aIT16oA_X2EGrlMK9q5YgTZMsrt4XaUb-UZcQCu4ZqlfArc2yb3IfoPe1fYH6_-t75zTQNs-Zmvj9EzuRhBNvfv3wP-HbUvXNChjRnh8xbneBoiilG5Zw120Er-bfFWsrLiLOWGnB2LMq8g14Hbp_ZnsG9Er07A585xjM1i9CmgAQov-HRG"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+</div>
+<div class="p-6 space-y-4">
+<div class="flex justify-between items-start">
+<h3 class="text-lg font-bold font-headline leading-tight text-on-surface">急诊医学：创伤生命支持模拟</h3>
+<span class="flex items-center text-primary">
+<span class="material-symbols-outlined text-sm">star</span>
+<span class="text-xs font-bold ml-1">5.0</span>
+</span>
+</div>
+<p class="text-sm text-on-surface-variant line-clamp-2">多场景急诊室模拟，通过AI驱动的虚拟病人反应，训练医学生在压力下的临床决策能力。</p>
+<div class="flex items-center gap-4 text-[11px] font-bold text-slate-400 uppercase tracking-tighter">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> 60分钟</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">group</span> 21k 次进行</span>
+</div>
+<div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+<span class="text-primary font-bold text-sm">热门课程</span>
+<button class="text-xs font-bold text-primary flex items-center gap-1 group-hover:gap-2 transition-all">
+                                开始实验 <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Vitals Monitor Style Stats Panel -->
+<section class="bg-inverse-surface rounded-xl p-6 text-white overflow-hidden relative">
+<div class="absolute top-0 right-0 w-64 h-full opacity-10 pointer-events-none">
+<svg class="w-full h-full text-inverse-primary fill-current" preserveaspectratio="none" viewbox="0 0 100 100">
+<path d="M0 100 C 20 0, 50 0, 100 100 Z"></path>
+</svg>
+</div>
+<div class="relative z-10 grid grid-cols-1 md:grid-cols-4 gap-8">
+<div class="space-y-1">
+<span class="text-xs font-bold text-inverse-primary uppercase tracking-widest">Active Simulations</span>
+<div class="text-4xl font-extrabold font-headline">1,402</div>
+<div class="w-24 h-1 bg-inverse-primary/30 rounded-full overflow-hidden">
+<div class="w-2/3 h-full bg-inverse-primary"></div>
+</div>
+</div>
+<div class="space-y-1">
+<span class="text-xs font-bold text-inverse-primary uppercase tracking-widest">Global Nodes</span>
+<div class="text-4xl font-extrabold font-headline">18</div>
+<div class="w-24 h-1 bg-inverse-primary/30 rounded-full overflow-hidden">
+<div class="w-full h-full bg-inverse-primary"></div>
+</div>
+</div>
+<div class="space-y-1">
+<span class="text-xs font-bold text-inverse-primary uppercase tracking-widest">Average Latency</span>
+<div class="text-4xl font-extrabold font-headline">12ms</div>
+<div class="w-24 h-1 bg-inverse-primary/30 rounded-full overflow-hidden">
+<div class="w-1/4 h-full bg-inverse-primary"></div>
+</div>
+</div>
+<div class="flex items-center">
+<button class="w-full py-4 bg-inverse-primary text-primary font-bold rounded-xl hover:bg-white transition-colors">
+                            查看实时系统状态
+                        </button>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- Mobile BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex justify-around items-center py-3 z-50">
+<a class="flex flex-col items-center text-blue-700" href="#">
+<span class="material-symbols-outlined active-icon">science</span>
+<span class="text-[10px] font-bold mt-1">仿真</span>
+</a>
+<a class="flex flex-col items-center text-slate-400" href="#">
+<span class="material-symbols-outlined">biotech</span>
+<span class="text-[10px] font-bold mt-1">应用</span>
+</a>
+<a class="flex flex-col items-center text-slate-400" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="text-[10px] font-bold mt-1">搜索</span>
+</a>
+<a class="flex flex-col items-center text-slate-400" href="#">
+<span class="material-symbols-outlined">help_center</span>
+<span class="text-[10px] font-bold mt-1">帮助</span>
+</a>
+</nav>
+</body></html>

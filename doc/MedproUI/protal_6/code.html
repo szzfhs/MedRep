@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>心血管评估仿真实验 - 虚拟实验大厅</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error": "#ba1a1a",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-on-surface": "#f0f1f2",
+                    "tertiary-fixed": "#ffdbcc",
+                    "primary-fixed": "#d7e2ff",
+                    "on-secondary-fixed-variant": "#304a55",
+                    "on-surface": "#191c1d",
+                    "on-primary": "#ffffff",
+                    "surface-variant": "#e1e3e4",
+                    "on-primary-container": "#bbd0ff",
+                    "error-container": "#ffdad6",
+                    "inverse-primary": "#acc7ff",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed-dim": "#ffb694",
+                    "background": "#f8f9fa",
+                    "secondary-container": "#cbe7f5",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-low": "#f3f4f5",
+                    "secondary-fixed": "#cbe7f5",
+                    "primary-fixed-dim": "#acc7ff",
+                    "tertiary": "#722b00",
+                    "surface-dim": "#d9dadb",
+                    "outline-variant": "#c2c6d4",
+                    "on-primary-fixed-variant": "#004491",
+                    "tertiary-container": "#983c00",
+                    "surface-container": "#edeeef",
+                    "primary-container": "#0056b3",
+                    "on-surface-variant": "#424752",
+                    "surface-container-high": "#e7e8e9",
+                    "surface": "#f8f9fa",
+                    "on-primary-fixed": "#001a40",
+                    "on-secondary": "#ffffff",
+                    "surface-tint": "#115cb9",
+                    "on-secondary-fixed": "#021f29",
+                    "inverse-surface": "#2e3132",
+                    "secondary": "#48626e",
+                    "on-background": "#191c1d",
+                    "outline": "#727784",
+                    "on-secondary-container": "#4e6874",
+                    "surface-bright": "#f8f9fa",
+                    "on-tertiary-fixed-variant": "#7b2f00",
+                    "secondary-fixed-dim": "#afcbd8",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-container": "#ffc2a7",
+                    "primary": "#003f87",
+                    "on-tertiary-fixed": "#351000",
+                    "surface-container-highest": "#e1e3e4"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface">
+<!-- TopNavBar -->
+<nav class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl docked full-width top-0 z-50 shadow-sm flex justify-between items-center px-6 py-3 w-full border-b border-slate-200/50 dark:border-slate-700/50">
+<div class="flex items-center gap-4">
+<span class="text-xl font-bold text-blue-900 dark:text-blue-100 font-['Manrope'] tracking-tight">虚拟实验大厅</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="px-4 py-2 text-slate-600 dark:text-slate-400 font-['Manrope'] font-bold hover:text-blue-600 transition-colors">登录</button>
+<button class="px-6 py-2 bg-primary text-on-primary rounded-full font-['Manrope'] font-bold shadow-sm hover:opacity-90 transition-opacity">注册</button>
+</div>
+</nav>
+<div class="flex min-h-screen pt-16">
+<!-- SideNavBar -->
+<aside class="h-[calc(100vh-64px)] w-64 border-r border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex flex-col py-6 sticky top-16 hidden md:flex">
+<div class="px-6 mb-8">
+<h3 class="text-lg font-black text-blue-900 dark:text-white font-['Inter']">实验室管理</h3>
+<p class="text-xs text-slate-500 font-medium">临床医学中心</p>
+</div>
+<nav class="flex-1 space-y-1 px-3">
+<a class="flex items-center gap-3 px-3 py-2.5 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 font-semibold border-r-4 border-blue-700 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined">science</span>
+<span class="font-['Inter'] text-sm">仿真实验</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined">biotech</span>
+<span class="font-['Inter'] text-sm">虚拟仿真应用</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="font-['Inter'] text-sm">资源搜索</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined">help_center</span>
+<span class="font-['Inter'] text-sm">帮助中心</span>
+</a>
+</nav>
+<div class="mt-auto px-3 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:bg-slate-100 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm">设置</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 hover:bg-slate-100 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="text-sm">退出</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 bg-surface relative overflow-hidden">
+<!-- Hero Background Section -->
+<div class="absolute inset-0 z-0">
+<div class="absolute inset-0 bg-gradient-to-b from-surface via-surface/60 to-surface"></div>
+<img alt="Laboratory background" class="w-full h-full object-cover opacity-20 filter grayscale" data-alt="Modern medical laboratory with high-tech equipment, blue lighting, sterile environment, scientific aesthetic with medical monitors and surgical tools" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCD0AdwQTQXybTj4yqw7mgwW49Z2smdcww_vp0wz9fa8fxc4MkvVDRbTycf9fMbpxw-z6mA4qsFOfDW6mknM8eYq7nlNDlBI8Jx2g50CC53QWLV6JbYfCTGKQoPzgc5uoNz42NtyxBUXjmg67-08C8vrslsDWlqEVIKW0VF-i7Q2CxvJKlfoQZOyGVisDjGpDP2NOBsiXtTJ9XByp0LgAjmZTaYD2w9Xh4NIGFqqfzypICI3TLGuxX-R3ATpMqzbfH-qB0VMHC6CubG"/>
+</div>
+<!-- Content Canvas -->
+<div class="relative z-10 max-w-6xl mx-auto px-8 py-12">
+<!-- Breadcrumb -->
+<nav class="flex items-center gap-2 mb-8 text-label-sm text-on-surface-variant/70 uppercase tracking-widest font-semibold">
+<span>实验目录</span>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<span>临床医学</span>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<span class="text-primary font-bold">心血管评估</span>
+</nav>
+<!-- Header Section: Asymmetric Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12 items-start">
+<div class="lg:col-span-8">
+<h1 class="text-4xl md:text-5xl font-extrabold font-headline text-on-surface mb-6 tracking-tight leading-tight">
+                            心血管评估仿真实验
+                        </h1>
+<p class="text-lg text-on-surface-variant leading-relaxed mb-8 max-w-3xl">
+                            本实验旨在通过高精度3D生理模型，模拟人体心血管系统在不同病理状态下的反应。学员将学习如何应用多参数监护仪数据，进行心音听诊、血压调节机制分析以及常见心律失常的初步判定。
+                        </p>
+<div class="flex flex-wrap gap-4">
+<div class="flex items-center gap-2 px-4 py-2 bg-surface-container-low rounded-full border border-outline-variant/20">
+<span class="material-symbols-outlined text-primary text-sm">schedule</span>
+<span class="text-sm font-medium">预计耗时: 45分钟</span>
+</div>
+<div class="flex items-center gap-2 px-4 py-2 bg-surface-container-low rounded-full border border-outline-variant/20">
+<span class="material-symbols-outlined text-primary text-sm">school</span>
+<span class="text-sm font-medium">学分奖励: 2.0</span>
+</div>
+<div class="flex items-center gap-2 px-4 py-2 bg-surface-container-low rounded-full border border-outline-variant/20">
+<span class="material-symbols-outlined text-primary text-sm">verified_user</span>
+<span class="text-sm font-medium">难度: 高级</span>
+</div>
+</div>
+</div>
+<!-- Side Card: Quick Action / Status -->
+<div class="lg:col-span-4 h-full">
+<div class="glass-panel border border-white/40 shadow-2xl rounded-xl p-8 flex flex-col justify-center items-center text-center">
+<div class="w-16 h-16 bg-primary-fixed rounded-full flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary text-3xl">lock</span>
+</div>
+<h3 class="text-xl font-bold font-headline mb-4">实验访问受限</h3>
+<p class="text-sm text-on-surface-variant mb-8">
+                                检测到您当前未登录系统。请登录后以记录您的实验进度并获取学分认定。
+                            </p>
+<a class="w-full py-4 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-full font-bold shadow-lg hover:shadow-primary/20 transition-all flex items-center justify-center gap-3" href="#">
+<span class="material-symbols-outlined">login</span>
+                                请先登录后启动实验
+                            </a>
+</div>
+</div>
+</div>
+<!-- Bento Grid Content -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Instruction Card -->
+<div class="md:col-span-2 bg-surface-container-lowest rounded-xl p-8 shadow-sm border border-outline-variant/10">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-primary">menu_book</span>
+<h2 class="text-xl font-bold font-headline">操作指南</h2>
+</div>
+<div class="space-y-6">
+<div class="flex gap-4">
+<div class="flex-shrink-0 w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-sm font-bold text-primary">01</div>
+<div>
+<h4 class="font-bold text-on-surface mb-1">系统初始化</h4>
+<p class="text-sm text-on-surface-variant">启动后进入患者资料库，选择“病例 A-04”进行初始化，加载实时生命体征波形。</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="flex-shrink-0 w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-sm font-bold text-primary">02</div>
+<div>
+<h4 class="font-bold text-on-surface mb-1">交互式评估</h4>
+<p class="text-sm text-on-surface-variant">使用鼠标滚轮调整听诊器位置，点击特定解剖部位触发心音回放。利用侧边栏进行药物输注模拟。</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="flex-shrink-0 w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-sm font-bold text-primary">03</div>
+<div>
+<h4 class="font-bold text-on-surface mb-1">数据导出与报告</h4>
+<p class="text-sm text-on-surface-variant">实验结束后，系统会自动生成评估报告。请下载 PDF 版本并上传至教学评价系统。</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Environment Requirements Card -->
+<div class="bg-inverse-surface text-inverse-on-surface rounded-xl p-8 shadow-xl">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-inverse-primary">settings_input_component</span>
+<h2 class="text-xl font-bold font-headline">环境要求</h2>
+</div>
+<ul class="space-y-5">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-inverse-primary text-sm mt-1">check_circle</span>
+<div>
+<span class="block text-sm font-bold">浏览器</span>
+<span class="text-xs text-on-surface-variant/70">Chrome 90+ / Firefox 88+</span>
+</div>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-inverse-primary text-sm mt-1">check_circle</span>
+<div>
+<span class="block text-sm font-bold">硬件加速</span>
+<span class="text-xs text-on-surface-variant/70">需开启 WebGL 2.0 支持</span>
+</div>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-inverse-primary text-sm mt-1">check_circle</span>
+<div>
+<span class="block text-sm font-bold">网络带宽</span>
+<span class="text-xs text-on-surface-variant/70">稳定连接，带宽不低于 20Mbps</span>
+</div>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-inverse-primary text-sm mt-1">check_circle</span>
+<div>
+<span class="block text-sm font-bold">音频输出</span>
+<span class="text-xs text-on-surface-variant/70">建议佩戴立体声耳机进行听诊练习</span>
+</div>
+</li>
+</ul>
+</div>
+<!-- Vitals Monitor Style Decorative Card -->
+<div class="lg:col-span-3 bg-inverse-surface rounded-xl p-6 overflow-hidden relative min-h-[160px]">
+<div class="relative z-10">
+<div class="flex justify-between items-center mb-4">
+<span class="text-[10px] font-bold text-inverse-primary tracking-widest uppercase">实时仿真流示意 (PREVIEW)</span>
+<div class="flex gap-2">
+<span class="w-2 h-2 rounded-full bg-error animate-pulse"></span>
+<span class="text-[10px] text-on-surface-variant">REC 00:42:15</span>
+</div>
+</div>
+<div class="flex items-end gap-6">
+<div>
+<span class="text-xs text-on-surface-variant block mb-1">HR (BPM)</span>
+<span class="text-4xl font-extrabold text-inverse-primary font-headline">72</span>
+</div>
+<div class="flex-1 h-12 flex items-end">
+<!-- Simple CSS-only ECG preview -->
+<div class="w-full h-8 border-b border-inverse-primary/20 relative">
+<div class="absolute bottom-0 left-0 w-full h-[2px] bg-inverse-primary/40"></div>
+<div class="absolute bottom-0 left-1/4 w-[2px] h-6 bg-inverse-primary"></div>
+<div class="absolute bottom-0 left-2/4 w-[2px] h-4 bg-inverse-primary"></div>
+<div class="absolute bottom-0 left-3/4 w-[2px] h-8 bg-inverse-primary"></div>
+</div>
+</div>
+<div>
+<span class="text-xs text-on-surface-variant block mb-1">SpO2 (%)</span>
+<span class="text-4xl font-extrabold text-secondary-fixed-dim font-headline">98</span>
+</div>
+</div>
+</div>
+<div class="absolute top-0 right-0 p-2 opacity-5 scale-150">
+<span class="material-symbols-outlined text-[120px]">monitor_heart</span>
+</div>
+</div>
+</div>
+<!-- Footer Metadata -->
+<div class="mt-12 pt-8 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-on-surface-variant font-medium">
+<div class="flex gap-8">
+<span>版本号: v2.4.1-stable</span>
+<span>最近更新: 2023-11-20</span>
+<span>版权所有: 临床医学数字资源中心</span>
+</div>
+<div class="flex gap-4">
+<button class="hover:text-primary transition-colors">技术支持</button>
+<button class="hover:text-primary transition-colors">隐私权政策</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

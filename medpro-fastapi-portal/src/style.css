@@ -1,0 +1,52 @@
+/* Material Symbols 本地字体 */
+@import 'material-symbols/outlined.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Material Symbols 字体变体设置 */
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined', 'Material Icons', sans-serif;
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-white font-headline font-bold px-6 py-2.5 rounded-full hover:bg-primary-container transition-colors duration-200 cursor-pointer;
+  }
+
+  .btn-outline {
+    @apply border-2 border-primary text-primary font-headline font-bold px-6 py-2.5 rounded-full hover:bg-primary hover:text-white transition-all duration-200 cursor-pointer;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200;
+  }
+}
