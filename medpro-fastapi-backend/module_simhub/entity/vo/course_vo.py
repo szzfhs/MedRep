@@ -16,6 +16,9 @@ class CourseSectionModel(BaseModel):
     sort_order: int | None = Field(default=None, description='排序')
     section_type: str | None = Field(default=None, description='类型(chapter/section)')
     description: str | None = Field(default=None, description='描述')
+    status: str | None = Field(default=None, description='状态(0=正常,1=停用)')
+    create_time: datetime | None = Field(default=None, description='创建时间')
+    update_time: datetime | None = Field(default=None, description='更新时间')
     children: list['CourseSectionModel'] | None = Field(default=None, description='子章节')
 
 
@@ -43,10 +46,11 @@ class CourseModel(BaseModel):
     teacher_name: str | None = Field(default=None, description='主讲教师姓名（冗余）')
     cover_image: str | None = Field(default=None, description='封面图URL')
     description: str | None = Field(default=None, description='课程介绍')
-    category: str | None = Field(default=None, description='课程分类')
+    course_category: str | None = Field(default=None, description='课程分类(1=理论课,2=实验课,3=理实一体化课)')
+    category: str | None = Field(default=None, description='课程分类（旧字段，已废弃）')
     total_sections: int | None = Field(default=None, description='章节数')
     total_resources: int | None = Field(default=None, description='资源数')
-    status: Literal['0', '1'] | None = Field(default=None, description='状态(0=发布,1=草稿)')
+    status: Literal['0', '1', '2'] | None = Field(default=None, description='状态(0=新建,1=已审核,2=已发布)')
     enroll_count: int | None = Field(default=None, description='选课人数')
     sort_order: int | None = Field(default=None, description='排序')
     create_by: str | None = Field(default=None, description='创建者')
@@ -62,8 +66,8 @@ class AddCourseModel(BaseModel):
     teacher_id: int | None = Field(default=None, description='主讲教师ID')
     cover_image: str | None = Field(default=None, description='封面图URL')
     description: str | None = Field(default=None, description='课程介绍')
-    category: str | None = Field(default=None, description='课程分类')
-    status: Literal['0', '1'] | None = Field(default='1', description='状态')
+    course_category: str | None = Field(default='1', description='课程分类(1=理论课,2=实验课,3=理实一体化课)')
+    status: Literal['0', '1', '2'] | None = Field(default='0', description='状态(0=新建,1=已审核,2=已发布)')
     sort_order: int | None = Field(default=0, description='排序')
 
 
@@ -84,7 +88,7 @@ class CoursePageQueryModel(BaseModel):
     course_name: str | None = Field(default=None, description='课程名称关键词')
     teacher_id: int | None = Field(default=None, description='教师ID')
     status: str | None = Field(default=None, description='状态')
-    category: str | None = Field(default=None, description='分类')
+    course_category: str | None = Field(default=None, description='课程分类')
 
 
 class EnrollmentModel(BaseModel):
@@ -118,3 +122,23 @@ class UpdateProgressModel(BaseModel):
     resource_id: int | None = Field(default=None, description='资源ID')
     last_position: int | None = Field(default=0, description='当前位置（秒）')
     completed: str | None = Field(default='0', description='是否完成')
+
+
+# ——— 章节-实验 / 章节-资源 绑定 VO ———
+
+class AddSectionExperimentModel(BaseModel):
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
+    section_id: int = Field(description='章节ID')
+    course_id: int | None = Field(default=None, description='课程ID（冗余，可选）')
+    exp_id: int = Field(description='实验ID')
+    sort_order: int | None = Field(default=0, description='排序')
+
+
+class AddSectionResourceModel(BaseModel):
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
+    section_id: int = Field(description='章节ID')
+    course_id: int | None = Field(default=None, description='课程ID（冗余，可选）')
+    resource_id: int = Field(description='资源ID')
+    sort_order: int | None = Field(default=0, description='排序')

@@ -14,7 +14,9 @@ from common.vo import DataResponseModel, PageResponseModel, ResponseBaseModel
 from module_admin.entity.vo.user_vo import CurrentUserModel
 from module_simhub.entity.vo.course_vo import (
     AddCourseModel,
+    AddSectionExperimentModel,
     AddSectionModel,
+    AddSectionResourceModel,
     CoursePageQueryModel,
     DeleteCourseModel,
     EditCourseModel,
@@ -173,6 +175,112 @@ async def delete_section(
 ) -> Response:
     result = await CourseService.delete_section(query_db, section_id)
     logger.info(result.message)
+    return ResponseUtil.success(msg=result.message)
+
+
+# ——— 章节-实验 关联 ———
+
+@course_controller.get(
+    '/section/{section_id}/experiments',
+    summary='获取章节绑定的实验列表',
+    response_model=DataResponseModel,
+    dependencies=[UserInterfaceAuthDependency('simhub:course:query')],
+)
+async def get_section_experiments(
+    request: Request,
+    section_id: Annotated[int, Path(ge=1)],
+    query_db: Annotated[AsyncSession, DBSessionDependency()],
+) -> Response:
+    data = await CourseService.get_section_experiments_detail(query_db, section_id)
+    return ResponseUtil.success(data=data)
+
+
+@course_controller.post(
+    '/section/experiment',
+    summary='章节绑定实验',
+    response_model=ResponseBaseModel,
+    dependencies=[UserInterfaceAuthDependency('simhub:course:edit')],
+)
+@Log(title='章节实验关联', business_type=BusinessType.INSERT)
+async def bind_section_experiment(
+    request: Request,
+    data: AddSectionExperimentModel,
+    query_db: Annotated[AsyncSession, DBSessionDependency()],
+    current_user: Annotated[CurrentUserModel, CurrentUserDependency()],
+) -> Response:
+    result = await CourseService.link_section_experiment_v2(query_db, data)
+    return ResponseUtil.success(msg=result.message)
+
+
+@course_controller.delete(
+    '/section/{section_id}/experiment/{exp_id}',
+    summary='章节解绑实验',
+    response_model=ResponseBaseModel,
+    dependencies=[UserInterfaceAuthDependency('simhub:course:edit')],
+)
+@Log(title='章节实验关联', business_type=BusinessType.DELETE)
+async def unbind_section_experiment(
+    request: Request,
+    section_id: Annotated[int, Path(ge=1)],
+    exp_id: Annotated[int, Path(ge=1)],
+    query_db: Annotated[AsyncSession, DBSessionDependency()],
+    current_user: Annotated[CurrentUserModel, CurrentUserDependency()],
+) -> Response:
+    result = await CourseService.unlink_section_experiment(query_db, section_id, exp_id)
+    await query_db.commit()
+    return ResponseUtil.success(msg=result.message)
+
+
+# ——— 章节-资源 关联 ———
+
+@course_controller.get(
+    '/section/{section_id}/resources',
+    summary='获取章节绑定的资源列表',
+    response_model=DataResponseModel,
+    dependencies=[UserInterfaceAuthDependency('simhub:course:query')],
+)
+async def get_section_resources(
+    request: Request,
+    section_id: Annotated[int, Path(ge=1)],
+    query_db: Annotated[AsyncSession, DBSessionDependency()],
+) -> Response:
+    data = await CourseService.get_section_resources_detail(query_db, section_id)
+    return ResponseUtil.success(data=data)
+
+
+@course_controller.post(
+    '/section/resource',
+    summary='章节绑定资源',
+    response_model=ResponseBaseModel,
+    dependencies=[UserInterfaceAuthDependency('simhub:course:edit')],
+)
+@Log(title='章节资源关联', business_type=BusinessType.INSERT)
+async def bind_section_resource(
+    request: Request,
+    data: AddSectionResourceModel,
+    query_db: Annotated[AsyncSession, DBSessionDependency()],
+    current_user: Annotated[CurrentUserModel, CurrentUserDependency()],
+) -> Response:
+    result = await CourseService.link_section_resource_v2(query_db, data)
+    return ResponseUtil.success(msg=result.message)
+
+
+@course_controller.delete(
+    '/section/{section_id}/resource/{resource_id}',
+    summary='章节解绑资源',
+    response_model=ResponseBaseModel,
+    dependencies=[UserInterfaceAuthDependency('simhub:course:edit')],
+)
+@Log(title='章节资源关联', business_type=BusinessType.DELETE)
+async def unbind_section_resource(
+    request: Request,
+    section_id: Annotated[int, Path(ge=1)],
+    resource_id: Annotated[int, Path(ge=1)],
+    query_db: Annotated[AsyncSession, DBSessionDependency()],
+    current_user: Annotated[CurrentUserModel, CurrentUserDependency()],
+) -> Response:
+    result = await CourseService.unlink_section_resource(query_db, section_id, resource_id)
+    await query_db.commit()
     return ResponseUtil.success(msg=result.message)
 
 

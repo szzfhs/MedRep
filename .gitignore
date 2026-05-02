@@ -152,3 +152,22 @@ cython_debug/
 .opencode/
 .qoder/
 .trae/
+
+# Node.js / Frontend
+node_modules/
+dist/
+.output/
+.nuxt/
+.next/
+*.local
+
+# Python virtual environments
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# Build outputs
+build/
+*.egg-info/

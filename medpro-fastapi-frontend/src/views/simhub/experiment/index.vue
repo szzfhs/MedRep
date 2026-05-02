@@ -34,6 +34,11 @@
           <el-form-item label="实验名称" prop="expName">
             <el-input v-model="queryParams.expName" placeholder="请输入实验名称" clearable style="width:180px" @keyup.enter="handleQuery" />
           </el-form-item>
+          <el-form-item label="实验系统" prop="simSystemId">
+            <el-select v-model="queryParams.simSystemId" placeholder="实验系统" clearable style="width:150px">
+              <el-option v-for="item in simSystemOptions" :key="item.simSystemId" :label="item.systemName" :value="item.simSystemId" />
+            </el-select>
+          </el-form-item>
           <el-form-item label="状态" prop="status">
             <el-select v-model="queryParams.status" placeholder="状态" clearable style="width:100px">
               <el-option label="启用" value="1" /><el-option label="停用" value="0" />
@@ -63,6 +68,14 @@
           <el-table-column label="ID" prop="expId" width="80" align="center" />
           <el-table-column label="实验名称" prop="expName" :show-overflow-tooltip="true" />
           <el-table-column label="类型" prop="expType" width="80" align="center" />
+          <el-table-column label="实验系统" prop="simSystemId" width="120" align="center">
+            <template #default="{ row }">
+              <span>{{ getSimSystemName(row.simSystemId) || '-' }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="时长(分)" prop="expDuration" width="90" align="center">
+            <template #default="{ row }"><span>{{ row.expDuration || '-' }}</span></template>
+          </el-table-column>
           <el-table-column label="浏览量" prop="viewCount" width="80" align="center" />
           <el-table-column label="参与次数" prop="participateCount" width="90" align="center" />
           <el-table-column label="状态" prop="status" width="90" align="center">
@@ -133,6 +146,18 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
+            <el-form-item label="所属实验系统">
+              <el-select v-model="form.simSystemId" placeholder="请选择实验系统" clearable style="width:100%">
+                <el-option v-for="item in simSystemOptions" :key="item.simSystemId" :label="item.systemName" :value="item.simSystemId" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="实验时长(分)">
+              <el-input-number v-model="form.expDuration" :min="0" :max="9999" style="width:100%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
             <el-form-item label="状态" prop="status">
               <el-radio-group v-model="form.status">
                 <el-radio value="1">启用</el-radio><el-radio value="0">停用</el-radio>
@@ -159,6 +184,11 @@
               <editor v-model="form.description" :min-height="200" />
             </el-form-item>
           </el-col>
+          <el-col :span="24">
+            <el-form-item label="实验指引">
+              <editor v-model="form.expGuide" :min-height="200" />
+            </el-form-item>
+          </el-col>
         </el-row>
       </el-form>
       <template #footer>
@@ -174,8 +204,20 @@ import {
   listExperimentCategoryTree, addExperimentCategory, updateExperimentCategory, delExperimentCategory,
   listExperiment, getExperiment, addExperiment, updateExperiment, delExperiment
 } from '@/api/simhub/experiment'
+import { getSimSystemOptions } from '@/api/simhub/sim_system'
 
 const { proxy } = getCurrentInstance()
+
+// ——— 实验系统选项 ———
+const simSystemOptions = ref([])
+function loadSimSystemOptions() {
+  getSimSystemOptions().then(res => { simSystemOptions.value = res.data || [] })
+}
+function getSimSystemName(simSystemId) {
+  if (!simSystemId) return ''
+  const item = simSystemOptions.value.find(o => o.simSystemId === simSystemId)
+  return item?.systemName || ''
+}
 
 // ——— 分类树 ———
 const categoryTree = ref([])
@@ -226,7 +268,7 @@ const dialogTitle = ref('')
 
 const data = reactive({
   form: {},
-  queryParams: { pageNum: 1, pageSize: 10, expName: undefined, categoryId: undefined, status: undefined },
+  queryParams: { pageNum: 1, pageSize: 10, expName: undefined, categoryId: undefined, simSystemId: undefined, status: undefined },
   rules: { expName: [{ required: true, message: '实验名称不能为空', trigger: 'blur' }] }
 })
 const { queryParams, form, rules } = toRefs(data)
@@ -242,7 +284,7 @@ function getList() {
   listExperiment(queryParams.value).then(res => { experimentList.value = res.rows; total.value = res.total; loading.value = false })
 }
 
-function reset() { form.value = { expId: undefined, expName: undefined, categoryId: undefined, expType: 'web', launchUrl: undefined, description: undefined, status: '1', sortOrder: 0 }; proxy.resetForm('experimentRef') }
+function reset() { form.value = { expId: undefined, expName: undefined, categoryId: undefined, expType: 'web', launchUrl: undefined, description: undefined, status: '1', sortOrder: 0, simSystemId: undefined, expDuration: undefined, expGuide: undefined }; proxy.resetForm('experimentRef') }
 function handleQuery() { queryParams.value.pageNum = 1; getList() }
 function resetQuery() { proxy.resetForm('queryRef'); queryParams.value.categoryId = undefined; handleQuery() }
 function handleSelectionChange(sel) { ids.value = sel.map(i => i.expId); single.value = sel.length !== 1; multiple.value = !sel.length }
@@ -268,6 +310,7 @@ function handleDelete(row) {
 }
 
 loadCategoryTree()
+loadSimSystemOptions()
 getList()
 </script>
 

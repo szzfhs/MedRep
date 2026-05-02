@@ -5,6 +5,7 @@ SimHub 虚拟仿真实验教学平台 — 所有数据库模型
 from datetime import datetime
 
 from sqlalchemy import CHAR, BigInteger, Column, DateTime, Integer, String, Text
+from sqlalchemy.dialects.mysql import MEDIUMTEXT
 
 from config.database import Base
 from config.env import DataBaseConfig
@@ -108,12 +109,20 @@ class VfExperiment(Base):
     exp_type = Column(String(10), nullable=True, server_default='web', comment='类型(web/exe)')
     launch_url = Column(String(500), nullable=True, server_default="''", comment='启动地址')
     cover_image = Column(String(200), nullable=True, server_default="''", comment='封面图URL')
+    sim_system_id = Column(
+        BigInteger,
+        nullable=True,
+        server_default=SqlalchemyUtil.get_server_default_null(DataBaseConfig.db_type, False),
+        comment='关联实验系统ID（FK→vf_sim_system）',
+    )
     description = Column(Text, nullable=True, comment='实验介绍（富文本）')
+    exp_duration = Column(Integer, nullable=True, server_default='0', comment='实验时长（分钟）')
+    exp_guide = Column(MEDIUMTEXT, nullable=True, comment='实验指导书（HTML图文内容）')
     env_requirements = Column(Text, nullable=True, comment='环境要求')
     software_requirements = Column(Text, nullable=True, comment='软件要求')
     attachments = Column(Text, nullable=True, comment='附件JSON数组')
     tags = Column(String(200), nullable=True, server_default="''", comment='标签（逗号分隔）')
-    status = Column(CHAR(1), nullable=True, server_default='0', comment='状态(0=发布,1=下线)')
+    status = Column(CHAR(1), nullable=True, server_default='0', comment='状态(0=正常,1=停用)')
     view_count = Column(Integer, nullable=True, server_default='0', comment='查看次数')
     participate_count = Column(Integer, nullable=True, server_default='0', comment='参与人数')
     sort_order = Column(Integer, nullable=True, server_default='0', comment='排序')
@@ -155,10 +164,11 @@ class VfCourse(Base):
     )
     cover_image = Column(String(200), nullable=True, server_default="''", comment='封面图URL')
     description = Column(Text, nullable=True, comment='课程介绍（富文本）')
-    category = Column(String(100), nullable=True, server_default="''", comment='课程分类')
+    course_category = Column(CHAR(1), nullable=True, server_default='1', comment='课程分类(1=理论课,2=实验课,3=理实一体化课)')
+    category = Column(String(100), nullable=True, server_default="''", comment='课程分类（旧字段，已废弃）')
     total_sections = Column(Integer, nullable=True, server_default='0', comment='章节数')
     total_resources = Column(Integer, nullable=True, server_default='0', comment='资源数')
-    status = Column(CHAR(1), nullable=True, server_default='1', comment='状态(0=发布,1=草稿)')
+    status = Column(CHAR(1), nullable=True, server_default='0', comment='课程状态(0=新建,1=已审核,2=已发布)')
     enroll_count = Column(Integer, nullable=True, server_default='0', comment='选课人数')
     sort_order = Column(Integer, nullable=True, server_default='0', comment='排序')
     create_by = Column(String(64), nullable=True, server_default="''", comment='创建者')
@@ -180,7 +190,10 @@ class VfCourseSection(Base):
     title = Column(String(200), nullable=False, comment='章节标题')
     sort_order = Column(Integer, nullable=True, server_default='0', comment='排序')
     section_type = Column(String(10), nullable=True, server_default='section', comment='类型(chapter/section)')
-    description = Column(String(500), nullable=True, server_default="''", comment='描述')
+    description = Column(Text, nullable=True, comment='章节简介')
+    status = Column(CHAR(1), nullable=True, server_default='0', comment='状态(0=正常,1=停用)')
+    create_time = Column(DateTime, nullable=True, comment='创建时间', default=datetime.now)
+    update_time = Column(DateTime, nullable=True, comment='更新时间', onupdate=datetime.now)
 
 
 class VfCourseEnrollment(Base):
@@ -238,7 +251,9 @@ class VfResource(Base):
 
     resource_id = Column(BigInteger, primary_key=True, autoincrement=True, comment='资源ID')
     resource_name = Column(String(200), nullable=False, comment='资源名称')
-    resource_type = Column(String(10), nullable=True, server_default='doc', comment='类型(pdf/video/audio/image/doc)')
+    resource_content = Column(Text, nullable=True, comment='资源内容描述（摘要/正文）')
+    file_format = Column(String(20), nullable=True, server_default="''", comment='文件格式(pdf/mp4/docx/pptx/epub等)')
+    resource_type = Column(String(20), nullable=True, server_default='courseware', comment='类型(courseware/lesson_plan/micro_video/ebook/extension)')
     file_url = Column(String(500), nullable=True, server_default="''", comment='文件URL')
     cover_image = Column(String(200), nullable=True, server_default="''", comment='封面图URL')
     description = Column(String(500), nullable=True, server_default="''", comment='描述')
@@ -281,8 +296,17 @@ class VfSectionExperiment(Base):
 
     id = Column(BigInteger, primary_key=True, autoincrement=True, comment='ID')
     section_id = Column(BigInteger, nullable=False, comment='章节ID')
+    course_id = Column(
+        BigInteger,
+        nullable=True,
+        server_default=SqlalchemyUtil.get_server_default_null(DataBaseConfig.db_type, False),
+        comment='课程ID（冗余加速查询）',
+    )
     exp_id = Column(BigInteger, nullable=False, comment='实验ID')
     sort_order = Column(Integer, nullable=True, server_default='0', comment='排序')
+    status = Column(CHAR(1), nullable=True, server_default='0', comment='状态(0=正常,1=停用)')
+    create_time = Column(DateTime, nullable=True, comment='创建时间', default=datetime.now)
+    update_time = Column(DateTime, nullable=True, comment='更新时间', onupdate=datetime.now)
 
 
 class VfSectionResource(Base):
@@ -293,8 +317,92 @@ class VfSectionResource(Base):
 
     id = Column(BigInteger, primary_key=True, autoincrement=True, comment='ID')
     section_id = Column(BigInteger, nullable=False, comment='章节ID')
+    course_id = Column(
+        BigInteger,
+        nullable=True,
+        server_default=SqlalchemyUtil.get_server_default_null(DataBaseConfig.db_type, False),
+        comment='课程ID（冗余加速查询）',
+    )
     resource_id = Column(BigInteger, nullable=False, comment='资源ID')
     sort_order = Column(Integer, nullable=True, server_default='0', comment='排序')
+    status = Column(CHAR(1), nullable=True, server_default='0', comment='状态(0=正常,1=停用)')
+    create_time = Column(DateTime, nullable=True, comment='创建时间', default=datetime.now)
+    update_time = Column(DateTime, nullable=True, comment='更新时间', onupdate=datetime.now)
+
+
+class VfSimSystem(Base):
+    """实验系统信息表"""
+
+    __tablename__ = 'vf_sim_system'
+    __table_args__ = {'comment': '实验系统信息表'}
+
+    sim_system_id = Column(BigInteger, primary_key=True, autoincrement=True, comment='实验系统ID')
+    system_name = Column(String(200), nullable=False, comment='系统名称')
+    system_detail = Column(Text, nullable=True, comment='系统详情（富文本）')
+    cover_image = Column(String(200), nullable=True, server_default="''", comment='系统封面图URL')
+    hw_recommend = Column(String(500), nullable=True, server_default="''", comment='推荐硬件配置描述')
+    hw_support = Column(String(100), nullable=True, server_default="''", comment='支持的硬件设备（逗号分隔：helmet/pc/zspace）')
+    sys_category = Column(String(100), nullable=True, server_default="''", comment='系统分类')
+    view_count = Column(Integer, nullable=True, server_default='0', comment='查看次数')
+    status = Column(CHAR(1), nullable=True, server_default='0', comment='状态(0=正常,1=停用)')
+    del_flag = Column(CHAR(1), nullable=True, server_default='0', comment='删除标志(0=存在,2=删除)')
+    create_by = Column(String(64), nullable=True, server_default="''", comment='创建人')
+    create_time = Column(DateTime, nullable=True, comment='创建时间', default=datetime.now)
+    update_by = Column(String(64), nullable=True, server_default="''", comment='更新者')
+    update_time = Column(DateTime, nullable=True, comment='更新时间', onupdate=datetime.now)
+
+
+class VfSimSystemImage(Base):
+    """实验系统图集表"""
+
+    __tablename__ = 'vf_sim_system_image'
+    __table_args__ = {'comment': '实验系统图集表'}
+
+    image_id = Column(BigInteger, primary_key=True, autoincrement=True, comment='图片ID')
+    sim_system_id = Column(BigInteger, nullable=False, comment='实验系统ID')
+    image_url = Column(String(500), nullable=False, comment='图片URL')
+    sort_order = Column(Integer, nullable=True, server_default='0', comment='排序')
+    status = Column(CHAR(1), nullable=True, server_default='0', comment='状态(0=正常,1=停用)')
+    create_time = Column(DateTime, nullable=True, comment='创建时间', default=datetime.now)
+    update_time = Column(DateTime, nullable=True, comment='更新时间', onupdate=datetime.now)
+
+
+class VfQuestion(Base):
+    """习题信息表"""
+
+    __tablename__ = 'vf_question'
+    __table_args__ = {'comment': '习题信息表'}
+
+    question_id = Column(BigInteger, primary_key=True, autoincrement=True, comment='习题ID')
+    question_name = Column(String(200), nullable=True, server_default="''", comment='习题名称/标题')
+    stem = Column(Text, nullable=False, comment='题干内容（富文本）')
+    options = Column(Text, nullable=True, comment='选项JSON数组（单/多选题）')
+    question_type = Column(String(20), nullable=False, server_default='single', comment='题型(single/multiple/fill/essay)')
+    answer = Column(Text, nullable=True, comment='正确答案')
+    explanation = Column(Text, nullable=True, comment='答案释义/解析')
+    difficulty = Column(Integer, nullable=True, server_default='1', comment='难度(1=易,2=中,3=难)')
+    status = Column(CHAR(1), nullable=True, server_default='0', comment='状态(0=正常,1=停用)')
+    del_flag = Column(CHAR(1), nullable=True, server_default='0', comment='删除标志(0=存在,2=删除)')
+    create_by = Column(String(64), nullable=True, server_default="''", comment='创建人')
+    create_time = Column(DateTime, nullable=True, comment='创建时间', default=datetime.now)
+    update_by = Column(String(64), nullable=True, server_default="''", comment='更新者')
+    update_time = Column(DateTime, nullable=True, comment='更新时间', onupdate=datetime.now)
+
+
+class VfSectionQuestion(Base):
+    """课程章节与习题关联表"""
+
+    __tablename__ = 'vf_section_question'
+    __table_args__ = {'comment': '课程章节与习题关联表'}
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True, comment='主键')
+    section_id = Column(BigInteger, nullable=False, comment='章节ID')
+    course_id = Column(BigInteger, nullable=False, comment='课程ID（冗余加速查询）')
+    question_id = Column(BigInteger, nullable=False, comment='习题ID')
+    sort_order = Column(Integer, nullable=True, server_default='0', comment='排序')
+    status = Column(CHAR(1), nullable=True, server_default='0', comment='状态(0=正常,1=停用)')
+    create_time = Column(DateTime, nullable=True, comment='创建时间', default=datetime.now)
+    update_time = Column(DateTime, nullable=True, comment='更新时间', onupdate=datetime.now)
 
 
 class VfStudentProfile(Base):

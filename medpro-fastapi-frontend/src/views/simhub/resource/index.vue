@@ -35,8 +35,8 @@
             <el-input v-model="queryParams.resourceName" placeholder="请输入资源名称" clearable style="width:180px" @keyup.enter="handleQuery" />
           </el-form-item>
           <el-form-item label="类型" prop="resourceType">
-            <el-select v-model="queryParams.resourceType" placeholder="资源类型" clearable style="width:110px">
-              <el-option label="PDF" value="pdf" /><el-option label="视频" value="video" /><el-option label="音频" value="audio" /><el-option label="图片" value="image" /><el-option label="文档" value="doc" />
+            <el-select v-model="queryParams.resourceType" placeholder="资源类型" clearable style="width:120px">
+              <el-option v-for="d in dict.type.vf_resource_type" :key="d.value" :label="d.label" :value="d.value" />
             </el-select>
           </el-form-item>
           <el-form-item>
@@ -62,9 +62,9 @@
           <el-table-column type="selection" width="55" align="center" />
           <el-table-column label="ID" prop="resourceId" width="80" align="center" />
           <el-table-column label="资源名称" prop="resourceName" :show-overflow-tooltip="true" />
-          <el-table-column label="类型" prop="resourceType" width="80" align="center">
+          <el-table-column label="类型" prop="resourceType" width="100" align="center">
             <template #default="{ row }">
-              <el-tag size="small">{{ row.resourceType?.toUpperCase() }}</el-tag>
+              <dict-tag :options="dict.type.vf_resource_type" :value="row.resourceType" />
             </template>
           </el-table-column>
           <el-table-column label="文件大小" prop="fileSize" width="100" align="center">
@@ -124,7 +124,7 @@
           <el-col :span="8">
             <el-form-item label="资源类型" prop="resourceType">
               <el-select v-model="form.resourceType" placeholder="请选择" style="width:100%">
-                <el-option label="PDF" value="pdf" /><el-option label="视频" value="video" /><el-option label="音频" value="audio" /><el-option label="图片" value="image" /><el-option label="文档" value="doc" />
+                <el-option v-for="d in dict.type.vf_resource_type" :key="d.value" :label="d.label" :value="d.value" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -149,8 +149,8 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="封面图">
-              <image-upload v-model="form.coverImage" :limit="1" />
+            <el-form-item label="文件格式">
+              <el-input v-model="form.fileFormat" placeholder="如: mp4、pdf、docx" maxlength="20" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -159,8 +159,8 @@
             </el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="描述">
-              <el-input v-model="form.description" type="textarea" :rows="3" placeholder="请输入资源描述" />
+            <el-form-item label="正文内容">
+              <editor v-model="form.resourceContent" :min-height="200" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -180,6 +180,8 @@ import {
 } from '@/api/simhub/resource'
 
 const { proxy } = getCurrentInstance()
+const { vf_resource_type } = proxy.useDict('vf_resource_type')
+const dict = reactive({ type: { vf_resource_type } })
 
 // ——— 分类树 ———
 const categoryTree = ref([])
@@ -241,7 +243,7 @@ function getList() {
   listResource(queryParams.value).then(res => { resourceList.value = res.rows; total.value = res.total; loading.value = false })
 }
 
-function reset() { form.value = { resourceId: undefined, resourceName: undefined, resourceType: undefined, fileUrl: undefined, categoryId: undefined, allowDownload: '0', fileSize: 0 }; proxy.resetForm('resourceRef') }
+function reset() { form.value = { resourceId: undefined, resourceName: undefined, resourceType: undefined, fileUrl: undefined, categoryId: undefined, allowDownload: '0', fileSize: 0, fileFormat: undefined, resourceContent: undefined }; proxy.resetForm('resourceRef') }
 function handleQuery() { queryParams.value.pageNum = 1; getList() }
 function resetQuery() { proxy.resetForm('queryRef'); queryParams.value.categoryId = undefined; handleQuery() }
 function handleSelectionChange(sel) { ids.value = sel.map(i => i.resourceId); single.value = sel.length !== 1; multiple.value = !sel.length }

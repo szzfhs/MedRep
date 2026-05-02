@@ -75,7 +75,10 @@ class CourseSectionDao:
 
     @classmethod
     async def add_section_experiment(cls, db: AsyncSession, section_id: int, exp_id: int, sort_order: int = 0) -> None:
-        rel = VfSectionExperiment(section_id=section_id, exp_id=exp_id, sort_order=sort_order)
+        # 通过 section 获取 course_id 以填充冗余字段
+        section = await cls.get_section_by_id(db, section_id)
+        course_id = section.course_id if section else None
+        rel = VfSectionExperiment(section_id=section_id, exp_id=exp_id, sort_order=sort_order, course_id=course_id)
         db.add(rel)
         await db.flush()
 
@@ -94,7 +97,9 @@ class CourseSectionDao:
 
     @classmethod
     async def add_section_resource(cls, db: AsyncSession, section_id: int, resource_id: int, sort_order: int = 0) -> None:
-        rel = VfSectionResource(section_id=section_id, resource_id=resource_id, sort_order=sort_order)
+        section = await cls.get_section_by_id(db, section_id)
+        course_id = section.course_id if section else None
+        rel = VfSectionResource(section_id=section_id, resource_id=resource_id, sort_order=sort_order, course_id=course_id)
         db.add(rel)
         await db.flush()
 
@@ -122,8 +127,8 @@ class CourseDao:
             conditions.append(VfCourse.teacher_id == query.teacher_id)
         if query.status is not None:
             conditions.append(VfCourse.status == query.status)
-        if query.category:
-            conditions.append(VfCourse.category == query.category)
+        if query.course_category:
+            conditions.append(VfCourse.course_category == query.course_category)
 
         count_result = await db.execute(select(func.count()).where(*conditions))
         total = count_result.scalar() or 0

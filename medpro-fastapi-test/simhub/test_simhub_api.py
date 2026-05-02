@@ -331,3 +331,231 @@ class TestAuthGuard:
         assert resp.status_code == 200
         body = resp.json()
         assert body.get('code') == 401, f'期望业务 code=401，实际: {body}'
+
+
+# ===========================================================================
+# 十、实验系统管理 CRUD（v2 新增）
+# ===========================================================================
+
+
+class TestSimSystemAPI:
+    created_id: int | None = None
+
+    def test_list_sim_systems(self, auth_headers: dict) -> None:
+        resp = requests.get(
+            f'{BASE}/simhub/sim-system/list',
+            params={'pageNum': 1, 'pageSize': 10},
+            headers=auth_headers,
+            timeout=10,
+        )
+        _ok(resp)
+
+    def test_get_sim_system_options(self, auth_headers: dict) -> None:
+        resp = requests.get(f'{BASE}/simhub/sim-system/options', headers=auth_headers, timeout=10)
+        _ok(resp)
+
+    def test_add_sim_system(self, auth_headers: dict) -> None:
+        payload = {
+            'systemName': 'pytest 测试实验系统',
+            'systemDetail': '<p>接口联调测试实验系统</p>',
+            'hwSupport': 'pc',
+            'sysCategory': '临床技能',
+            'status': '0',
+            'images': [],
+        }
+        resp = requests.post(f'{BASE}/simhub/sim-system', json=payload, headers=auth_headers, timeout=10)
+        _ok(resp)
+
+    def test_list_after_add(self, auth_headers: dict) -> None:
+        """新增后再次查询，验证数据存在。"""
+        resp = requests.get(
+            f'{BASE}/simhub/sim-system/list',
+            params={'pageNum': 1, 'pageSize': 100, 'systemName': 'pytest'},
+            headers=auth_headers,
+            timeout=10,
+        )
+        body = _ok(resp)
+        rows = body.get('rows') or body.get('data', {}).get('rows', [])
+        assert len(rows) >= 1, '应能查到刚新增的实验系统'
+        TestSimSystemAPI.created_id = rows[0].get('simSystemId')
+
+    def test_get_sim_system_detail(self, auth_headers: dict) -> None:
+        if TestSimSystemAPI.created_id is None:
+            pytest.skip('未获取到新增的实验系统ID')
+        resp = requests.get(
+            f'{BASE}/simhub/sim-system/{TestSimSystemAPI.created_id}',
+            headers=auth_headers, timeout=10,
+        )
+        _ok(resp)
+
+    def test_edit_sim_system(self, auth_headers: dict) -> None:
+        if TestSimSystemAPI.created_id is None:
+            pytest.skip('未获取到新增的实验系统ID')
+        payload = {
+            'simSystemId': TestSimSystemAPI.created_id,
+            'systemName': 'pytest 测试实验系统（已更新）',
+            'hwSupport': 'pc,helmet',
+        }
+        resp = requests.put(f'{BASE}/simhub/sim-system', json=payload, headers=auth_headers, timeout=10)
+        _ok(resp)
+
+    def test_delete_sim_system(self, auth_headers: dict) -> None:
+        if TestSimSystemAPI.created_id is None:
+            pytest.skip('未获取到新增的实验系统ID')
+        resp = requests.delete(
+            f'{BASE}/simhub/sim-system/{TestSimSystemAPI.created_id}',
+            headers=auth_headers, timeout=10,
+        )
+        _ok(resp)
+
+
+# ===========================================================================
+# 十一、习题管理 CRUD（v2 新增）
+# ===========================================================================
+
+
+class TestQuestionAPI:
+    created_id: int | None = None
+
+    def test_list_questions(self, auth_headers: dict) -> None:
+        resp = requests.get(
+            f'{BASE}/simhub/question/list',
+            params={'pageNum': 1, 'pageSize': 10},
+            headers=auth_headers,
+            timeout=10,
+        )
+        _ok(resp)
+
+    def test_add_single_question(self, auth_headers: dict) -> None:
+        payload = {
+            'questionName': 'pytest 单选题',
+            'stem': '下列哪项是心肺复苏的首要步骤？',
+            'options': '[{"key":"A","text":"检查意识"},{"key":"B","text":"立即胸外按压"},{"key":"C","text":"呼叫帮助"},{"key":"D","text":"开放气道"}]',
+            'questionType': 'single',
+            'answer': 'A',
+            'explanation': '首先判断患者意识状态。',
+            'difficulty': 1,
+            'status': '0',
+        }
+        resp = requests.post(f'{BASE}/simhub/question', json=payload, headers=auth_headers, timeout=10)
+        _ok(resp)
+
+    def test_list_after_add(self, auth_headers: dict) -> None:
+        resp = requests.get(
+            f'{BASE}/simhub/question/list',
+            params={'pageNum': 1, 'pageSize': 100, 'questionName': 'pytest'},
+            headers=auth_headers,
+            timeout=10,
+        )
+        body = _ok(resp)
+        rows = body.get('rows') or body.get('data', {}).get('rows', [])
+        assert len(rows) >= 1
+        TestQuestionAPI.created_id = rows[0].get('questionId')
+
+    def test_get_question_detail(self, auth_headers: dict) -> None:
+        if TestQuestionAPI.created_id is None:
+            pytest.skip('未获取到新增的习题ID')
+        resp = requests.get(
+            f'{BASE}/simhub/question/{TestQuestionAPI.created_id}',
+            headers=auth_headers, timeout=10,
+        )
+        body = _ok(resp)
+        data = body.get('data') or {}
+        assert data.get('questionType') == 'single'
+
+    def test_edit_question(self, auth_headers: dict) -> None:
+        if TestQuestionAPI.created_id is None:
+            pytest.skip('未获取到新增的习题ID')
+        payload = {
+            'questionId': TestQuestionAPI.created_id,
+            'questionName': 'pytest 单选题（已更新）',
+            'stem': '下列哪项是心肺复苏的首要步骤？（已修改）',
+            'questionType': 'single',
+            'difficulty': 2,
+        }
+        resp = requests.put(f'{BASE}/simhub/question', json=payload, headers=auth_headers, timeout=10)
+        _ok(resp)
+
+    def test_section_question_flow(self, auth_headers: dict) -> None:
+        """章节-习题关联：关联→查询→移除 完整流程（使用已初始化的 section_id=1）。"""
+        if TestQuestionAPI.created_id is None:
+            pytest.skip('未获取到新增的习题ID')
+        # 关联
+        payload = {'sectionId': 1, 'questionId': TestQuestionAPI.created_id, 'sortOrder': 0}
+        resp = requests.post(f'{BASE}/simhub/question/section', json=payload, headers=auth_headers, timeout=10)
+        _ok(resp)
+        # 查询
+        resp = requests.get(f'{BASE}/simhub/question/section/1', headers=auth_headers, timeout=10)
+        body = _ok(resp)
+        data = body.get('data') or []
+        assert any(item.get('questionId') == TestQuestionAPI.created_id for item in data)
+        # 移除
+        resp = requests.delete(
+            f'{BASE}/simhub/question/section/1/{TestQuestionAPI.created_id}',
+            headers=auth_headers, timeout=10,
+        )
+        _ok(resp)
+
+    def test_delete_question(self, auth_headers: dict) -> None:
+        if TestQuestionAPI.created_id is None:
+            pytest.skip('未获取到新增的习题ID')
+        resp = requests.delete(
+            f'{BASE}/simhub/question/{TestQuestionAPI.created_id}',
+            headers=auth_headers, timeout=10,
+        )
+        _ok(resp)
+
+
+# ===========================================================================
+# 十二、v2 字段兼容性验证
+# ===========================================================================
+
+
+class TestV2FieldCompatibility:
+    """验证 v2 新增字段在接口响应中正常返回。"""
+
+    def test_course_has_course_category(self, auth_headers: dict) -> None:
+        """课程列表应包含 courseCategory 字段。"""
+        resp = requests.get(
+            f'{BASE}/simhub/course/list',
+            params={'pageNum': 1, 'pageSize': 5},
+            headers=auth_headers, timeout=10,
+        )
+        body = _ok(resp)
+        rows = body.get('rows') or body.get('data', {}).get('rows', [])
+        if rows:
+            assert 'courseCategory' in rows[0], f'courseCategory 字段缺失: {rows[0].keys()}'
+
+    def test_add_course_with_v2_fields(self, auth_headers: dict) -> None:
+        """新增课程时带 courseCategory 和 v2 status 值。"""
+        payload = {
+            'courseName': 'pytest v2 实验课程',
+            'courseCategory': '2',
+            'status': '0',
+        }
+        resp = requests.post(f'{BASE}/simhub/course', json=payload, headers=auth_headers, timeout=10)
+        _ok(resp)
+
+    def test_add_experiment_with_v2_fields(self, auth_headers: dict) -> None:
+        """新增实验时带 expDuration 和 expGuide 字段。"""
+        payload = {
+            'expName': 'pytest v2 实验',
+            'expType': 'web',
+            'expDuration': 30,
+            'expGuide': '<p>pytest 实验指导书</p>',
+            'status': '0',
+        }
+        resp = requests.post(f'{BASE}/simhub/experiment', json=payload, headers=auth_headers, timeout=10)
+        _ok(resp)
+
+    def test_add_resource_with_v2_fields(self, auth_headers: dict) -> None:
+        """新增资源时带 resourceContent / fileFormat / v2 resourceType 值。"""
+        payload = {
+            'resourceName': 'pytest v2 资源',
+            'resourceType': 'micro_video',
+            'resourceContent': 'pytest 资源摘要内容',
+            'fileFormat': 'mp4',
+            'status': '0',
+        }
+        resp = requests.post(f'{BASE}/simhub/resource', json=payload, headers=auth_headers, timeout=10)
+        _ok(resp)

@@ -37,3 +37,4 @@ export function updateExperiment(data) {
 export function delExperiment(expIds) {
   return request({ url: '/simhub/experiment/' + expIds, method: 'delete' })
 }
+

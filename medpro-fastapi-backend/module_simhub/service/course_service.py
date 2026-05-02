@@ -8,10 +8,14 @@ from module_simhub.dao.course_dao import (
     EnrollmentDao,
     LearningProgressDao,
 )
+from module_simhub.dao.experiment_dao import ExperimentDao
+from module_simhub.dao.resource_dao import ResourceDao
 from module_simhub.entity.do.simhub_do import VfCourse, VfCourseSection
 from module_simhub.entity.vo.course_vo import (
     AddCourseModel,
+    AddSectionExperimentModel,
     AddSectionModel,
+    AddSectionResourceModel,
     CourseSectionModel,
     CourseModel,
     CoursePageQueryModel,
@@ -163,3 +167,66 @@ class CourseService:
     ) -> CrudResponseModel:
         await CourseSectionDao.remove_section_resource(db, section_id, resource_id)
         return CrudResponseModel(is_success=True, message='取消关联成功')
+
+    @classmethod
+    async def get_section_experiments_detail(cls, db: AsyncSession, section_id: int) -> list[dict]:
+        """获取章节绑定的实验列表（含实验基本信息）"""
+        rels = await CourseSectionDao.get_section_experiments(db, section_id)
+        result = []
+        for rel in rels:
+            exp = await ExperimentDao.get_experiment_by_id(db, rel.exp_id)
+            item = {
+                'id': rel.id,
+                'sectionId': rel.section_id,
+                'courseId': rel.course_id,
+                'expId': rel.exp_id,
+                'sortOrder': rel.sort_order,
+                'status': rel.status,
+                'createTime': rel.create_time,
+                'updateTime': rel.update_time,
+                'expName': exp.exp_name if exp else None,
+                'expType': exp.exp_type if exp else None,
+                'coverImage': exp.cover_image if exp else None,
+            }
+            result.append(item)
+        return result
+
+    @classmethod
+    async def get_section_resources_detail(cls, db: AsyncSession, section_id: int) -> list[dict]:
+        """获取章节绑定的资源列表（含资源基本信息）"""
+        rels = await CourseSectionDao.get_section_resources(db, section_id)
+        result = []
+        for rel in rels:
+            res = await ResourceDao.get_resource_by_id(db, rel.resource_id)
+            item = {
+                'id': rel.id,
+                'sectionId': rel.section_id,
+                'courseId': rel.course_id,
+                'resourceId': rel.resource_id,
+                'sortOrder': rel.sort_order,
+                'status': rel.status,
+                'createTime': rel.create_time,
+                'updateTime': rel.update_time,
+                'resourceName': res.resource_name if res else None,
+                'resourceType': res.resource_type if res else None,
+                'fileUrl': res.file_url if res else None,
+                'coverImage': res.cover_image if res else None,
+            }
+            result.append(item)
+        return result
+
+    @classmethod
+    async def link_section_experiment_v2(
+        cls, db: AsyncSession, data: AddSectionExperimentModel
+    ) -> CrudResponseModel:
+        await CourseSectionDao.add_section_experiment(db, data.section_id, data.exp_id, data.sort_order or 0)
+        await db.commit()
+        return CrudResponseModel(is_success=True, message='关联成功')
+
+    @classmethod
+    async def link_section_resource_v2(
+        cls, db: AsyncSession, data: AddSectionResourceModel
+    ) -> CrudResponseModel:
+        await CourseSectionDao.add_section_resource(db, data.section_id, data.resource_id, data.sort_order or 0)
+        await db.commit()
+        return CrudResponseModel(is_success=True, message='关联成功')

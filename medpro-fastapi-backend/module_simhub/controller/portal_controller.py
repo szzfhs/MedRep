@@ -2,6 +2,7 @@
 from typing import Annotated
 
 from fastapi import Path, Query, Request, Response
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from common.aspect.db_seesion import DBSessionDependency
@@ -9,18 +10,22 @@ from common.aspect.interface_auth import UserInterfaceAuthDependency
 from common.aspect.pre_auth import CurrentUserDependency, PreAuthDependency
 from common.router import APIRouterPro
 from common.vo import DataResponseModel, PageResponseModel
+from module_admin.entity.do.user_do import SysUser
 from module_admin.entity.vo.user_vo import CurrentUserModel
+from module_simhub.entity.do.simhub_do import VfCourse, VfExperiment, VfResource
 from module_simhub.entity.vo.course_vo import CoursePageQueryModel
 from module_simhub.entity.vo.experiment_vo import ExperimentPageQueryModel
 from module_simhub.entity.vo.news_vo import NewsPageQueryModel
 from module_simhub.entity.vo.regulation_vo import RegulationPageQueryModel
 from module_simhub.entity.vo.resource_vo import ResourcePageQueryModel
+from module_simhub.entity.vo.sim_system_vo import SimSystemPageQueryModel
 from module_simhub.service.center_service import CenterService
 from module_simhub.service.course_service import CourseService
 from module_simhub.service.experiment_service import ExperimentService
 from module_simhub.service.news_service import NewsService
 from module_simhub.service.regulation_service import RegulationService
 from module_simhub.service.resource_service import ResourceService
+from module_simhub.service.sim_system_service import SimSystemService
 from utils.response_util import ResponseUtil
 
 # 门户路由无 PreAuthDependency —— 公开接口
@@ -223,4 +228,69 @@ async def portal_resource_detail(
 ) -> Response:
     await ResourceService.increment_view(query_db, resource_id)
     result = await ResourceService.get_resource_by_id(query_db, resource_id)
+    return ResponseUtil.success(data=result)
+
+
+# ——— 平台统计 ———
+
+@portal_controller.get(
+    '/stats',
+    summary='门户-平台统计数据',
+    response_model=DataResponseModel,
+)
+async def portal_stats(
+    request: Request,
+    query_db: Annotated[AsyncSession, DBSessionDependency()],
+) -> Response:
+    exp_count = (await query_db.execute(
+        select(func.count()).select_from(VfExperiment).where(VfExperiment.status == '1')
+    )).scalar_one()
+    course_count = (await query_db.execute(
+        select(func.count()).select_from(VfCourse).where(VfCourse.status == '2')
+    )).scalar_one()
+    user_count = (await query_db.execute(
+        select(func.count()).select_from(SysUser).where(SysUser.del_flag == '0')
+    )).scalar_one()
+    total_duration = (await query_db.execute(
+        select(func.coalesce(func.sum(VfExperiment.exp_duration), 0))
+        .select_from(VfExperiment)
+        .where(VfExperiment.status == '1', VfExperiment.exp_duration.isnot(None))
+    )).scalar_one()
+    return ResponseUtil.success(data={
+        'experimentCount': exp_count,
+        'courseCount': course_count,
+        'userCount': user_count,
+        'totalDuration': total_duration,
+    })
+
+
+# ——— 应用中心（实验系统）———
+
+@portal_controller.get(
+    '/sim-system',
+    summary='门户-应用中心列表',
+    response_model=PageResponseModel,
+)
+async def portal_sim_system_list(
+    request: Request,
+    query: Annotated[SimSystemPageQueryModel, Query()],
+    query_db: Annotated[AsyncSession, DBSessionDependency()],
+) -> Response:
+    result = await SimSystemService.get_portal_sim_system_list(query_db, query)
+    return ResponseUtil.success(model_content=result)
+
+
+@portal_controller.get(
+    '/sim-system/{sim_system_id}',
+    summary='门户-应用中心系统详情',
+    response_model=DataResponseModel,
+)
+async def portal_sim_system_detail(
+    request: Request,
+    sim_system_id: Annotated[int, Path(ge=1)],
+    query_db: Annotated[AsyncSession, DBSessionDependency()],
+) -> Response:
+    result = await SimSystemService.get_sim_system_detail(query_db, sim_system_id, incr_view=True)
+    if result is None:
+        return ResponseUtil.failure(msg='系统不存在')
     return ResponseUtil.success(data=result)

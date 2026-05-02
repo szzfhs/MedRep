@@ -61,6 +61,8 @@ class ExperimentDao:
             conditions.append(VfExperiment.exp_name.like(f'%{query.exp_name}%'))
         if query.category_id:
             conditions.append(VfExperiment.category_id == query.category_id)
+        if query.sim_system_id:
+            conditions.append(VfExperiment.sim_system_id == query.sim_system_id)
         if query.exp_type:
             conditions.append(VfExperiment.exp_type == query.exp_type)
         if query.status is not None:

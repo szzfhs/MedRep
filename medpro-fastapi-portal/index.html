@@ -1,21 +1,17 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SimHub 虚拟仿真实验教学平台</title>
-    <!-- 无外部 CDN，字体资源由 npm 包本地提供 -->
-    <!-- 内联字体回退：使用系统字体栈，无需外部字体加载 -->
-    <style>
-      :root {
-        --font-headline: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', system-ui, sans-serif;
-        --font-body: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', system-ui, sans-serif;
-      }
-    </style>
-  </head>
-  <body class="bg-background text-on-surface font-body">
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
-</html>
+
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+      <title>临床医学虚拟仿真实验教学平台</title>
+      <style>html, body { height: 100%; margin: 0; } #root { height: 100%; }</style>
+    </head>
+
+    <body>
+      <div id="root"></div>
+      <script type="module" src="/src/main.tsx"></script>
+    </body>
+  </html>
+  

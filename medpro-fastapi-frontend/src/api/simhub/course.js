@@ -33,3 +33,29 @@ export function updateSection(data) {
 export function delSection(sectionId) {
   return request({ url: '/simhub/course/section/' + sectionId, method: 'delete' })
 }
+
+// ——— 章节-实验 关联 ———
+export function getSectionExperiments(sectionId) {
+  return request({ url: `/simhub/course/section/${sectionId}/experiments`, method: 'get' })
+}
+
+export function bindSectionExperiment(data) {
+  return request({ url: '/simhub/course/section/experiment', method: 'post', data })
+}
+
+export function unbindSectionExperiment(sectionId, expId) {
+  return request({ url: `/simhub/course/section/${sectionId}/experiment/${expId}`, method: 'delete' })
+}
+
+// ——— 章节-资源 关联 ———
+export function getSectionResources(sectionId) {
+  return request({ url: `/simhub/course/section/${sectionId}/resources`, method: 'get' })
+}
+
+export function bindSectionResource(data) {
+  return request({ url: '/simhub/course/section/resource', method: 'post', data })
+}
+
+export function unbindSectionResource(sectionId, resourceId) {
+  return request({ url: `/simhub/course/section/${sectionId}/resource/${resourceId}`, method: 'delete' })
+}
