@@ -63,8 +63,8 @@
     <pagination v-show="total > 0" :total="total" v-model:page="queryParams.pageNum" v-model:limit="queryParams.pageSize" @pagination="getList" />
 
     <!-- 课程对话框 -->
-    <el-dialog :title="dialogTitle" v-model="open" width="720px" append-to-body destroy-on-close>
-      <el-form ref="courseRef" :model="form" :rules="rules" label-width="90px">
+    <el-dialog :title="dialogTitle" v-model="open" width="820px" append-to-body destroy-on-close>
+      <el-form ref="courseRef" :model="form" :rules="rules" label-width="100px">
         <el-row :gutter="16">
           <el-col :span="16">
             <el-form-item label="课程名称" prop="courseName">
@@ -76,6 +76,41 @@
               <el-select v-model="form.courseCategory" placeholder="请选择" style="width:100%">
                 <el-option v-for="d in dict.type.vf_course_category" :key="d.value" :label="d.label" :value="d.value" />
               </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="英文副标题">
+              <el-input v-model="form.subtitle" placeholder="如：Virtual Human Anatomy Laboratory" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="主讲教师">
+              <el-input v-model="form.teacherName" placeholder="如：王明远 教授" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="所属院系">
+              <el-input v-model="form.department" placeholder="如：基础医学院" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="总学时">
+              <el-input-number v-model="form.totalHours" :min="0" style="width:100%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="课程评分">
+              <el-input-number v-model="form.rating" :min="0" :max="5" :precision="1" :step="0.1" style="width:100%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="评价数">
+              <el-input-number v-model="form.reviewCount" :min="0" style="width:100%" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="开课时间">
+              <el-date-picker v-model="form.publishDate" type="date" placeholder="选择日期" style="width:100%" value-format="YYYY-MM-DD HH:mm:ss" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -152,8 +187,24 @@
               <el-option label="章" value="chapter" /><el-option label="节" value="section" />
             </el-select>
           </el-form-item>
+          <el-form-item label="学时">
+            <el-input-number v-model="sectionForm.hours" :min="0" style="width:100%" />
+          </el-form-item>
           <el-form-item label="排序">
             <el-input-number v-model="sectionForm.sortOrder" :min="0" style="width:100%" />
+          </el-form-item>
+          <el-form-item label="资源标识">
+            <el-row :gutter="12">
+              <el-col :span="8">
+                <el-checkbox v-model="sectionForm.hasResource" true-value="1" false-value="0">有课件资源</el-checkbox>
+              </el-col>
+              <el-col :span="8">
+                <el-checkbox v-model="sectionForm.hasExperiment" true-value="1" false-value="0">有虚拟实验</el-checkbox>
+              </el-col>
+              <el-col :span="8">
+                <el-checkbox v-model="sectionForm.hasTest" true-value="1" false-value="0">有在线测试</el-checkbox>
+              </el-col>
+            </el-row>
           </el-form-item>
         </el-form>
         <template #footer>
@@ -384,7 +435,7 @@ const data = reactive({
 })
 const { queryParams, form, rules } = toRefs(data)
 
-const sectionForm = ref({ sectionId: undefined, courseId: undefined, title: undefined, parentId: undefined, sectionType: 'section', sortOrder: 0 })
+const sectionForm = ref({ sectionId: undefined, courseId: undefined, title: undefined, parentId: undefined, sectionType: 'section', sortOrder: 0, hours: 0, hasResource: '0', hasExperiment: '0', hasTest: '0' })
 const sectionRules = { title: [{ required: true, message: '章节标题不能为空', trigger: 'blur' }] }
 
 function getList() {
@@ -392,7 +443,7 @@ function getList() {
   listCourse(queryParams.value).then(res => { courseList.value = res.rows; total.value = res.total; loading.value = false })
 }
 
-function reset() { form.value = { courseId: undefined, courseName: undefined, courseCategory: undefined, description: undefined, status: '0', sortOrder: 0 }; proxy.resetForm('courseRef') }
+function reset() { form.value = { courseId: undefined, courseName: undefined, subtitle: undefined, teacherName: undefined, department: undefined, courseCategory: undefined, description: undefined, totalHours: 0, rating: undefined, reviewCount: 0, publishDate: undefined, status: '0', sortOrder: 0 }; proxy.resetForm('courseRef') }
 function handleQuery() { queryParams.value.pageNum = 1; getList() }
 function resetQuery() { proxy.resetForm('queryRef'); handleQuery() }
 function handleSelectionChange(sel) { ids.value = sel.map(i => i.courseId); single.value = sel.length !== 1; multiple.value = !sel.length }
@@ -423,7 +474,7 @@ function handleSection(row) {
 }
 
 function handleAddSection(parent) {
-  sectionForm.value = { sectionId: undefined, courseId: currentCourseId.value, title: undefined, parentId: parent?.sectionId, sectionType: 'section', sortOrder: 0 }
+  sectionForm.value = { sectionId: undefined, courseId: currentCourseId.value, title: undefined, parentId: parent?.sectionId, sectionType: 'section', sortOrder: 0, hours: 0, hasResource: '0', hasExperiment: '0', hasTest: '0' }
   sectionFormOpen.value = true
 }
 

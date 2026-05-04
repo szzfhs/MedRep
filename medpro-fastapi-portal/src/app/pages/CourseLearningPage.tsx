@@ -1,25 +1,52 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router';
 import {
   ChevronLeft, ChevronRight, BookOpen, FlaskConical,
   HelpCircle, FileText, Play, CheckCircle, Menu, X,
   Maximize2, Volume2, Settings, ArrowLeft, ArrowRight
 } from 'lucide-react';
-import { courses } from '../data/mockData';
+import { getCourseDetail, type Course, type CourseSection } from '../../api/course';
 
 export function CourseLearningPage() {
   const { id } = useParams<{ id: string }>();
-  const course = courses.find((c) => c.id === id) || courses[0];
+  const [course, setCourse] = useState<Course | null>(null);
+  const [sections, setSections] = useState<CourseSection[]>([]);
+  const [loading, setLoading] = useState(true);
   const [currentChapter, setCurrentChapter] = useState(0);
   const [activeTab, setActiveTab] = useState<'resource' | 'experiment' | 'test'>('resource');
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  const chapter = course.outline[currentChapter];
+  useEffect(() => {
+    if (!id) return;
+    setLoading(true);
+    getCourseDetail(Number(id))
+      .then((res) => { setCourse(res.course); setSections(res.sections ?? []); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="h-screen bg-[#0F1923] flex items-center justify-center">
+        <div className="text-[#64748B]">加载中...</div>
+      </div>
+    );
+  }
+
+  if (!course || sections.length === 0) {
+    return (
+      <div className="h-screen bg-[#0F1923] flex items-center justify-center">
+        <div className="text-[#64748B]">暂无章节内容</div>
+      </div>
+    );
+  }
+
+  const chapter = sections[currentChapter];
 
   const tabs = [
-    { key: 'resource' as const, label: '课件讲义', icon: FileText, available: chapter.hasResource },
-    { key: 'experiment' as const, label: '虚拟实验', icon: FlaskConical, available: chapter.hasExperiment },
-    { key: 'test' as const, label: '在线测试', icon: HelpCircle, available: chapter.hasTest },
+    { key: 'resource' as const, label: '课件讲义', icon: FileText, available: chapter.hasResource === '1' },
+    { key: 'experiment' as const, label: '虚拟实验', icon: FlaskConical, available: chapter.hasExperiment === '1' },
+    { key: 'test' as const, label: '在线测试', icon: HelpCircle, available: chapter.hasTest === '1' },
   ];
 
   return (
@@ -35,7 +62,7 @@ export function CourseLearningPage() {
           </Link>
           <span className="text-[#2D3F55]">|</span>
           <div className="text-white text-sm">
-            <span className="text-[#64748B]">{course.title}</span>
+            <span className="text-[#64748B]">{course.courseName}</span>
             <span className="text-[#64748B] mx-2">›</span>
             <span className="text-white">第{currentChapter + 1}章 {chapter.title}</span>
           </div>
@@ -47,10 +74,10 @@ export function CourseLearningPage() {
             <div className="w-24 h-1.5 bg-[#2D3F55] rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-[#1E88E5] to-[#00897B] rounded-full transition-all"
-                style={{ width: `${((currentChapter + 1) / course.outline.length) * 100}%` }}
+                style={{ width: `${((currentChapter + 1) / sections.length) * 100}%` }}
               />
             </div>
-            <span>{currentChapter + 1}/{course.outline.length}</span>
+            <span>{currentChapter + 1}/{sections.length}</span>
           </div>
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -159,7 +186,7 @@ export function CourseLearningPage() {
               </div>
             )}
 
-            {activeTab === 'experiment' && chapter.hasExperiment && (
+            {activeTab === 'experiment' && chapter.hasExperiment === '1' && (
               <div className="h-full flex items-center justify-center bg-[#0F1923]">
                 <div className="text-center px-6">
                   <div className="w-20 h-20 bg-[#1E2D3D] rounded-2xl flex items-center justify-center mx-auto mb-5">
@@ -183,7 +210,7 @@ export function CourseLearningPage() {
               </div>
             )}
 
-            {activeTab === 'test' && chapter.hasTest && (
+            {activeTab === 'test' && chapter.hasTest === '1' && (
               <div className="p-6 max-w-3xl mx-auto">
                 <div className="bg-[#1A2332] rounded-2xl p-6">
                   <h3 className="text-white font-semibold text-lg mb-1">
@@ -232,7 +259,7 @@ export function CourseLearningPage() {
               <ArrowLeft size={16} /> 上一章
             </button>
             <div className="flex gap-1.5">
-              {course.outline.slice(0, 10).map((_, i) => (
+              {sections.slice(0, 10).map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setCurrentChapter(i)}
@@ -247,8 +274,8 @@ export function CourseLearningPage() {
               ))}
             </div>
             <button
-              onClick={() => setCurrentChapter(Math.min(course.outline.length - 1, currentChapter + 1))}
-              disabled={currentChapter === course.outline.length - 1}
+              onClick={() => setCurrentChapter(Math.min(sections.length - 1, currentChapter + 1))}
+              disabled={currentChapter === sections.length - 1}
               className="flex items-center gap-2 px-4 py-2 text-sm text-[#64748B] hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
               下一章 <ArrowRight size={16} />
@@ -261,12 +288,12 @@ export function CourseLearningPage() {
           <div className="w-72 bg-[#161F2A] border-l border-[#2D3F55] flex flex-col overflow-hidden flex-shrink-0">
             <div className="px-4 py-3 border-b border-[#2D3F55]">
               <p className="text-white text-sm font-medium">课程章节目录</p>
-              <p className="text-[#64748B] text-xs mt-0.5">{course.chapters}章 · {course.totalHours}学时</p>
+              <p className="text-[#64748B] text-xs mt-0.5">{course.totalSections ?? 0}章 · {course.totalHours ?? 0}学时</p>
             </div>
             <div className="flex-1 overflow-y-auto">
-              {course.outline.map((ch, i) => (
+              {sections.map((ch, i) => (
                 <button
-                  key={ch.id}
+                  key={ch.sectionId}
                   onClick={() => setCurrentChapter(i)}
                   className={`w-full text-left px-4 py-3 border-b border-[#1A2332] transition-colors ${
                     i === currentChapter
@@ -291,10 +318,10 @@ export function CourseLearningPage() {
                         {ch.title}
                       </p>
                       <div className="flex items-center gap-2 mt-1">
-                        {ch.hasResource && <span className="w-1.5 h-1.5 rounded-full bg-[#1E88E5]" title="课件" />}
-                        {ch.hasExperiment && <span className="w-1.5 h-1.5 rounded-full bg-[#00897B]" title="实验" />}
-                        {ch.hasTest && <span className="w-1.5 h-1.5 rounded-full bg-[#F57F17]" title="测试" />}
-                        <span className="text-[#475569] text-xs">{ch.hours}h</span>
+                        {ch.hasResource === '1' && <span className="w-1.5 h-1.5 rounded-full bg-[#1E88E5]" title="课件" />}
+                        {ch.hasExperiment === '1' && <span className="w-1.5 h-1.5 rounded-full bg-[#00897B]" title="实验" />}
+                        {ch.hasTest === '1' && <span className="w-1.5 h-1.5 rounded-full bg-[#F57F17]" title="测试" />}
+                        <span className="text-[#475569] text-xs">{(ch.hours ?? 0) > 0 ? `${ch.hours}h` : ''}</span>
                       </div>
                     </div>
                   </div>
@@ -306,12 +333,12 @@ export function CourseLearningPage() {
             <div className="p-4 border-t border-[#2D3F55]">
               <div className="flex justify-between text-xs text-[#64748B] mb-2">
                 <span>学习进度</span>
-                <span>{Math.round(((currentChapter + 1) / course.outline.length) * 100)}%</span>
+                <span>{Math.round(((currentChapter + 1) / sections.length) * 100)}%</span>
               </div>
               <div className="w-full h-2 bg-[#2D3F55] rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-[#1E88E5] to-[#00897B] rounded-full transition-all"
-                  style={{ width: `${((currentChapter + 1) / course.outline.length) * 100}%` }}
+                  style={{ width: `${((currentChapter + 1) / sections.length) * 100}%` }}
                 />
               </div>
             </div>

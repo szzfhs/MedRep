@@ -47,7 +47,7 @@ async def portal_center_info(
     request: Request,
     query_db: Annotated[AsyncSession, DBSessionDependency()],
 ) -> Response:
-    result = await CenterService.get_center_info(query_db)
+    result = await CenterService.get_full_center_info(query_db)
     return ResponseUtil.success(data=result)
 
 

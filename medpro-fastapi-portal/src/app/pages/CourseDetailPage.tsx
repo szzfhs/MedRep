@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router';
 import { motion } from 'motion/react';
 import {
@@ -5,18 +6,49 @@ import {
   FlaskConical, FileText, HelpCircle, GraduationCap,
   Award, CheckCircle, Lock
 } from 'lucide-react';
-import { courses } from '../data/mockData';
+import { getCourseDetail, type Course, type CourseSection } from '../../api/course';
+
+const COURSE_CATEGORY_MAP: Record<string, string> = { '1': '理论课', '2': '实验课', '3': '理实一体化课' };
 
 export function CourseDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const course = courses.find((c) => c.id === id) || courses[0];
+  const [course, setCourse] = useState<Course | null>(null);
+  const [sections, setSections] = useState<CourseSection[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!id) return;
+    setLoading(true);
+    getCourseDetail(Number(id))
+      .then((res) => { setCourse(res.course); setSections(res.sections ?? []); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#F0F4F8] flex items-center justify-center">
+        <div className="text-[#64748B]">加载中...</div>
+      </div>
+    );
+  }
+
+  if (!course) {
+    return (
+      <div className="min-h-screen bg-[#F0F4F8] flex items-center justify-center">
+        <div className="text-[#64748B]">课程不存在</div>
+      </div>
+    );
+  }
+
+  const categoryLabel = COURSE_CATEGORY_MAP[course.courseCategory ?? ''] ?? '课程';
 
   return (
     <div className="min-h-screen bg-[#F0F4F8]">
       {/* Hero */}
       <div className="relative overflow-hidden bg-gradient-to-r from-[#0B1929] to-[#0B3A6B]">
         <div className="absolute inset-0">
-          <img src={course.image} alt={course.title} className="w-full h-full object-cover opacity-20" />
+          <img src={course.coverImage || '/placeholder.svg'} alt={course.courseName ?? ''} className="w-full h-full object-cover opacity-20" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-12">
           <div className="flex items-center gap-2 text-white/50 text-sm mb-4">
@@ -24,19 +56,19 @@ export function CourseDetailPage() {
             <ChevronRight size={13} />
             <Link to="/courses" className="hover:text-white">实验课程</Link>
             <ChevronRight size={13} />
-            <span className="text-white/80 truncate max-w-xs">{course.title}</span>
+            <span className="text-white/80 truncate max-w-xs">{course.courseName}</span>
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8 items-start">
             {/* Left: Info */}
             <div className="lg:col-span-2">
               <span className="inline-block px-3 py-1 bg-[#1E88E5]/20 border border-[#1E88E5]/30 text-[#42A5F5] rounded-lg text-xs mb-3">
-                {course.category}
+                {categoryLabel}
               </span>
               <h1 className="text-white mb-2" style={{ fontSize: '1.8rem', fontWeight: 700 }}>
-                {course.title}
+                {course.courseName}
               </h1>
-              <p className="text-white/60 text-sm mb-4">{course.subtitle}</p>
+              {course.subtitle && <p className="text-white/60 text-sm mb-4">{course.subtitle}</p>}
               <p className="text-white/70 text-sm leading-relaxed mb-5 max-w-2xl">
                 {course.description}
               </p>
@@ -45,19 +77,23 @@ export function CourseDetailPage() {
               <div className="flex flex-wrap items-center gap-4 text-sm">
                 <span className="flex items-center gap-2 text-white/70">
                   <GraduationCap size={16} className="text-[#42A5F5]" />
-                  {course.teacher}
+                  {course.teacherName ?? '暂无教师'}
                 </span>
-                <span className="flex items-center gap-1.5 text-white/70">
-                  <Award size={16} className="text-[#FFD740]" />
-                  {course.department}
-                </span>
-                <span className="flex items-center gap-1.5 text-[#FFD740]">
-                  <Star size={16} fill="currentColor" />
-                  {course.rating} ({course.reviews}条评价)
-                </span>
+                {course.department && (
+                  <span className="flex items-center gap-1.5 text-white/70">
+                    <Award size={16} className="text-[#FFD740]" />
+                    {course.department}
+                  </span>
+                )}
+                {course.rating != null && (
+                  <span className="flex items-center gap-1.5 text-[#FFD740]">
+                    <Star size={16} fill="currentColor" />
+                    {Number(course.rating).toFixed(1)} ({course.reviewCount ?? 0}条评价)
+                  </span>
+                )}
                 <span className="flex items-center gap-1.5 text-white/70">
                   <Users size={16} className="text-[#42A5F5]" />
-                  {course.students.toLocaleString()} 名学员
+                  {(course.enrollCount ?? 0).toLocaleString()} 名学员
                 </span>
               </div>
             </div>
@@ -65,7 +101,7 @@ export function CourseDetailPage() {
             {/* Right: CTA Card */}
             <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5">
               <div className="relative rounded-xl overflow-hidden h-40 mb-4">
-                <img src={course.image} alt={course.title} className="w-full h-full object-cover" />
+                <img src={course.coverImage || '/placeholder.svg'} alt={course.courseName ?? ''} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center">
                     <Play size={22} className="text-[#0B5394] ml-1" fill="currentColor" />
@@ -74,20 +110,22 @@ export function CourseDetailPage() {
               </div>
               <div className="grid grid-cols-3 gap-3 mb-4 text-center">
                 <div>
-                  <div className="text-white font-bold">{course.chapters}</div>
+                  <div className="text-white font-bold">{course.totalSections ?? 0}</div>
                   <div className="text-white/50 text-xs">章节</div>
                 </div>
                 <div className="border-x border-white/20">
-                  <div className="text-white font-bold">{course.totalHours}h</div>
+                  <div className="text-white font-bold">{course.totalHours ?? 0}h</div>
                   <div className="text-white/50 text-xs">总学时</div>
                 </div>
                 <div>
-                  <div className="text-white font-bold">{(course.students / 1000).toFixed(1)}k</div>
+                  <div className="text-white font-bold">
+                    {(course.enrollCount ?? 0) >= 1000 ? `${((course.enrollCount ?? 0) / 1000).toFixed(1)}k` : course.enrollCount ?? 0}
+                  </div>
                   <div className="text-white/50 text-xs">学员</div>
                 </div>
               </div>
               <Link
-                to={`/courses/${course.id}/learn`}
+                to={`/courses/${course.courseId}/learn`}
                 className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#1E88E5] text-white rounded-xl font-medium text-sm hover:bg-[#1976D2] transition-colors"
               >
                 <Play size={16} fill="currentColor" />
@@ -109,7 +147,7 @@ export function CourseDetailPage() {
                   <BookOpen size={18} className="text-[#0B5394]" />
                   课程大纲
                 </h2>
-                <span className="text-[#64748B] text-sm">{course.chapters} 章节 · {course.totalHours} 学时</span>
+                <span className="text-[#64748B] text-sm">{course.totalSections ?? 0} 章节 · {course.totalHours ?? 0} 学时</span>
               </div>
 
               {/* Legend */}
@@ -120,9 +158,9 @@ export function CourseDetailPage() {
               </div>
 
               <div className="divide-y divide-[#E2E8F0]">
-                {course.outline.map((chapter, i) => (
+                {sections.map((section, i) => (
                   <motion.div
-                    key={chapter.id}
+                    key={section.sectionId}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: i * 0.03 }}
@@ -138,24 +176,26 @@ export function CourseDetailPage() {
                     {/* Title */}
                     <div className="flex-1 min-w-0">
                       <p className={`text-sm font-medium ${i < 2 ? 'text-[#1A2332]' : 'text-[#4A5568]'} group-hover:text-[#0B5394] transition-colors`}>
-                        {`第${i + 1}章 ${chapter.title}`}
+                        {`第${i + 1}章 ${section.title}`}
                       </p>
-                      <span className="text-[#94A3B8] text-xs">{chapter.hours}学时</span>
+                      {(section.hours ?? 0) > 0 && (
+                        <span className="text-[#94A3B8] text-xs">{section.hours}学时</span>
+                      )}
                     </div>
 
                     {/* Icons */}
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      {chapter.hasResource && (
+                      {section.hasResource === '1' && (
                         <span className="flex items-center gap-1 px-2 py-1 rounded-md text-xs bg-[#E3F2FD] text-[#0B5394]">
                           <FileText size={11} /> 课件
                         </span>
                       )}
-                      {chapter.hasExperiment && (
+                      {section.hasExperiment === '1' && (
                         <span className="flex items-center gap-1 px-2 py-1 rounded-md text-xs bg-[#E0F2F1] text-[#00695C]">
                           <FlaskConical size={11} /> 实验
                         </span>
                       )}
-                      {chapter.hasTest && (
+                      {section.hasTest === '1' && (
                         <span className="flex items-center gap-1 px-2 py-1 rounded-md text-xs bg-[#FFF3E0] text-[#E65100]">
                           <HelpCircle size={11} /> 测试
                         </span>
@@ -177,13 +217,13 @@ export function CourseDetailPage() {
               <h3 className="text-[#1A2332] font-semibold mb-4 text-sm">课程信息</h3>
               <div className="space-y-3">
                 {[
-                  { label: '主讲教师', value: course.teacher },
-                  { label: '所属院系', value: course.department },
-                  { label: '课程类别', value: course.category },
-                  { label: '总章节数', value: `${course.chapters} 章` },
-                  { label: '总学时', value: `${course.totalHours} 学时` },
-                  { label: '开课时间', value: course.publishDate },
-                  { label: '学习人数', value: `${course.students.toLocaleString()} 人` },
+                  { label: '主讲教师', value: course.teacherName ?? '暂无' },
+                  { label: '所属院系', value: course.department ?? '暂无' },
+                  { label: '课程类别', value: categoryLabel },
+                  { label: '总章节数', value: `${course.totalSections ?? 0} 章` },
+                  { label: '总学时', value: `${course.totalHours ?? 0} 学时` },
+                  { label: '开课时间', value: course.publishDate ? course.publishDate.slice(0, 10) : '暂无' },
+                  { label: '学习人数', value: `${(course.enrollCount ?? 0).toLocaleString()} 人` },
                 ].map((item) => (
                   <div key={item.label} className="flex justify-between">
                     <span className="text-[#94A3B8] text-xs">{item.label}</span>
@@ -217,7 +257,7 @@ export function CourseDetailPage() {
               <p className="font-semibold mb-1">完成课程获取证书</p>
               <p className="text-white/60 text-xs mb-4">完成所有章节并通过测试，即可获取课程完成证书</p>
               <Link
-                to={`/courses/${course.id}/learn`}
+                to={`/courses/${course.courseId}/learn`}
                 className="block w-full py-2.5 bg-white text-[#0B5394] rounded-xl text-sm font-medium hover:bg-blue-50 transition-colors"
               >
                 立即开始学习

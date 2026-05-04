@@ -7,6 +7,10 @@ export interface CourseSection {
   title: string;
   sortOrder: number;
   sectionType: string;
+  hours: number | null;
+  hasResource: string | null;
+  hasExperiment: string | null;
+  hasTest: string | null;
   description: string | null;
   status: string;
   children?: CourseSection[];
@@ -15,15 +19,21 @@ export interface CourseSection {
 export interface Course {
   courseId: number;
   courseName: string;
+  subtitle: string | null;
   teacherId: number | null;
   teacherName: string | null;
+  department: string | null;
   coverImage: string | null;
   description: string | null;
   courseCategory: '1' | '2' | '3' | null;
   totalSections: number | null;
   totalResources: number | null;
+  totalHours: number | null;
   status: '0' | '1' | '2' | null;
   enrollCount: number | null;
+  rating: number | null;
+  reviewCount: number | null;
+  publishDate: string | null;
   sortOrder: number | null;
   createTime: string | null;
 }

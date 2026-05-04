@@ -4,7 +4,7 @@ SimHub 虚拟仿真实验教学平台 — 所有数据库模型
 """
 from datetime import datetime
 
-from sqlalchemy import CHAR, BigInteger, Column, DateTime, Integer, String, Text
+from sqlalchemy import CHAR, BigInteger, Column, DateTime, Integer, Numeric, String, Text
 from sqlalchemy.dialects.mysql import MEDIUMTEXT
 
 from config.database import Base
@@ -20,15 +20,60 @@ class VfCenterInfo(Base):
 
     id = Column(BigInteger, primary_key=True, autoincrement=True, comment='主键')
     center_name = Column(String(100), nullable=True, server_default='虚拟仿真实验中心', comment='中心名称')
-    center_slogan = Column(String(200), nullable=True, server_default="''", comment='宣传语')
-    description = Column(Text, nullable=True, comment='详细介绍（富文本）')
+    center_slogan = Column(String(200), nullable=True, server_default="''", comment='宣传语/副标题')
+    hero_badge = Column(String(200), nullable=True, server_default="''", comment='英雄区徽章文字（如：国家级虚拟仿真实验教学示范中心）')
+    description = Column(Text, nullable=True, comment='中心简介正文（支持换行，多段）')
     logo_url = Column(String(200), nullable=True, server_default="''", comment='Logo图片URL')
     banner_url = Column(String(200), nullable=True, server_default="''", comment='首页Banner图URL')
-    org_structure = Column(Text, nullable=True, comment='组织架构（富文本）')
-    team_intro = Column(Text, nullable=True, comment='团队介绍（富文本）')
-    contact_info = Column(String(500), nullable=True, server_default="''", comment='联系方式')
+    # 统计数据
+    stat_founded_year = Column(String(20), nullable=True, server_default='2018', comment='中心成立年份')
+    stat_experiments = Column(String(20), nullable=True, server_default='0', comment='虚拟仿真实验项目数')
+    stat_students = Column(String(20), nullable=True, server_default='0', comment='年服务学生数')
+    stat_courses = Column(String(20), nullable=True, server_default='0', comment='实验课程数')
+    # 荣誉成就（JSON数组）
+    achievements_json = Column(Text, nullable=True, comment='荣誉成就JSON数组[{label,year_desc,icon_name,color}]')
+    # 基本职能（JSON数组）
+    functions_json = Column(Text, nullable=True, comment='基本职能JSON数组[{content, sort_order}]')
+    # 联系方式（结构化）
+    contact_address = Column(String(500), nullable=True, server_default="''", comment='联系地址')
+    contact_phone = Column(String(100), nullable=True, server_default="''", comment='联系电话')
+    contact_email = Column(String(100), nullable=True, server_default="''", comment='联系邮箱')
+    # 兼容旧字段
+    contact_info = Column(String(500), nullable=True, server_default="''", comment='联系方式（旧）')
+    org_structure = Column(Text, nullable=True, comment='组织架构（富文本，旧）')
+    team_intro = Column(Text, nullable=True, comment='团队介绍（富文本，旧）')
     update_by = Column(String(64), nullable=True, server_default="''", comment='更新者')
     update_time = Column(DateTime, nullable=True, comment='更新时间', onupdate=datetime.now)
+
+
+class VfOrgMember(Base):
+    """中心组织架构成员表"""
+
+    __tablename__ = 'vf_org_member'
+    __table_args__ = {'comment': '中心组织架构成员表'}
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True, comment='主键')
+    name = Column(String(50), nullable=False, comment='姓名及职称（如：王建华 教授）')
+    title_text = Column(String(100), nullable=True, server_default="''", comment='职务名称（如：实验教学中心主任）')
+    dept = Column(String(50), nullable=True, server_default="''", comment='职责描述（如：统筹管理）')
+    color = Column(String(20), nullable=True, server_default='#0B5394', comment='显示颜色')
+    sort_order = Column(Integer, nullable=True, server_default='0', comment='排序')
+
+
+class VfTeamMember(Base):
+    """核心团队成员表"""
+
+    __tablename__ = 'vf_team_member'
+    __table_args__ = {'comment': '核心团队成员表'}
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True, comment='主键')
+    name = Column(String(50), nullable=False, comment='姓名')
+    title_role = Column(String(100), nullable=True, server_default="''", comment='职位职称（如：中心主任 · 教授）')
+    specialty = Column(String(200), nullable=True, server_default="''", comment='研究专长（如：解剖学 · 数字医学教育）')
+    bio = Column(Text, nullable=True, comment='个人简介')
+    image_url = Column(String(200), nullable=True, server_default="''", comment='头像图片URL')
+    sort_order = Column(Integer, nullable=True, server_default='0', comment='排序')
+    status = Column(CHAR(1), nullable=True, server_default='0', comment='状态(0=正常,1=停用)')
 
 
 class VfNews(Base):
@@ -156,20 +201,27 @@ class VfCourse(Base):
 
     course_id = Column(BigInteger, primary_key=True, autoincrement=True, comment='课程ID')
     course_name = Column(String(200), nullable=False, comment='课程名称')
+    subtitle = Column(String(300), nullable=True, server_default="''", comment='英文副标题')
     teacher_id = Column(
         BigInteger,
         nullable=True,
         server_default=SqlalchemyUtil.get_server_default_null(DataBaseConfig.db_type, False),
         comment='主讲教师ID',
     )
+    teacher_name = Column(String(100), nullable=True, server_default="''", comment='主讲教师姓名（冗余）')
+    department = Column(String(100), nullable=True, server_default="''", comment='所属院系')
     cover_image = Column(String(200), nullable=True, server_default="''", comment='封面图URL')
     description = Column(Text, nullable=True, comment='课程介绍（富文本）')
     course_category = Column(CHAR(1), nullable=True, server_default='1', comment='课程分类(1=理论课,2=实验课,3=理实一体化课)')
     category = Column(String(100), nullable=True, server_default="''", comment='课程分类（旧字段，已废弃）')
     total_sections = Column(Integer, nullable=True, server_default='0', comment='章节数')
     total_resources = Column(Integer, nullable=True, server_default='0', comment='资源数')
+    total_hours = Column(Integer, nullable=True, server_default='0', comment='总学时')
     status = Column(CHAR(1), nullable=True, server_default='0', comment='课程状态(0=新建,1=已审核,2=已发布)')
     enroll_count = Column(Integer, nullable=True, server_default='0', comment='选课人数')
+    rating = Column(Numeric(3, 1), nullable=True, server_default='0.0', comment='课程评分(0.0-5.0)')
+    review_count = Column(Integer, nullable=True, server_default='0', comment='评价数')
+    publish_date = Column(DateTime, nullable=True, comment='开课时间')
     sort_order = Column(Integer, nullable=True, server_default='0', comment='排序')
     create_by = Column(String(64), nullable=True, server_default="''", comment='创建者')
     create_time = Column(DateTime, nullable=True, comment='创建时间', default=datetime.now)
@@ -190,6 +242,10 @@ class VfCourseSection(Base):
     title = Column(String(200), nullable=False, comment='章节标题')
     sort_order = Column(Integer, nullable=True, server_default='0', comment='排序')
     section_type = Column(String(10), nullable=True, server_default='section', comment='类型(chapter/section)')
+    hours = Column(Integer, nullable=True, server_default='0', comment='章节学时')
+    has_resource = Column(CHAR(1), nullable=True, server_default='0', comment='是否有课件资源(0=否,1=是)')
+    has_experiment = Column(CHAR(1), nullable=True, server_default='0', comment='是否有虚拟实验(0=否,1=是)')
+    has_test = Column(CHAR(1), nullable=True, server_default='0', comment='是否有在线测试(0=否,1=是)')
     description = Column(Text, nullable=True, comment='章节简介')
     status = Column(CHAR(1), nullable=True, server_default='0', comment='状态(0=正常,1=停用)')
     create_time = Column(DateTime, nullable=True, comment='创建时间', default=datetime.now)
