@@ -158,42 +158,95 @@ getCode();
 </script>
 
 <style lang='scss' scoped>
+// ── 页面背景（与登录页保持一致）────────────────
 .register {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
-  background-image: url("../assets/images/login-background.jpg");
+  min-height: 100vh;
+  background-image:
+    linear-gradient(135deg, rgba(11,25,41,0.88) 0%, rgba(11,83,148,0.75) 50%, rgba(0,137,123,0.65) 100%),
+    url("../assets/images/login-background.jpg");
   background-size: cover;
-}
-.title {
-  margin: 0px auto 30px auto;
-  text-align: center;
-  color: #707070;
+  background-position: center;
+  overflow: hidden;
+  position: relative;
 }
 
+html.dark .register {
+  background-image:
+    linear-gradient(135deg, rgba(0,0,0,0.92) 0%, rgba(11,83,148,0.6) 50%, rgba(0,0,0,0.85) 100%),
+    url("../assets/images/login-background.jpg");
+}
+
+// ── 表单卡片（与登录页样式一致）────────────────
 .register-form {
-  border-radius: 6px;
-  background: #ffffff;
-  width: 400px;
-  padding: 25px 25px 5px 25px;
+  position: relative;
+  z-index: 10;
+  width: 420px;
+  padding: 36px 36px 24px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow:
+    0 24px 64px rgba(11, 25, 41, 0.35),
+    0 4px 16px rgba(11, 83, 148, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+
+  // 顶部品牌色条
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #0B5394 0%, #1E88E5 50%, #00897B 100%);
+    border-radius: 20px 20px 0 0;
+  }
+
   .el-input {
     height: 40px;
-    input {
-      height: 40px;
-    }
+    input { height: 40px; }
   }
+
   .input-icon {
     height: 39px;
     width: 14px;
     margin-left: 0px;
   }
 }
+
+html.dark .register-form {
+  background: rgba(20, 20, 20, 0.9);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+}
+
+// ── 标题 ────────────────────────────────
+.title {
+  margin: 0 auto 28px auto;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0B1929;
+  letter-spacing: 0.5px;
+}
+
+html.dark .title {
+  color: #F1F5F9;
+}
+
+// ── 验证码区域 ──────────────────────────
 .register-tip {
   font-size: 13px;
   text-align: center;
-  color: #bfbfbf;
+  color: var(--el-text-color-placeholder);
 }
+
 .register-code {
   width: 33%;
   height: 40px;
@@ -203,6 +256,14 @@ getCode();
     vertical-align: middle;
   }
 }
+
+.register-code-img {
+  height: 40px;
+  padding-left: 8px;
+  border-radius: 8px;
+}
+
+// ── 底部版权（与登录页一致）─────────────
 .el-register-footer {
   height: 40px;
   line-height: 40px;
@@ -210,13 +271,9 @@ getCode();
   bottom: 0;
   width: 100%;
   text-align: center;
-  color: #fff;
-  font-family: Arial;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 12px;
   letter-spacing: 1px;
-}
-.register-code-img {
-  height: 40px;
-  padding-left: 12px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 </style>
