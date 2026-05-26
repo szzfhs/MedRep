@@ -37,6 +37,7 @@ export function LoginPage() {
   const [captchaUuid, setCaptchaUuid] = useState('');
   const [captchaEnabled, setCaptchaEnabled] = useState(false);
   const [captchaLoading, setCaptchaLoading] = useState(false);
+  const [registerEnabled, setRegisterEnabled] = useState(true);
 
   // 已登录则直接跳转
   useEffect(() => {
@@ -51,6 +52,7 @@ export function LoginPage() {
       setCaptchaLoading(true);
       const data = await getCaptchaImage();
       setCaptchaEnabled(data.captchaEnabled);
+      setRegisterEnabled(data.registerEnabled);
       if (data.captchaEnabled) {
         setCaptchaImg(data.img);
         setCaptchaUuid(data.uuid);
@@ -120,17 +122,32 @@ export function LoginPage() {
           <p className="text-white/60 text-base mb-8 max-w-xs leading-relaxed">
             科技赋能医学教育，打造安全、高效、沉浸的虚拟实验学习环境
           </p>
-          {/* Features */}
-          <div className="space-y-3 w-full max-w-sm">
+          {/* Slogans */}
+          <div className="w-full max-w-sm space-y-5">
             {[
-              { icon: '🔬', text: '52个高精度虚拟仿真实验项目' },
-              { icon: '📚', text: '18门系统化实验课程体系' },
-              { icon: '🎯', text: '智能化实验指导与评分系统' },
-              { icon: '🥽', text: '支持WebGL与VR双模式运行' },
+              {
+                title: '突破时空，随时随地实验',
+                desc: '无需预约、不受场地限制，打开浏览器即可开始实验',
+              },
+              {
+                title: '沉浸体验，真实操作感',
+                desc: 'WebGL 三维交互与 VR 头显双模式，还原真实临床场景',
+              },
+              {
+                title: '数据驱动，精准评估成长',
+                desc: '全程记录实验轨迹，AI 实时评分与反馈，助力教学质量提升',
+              },
+              {
+                title: '医教协同，服务临床教育',
+                desc: '联合一线医学专家共同设计，内容符合执业医师培训标准',
+              },
             ].map((item) => (
-              <div key={item.text} className="flex items-center gap-3 bg-white/5 rounded-xl px-4 py-3 text-left">
-                <span className="text-xl">{item.icon}</span>
-                <span className="text-white/70 text-sm">{item.text}</span>
+              <div key={item.title} className="flex items-start gap-3 text-left">
+                <div className="w-1 h-full min-h-[2.5rem] rounded-full bg-gradient-to-b from-[#1E88E5] to-[#00897B] flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-white/90 text-sm font-semibold leading-snug">{item.title}</p>
+                  <p className="text-white/45 text-xs mt-0.5 leading-relaxed">{item.desc}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -300,12 +317,16 @@ export function LoginPage() {
             <div className="flex-1 h-px bg-[#E2E8F0]" />
           </div>
 
-          <Link
-            to="/register"
-            className="w-full flex items-center justify-center gap-2 py-3 border-2 border-[#E2E8F0] text-[#1A2332] rounded-xl text-sm font-medium hover:border-[#0B5394] hover:text-[#0B5394] transition-all"
-          >
-            注册新账号
-          </Link>
+          {registerEnabled ? (
+            <Link
+              to="/register"
+              className="w-full flex items-center justify-center gap-2 py-3 border-2 border-[#E2E8F0] text-[#1A2332] rounded-xl text-sm font-medium hover:border-[#0B5394] hover:text-[#0B5394] transition-all"
+            >
+              注册新账号
+            </Link>
+          ) : (
+            <p className="text-center text-[#94A3B8] text-xs py-2">此平台暂未开放自主注册，请联系管理员开通账号</p>
+          )}
 
           <p className="text-[#94A3B8] text-xs text-center mt-6">
             登录即代表您同意

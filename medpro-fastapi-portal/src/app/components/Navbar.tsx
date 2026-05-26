@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   FlaskConical, Menu, X, ChevronDown, User, LogOut,
   Settings, BookOpen, Microscope, Bell, AppWindow, LayoutDashboard,
 } from 'lucide-react';
+import { useAuth } from '@/stores/auth';
 
 // Simple direct-link nav — no broken dropdown submenus
 const navLinks = [
@@ -17,14 +18,13 @@ const navLinks = [
   { label: '应用中心', path: '/apps' },
 ];
 
-interface NavbarProps {
-  isLoggedIn?: boolean;
-  userRole?: 'student' | 'teacher' | 'admin';
-  userName?: string;
-}
-
-export function Navbar({ isLoggedIn = false, userRole, userName = '张同学' }: NavbarProps) {
+export function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { isLoggedIn, role, userInfo, logout } = useAuth();
+
+  const userName = userInfo?.user?.nickName || userInfo?.user?.userName || '用户';
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -41,8 +41,14 @@ export function Navbar({ isLoggedIn = false, userRole, userName = '张同学' }:
   };
 
   // Derive workbench link from role
-  const workbenchPath = userRole === 'admin' ? '/admin' : userRole === 'teacher' ? '/teacher' : '/student';
-  const workbenchLabel = userRole === 'admin' ? '后台管理' : userRole === 'teacher' ? '教师工作台' : '学生工作台';
+  const workbenchPath = role === 'admin' ? '/admin' : role === 'teacher' ? '/teacher' : '/student';
+  const workbenchLabel = role === 'admin' ? '后台管理' : role === 'teacher' ? '教师工作台' : '学生工作台';
+
+  const handleLogout = async () => {
+    setUserMenuOpen(false);
+    await logout();
+    navigate('/login');
+  };
 
   return (
     <nav
@@ -115,7 +121,7 @@ export function Navbar({ isLoggedIn = false, userRole, userName = '张同学' }:
                         <div className="px-4 py-3 border-b border-[#E2E8F0]">
                           <div className="text-sm font-medium text-[#1A2332]">{userName}</div>
                           <div className="text-xs text-[#64748B]">
-                            {userRole === 'admin' ? '管理员' : userRole === 'teacher' ? '教师' : '学生'}
+                            {role === 'admin' ? '管理员' : role === 'teacher' ? '教师' : '学生'}
                           </div>
                         </div>
                         <Link
@@ -126,7 +132,10 @@ export function Navbar({ isLoggedIn = false, userRole, userName = '张同学' }:
                           <LayoutDashboard size={14} className="text-[#64748B]" />
                           {workbenchLabel}
                         </Link>
-                        <button className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-[#E53935] hover:bg-red-50 transition-colors">
+                        <button
+                          onClick={handleLogout}
+                          className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-[#E53935] hover:bg-red-50 transition-colors"
+                        >
                           <LogOut size={14} />
                           退出登录
                         </button>

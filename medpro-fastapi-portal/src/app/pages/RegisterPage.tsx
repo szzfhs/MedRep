@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
 import {
-  FlaskConical, ChevronRight, User, Phone, Mail, Lock,
+  FlaskConical, ChevronRight, Phone, Lock,
   Eye, EyeOff, GraduationCap, BookOpen, Building2,
-  ArrowRight, ArrowLeft, CheckCircle, Loader2, Upload
+  ArrowRight, ArrowLeft, CheckCircle, Loader2, Upload,
+  Shield, RefreshCw,
 } from 'lucide-react';
+import { register as apiRegister, getCaptchaImage } from '@/api/auth';
 
 type RoleType = 'student' | 'teacher' | 'institution' | null;
 
@@ -16,29 +18,129 @@ export function RegisterPage() {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
     name: '', id: '', dept: '', phone: '', email: '',
-    password: '', confirmPassword: '', institution: '',
+    password: '', confirmPassword: '',
   });
   const [showPw, setShowPw] = useState(false);
+  const [showConfirmPw, setShowConfirmPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitError, setSubmitError] = useState('');
+
+  // 验证码 & 注册开关状态
+  const [registerEnabled, setRegisterEnabled] = useState<boolean | null>(null);
+  const [captchaEnabled, setCaptchaEnabled] = useState(false);
+  const [captchaImg, setCaptchaImg] = useState('');
+  const [captchaUuid, setCaptchaUuid] = useState('');
+  const [captchaValue, setCaptchaValue] = useState('');
+  const [captchaLoading, setCaptchaLoading] = useState(false);
 
   const updateForm = (key: string, value: string) =>
     setForm(prev => ({ ...prev, [key]: value }));
 
+  const fetchCaptcha = async () => {
+    try {
+      setCaptchaLoading(true);
+      const data = await getCaptchaImage();
+      setRegisterEnabled(data.registerEnabled);
+      setCaptchaEnabled(data.captchaEnabled);
+      if (data.captchaEnabled) {
+        setCaptchaImg(data.img);
+        setCaptchaUuid(data.uuid);
+        setCaptchaValue('');
+      }
+    } catch {
+      // 获取失败时允许继续（由后端兜底）
+      setRegisterEnabled(true);
+    } finally {
+      setCaptchaLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCaptcha();
+  }, []);
+
   const handleRoleSelect = (r: RoleType) => {
     setRole(r);
+    setErrors({});
     setStep(1);
   };
 
+  const validateStep1 = (): Record<string, string> => {
+    const errs: Record<string, string> = {};
+    if (!form.name.trim()) errs.name = '请输入真实姓名';
+    if (!form.id.trim()) {
+      errs.id = role === 'student' ? '请输入学号' : role === 'teacher' ? '请输入教工号' : '请输入机构代码';
+    }
+    if (!form.dept.trim()) errs.dept = '请填写所属信息';
+    if (!form.phone.trim()) errs.phone = '请输入手机号';
+    else if (!/^1[3-9]\d{9}$/.test(form.phone.trim())) errs.phone = '手机号格式不正确';
+    if (!form.email.trim()) errs.email = '请输入邮箱地址';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) errs.email = '邮箱格式不正确';
+    return errs;
+  };
+
+  const COMMON_PASSWORDS = ['12345678', 'password', '88888888', 'admin123', 'qwerty123'];
+
+  const validateStep2 = (): Record<string, string> => {
+    const errs: Record<string, string> = {};
+    if (!form.password) {
+      errs.password = '请设置密码';
+    } else if (form.password.length < 8) {
+      errs.password = '密码至少8位';
+    } else if (!/[A-Z]/.test(form.password)) {
+      errs.password = '密码须包含大写字母';
+    } else if (!/[a-z]/.test(form.password)) {
+      errs.password = '密码须包含小写字母';
+    } else if (!/[0-9]/.test(form.password)) {
+      errs.password = '密码须包含数字';
+    } else if (COMMON_PASSWORDS.includes(form.password.toLowerCase())) {
+      errs.password = '密码过于简单，请换一个';
+    }
+    if (!form.confirmPassword) errs.confirmPassword = '请确认密码';
+    else if (form.password !== form.confirmPassword) errs.confirmPassword = '两次密码不一致';
+    if (captchaEnabled && !captchaValue.trim()) errs.captcha = '请输入验证码';
+    return errs;
+  };
+
   const handleNext = () => {
-    if (step < 3) setStep(step + 1);
+    if (step === 1) {
+      const errs = validateStep1();
+      if (Object.keys(errs).length) { setErrors(errs); return; }
+    }
+    if (step === 2) {
+      const errs = validateStep2();
+      if (Object.keys(errs).length) { setErrors(errs); return; }
+    }
+    setErrors({});
+    setStep(step + 1);
   };
 
   const handleSubmit = async () => {
+    if (!agreedToTerms) {
+      setSubmitError('请阅读并勾选同意用户服务协议和隐私政策');
+      return;
+    }
     setLoading(true);
-    await new Promise(r => setTimeout(r, 2000));
-    setLoading(false);
-    setDone(true);
+    setSubmitError('');
+    try {
+      await apiRegister({
+        username: form.id.trim(),
+        password: form.password,
+        confirmPassword: form.confirmPassword,
+        code: captchaEnabled ? captchaValue.trim() : undefined,
+        uuid: captchaEnabled ? captchaUuid : undefined,
+      });
+      setDone(true);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : '注册失败，请重试';
+      setSubmitError(msg);
+      fetchCaptcha();
+    } finally {
+      setLoading(false);
+    }
   };
 
   const roles = [
@@ -67,6 +169,29 @@ export function RegisterPage() {
       bg: '#F3E5F5',
     },
   ];
+
+  // 注册已关闭
+  if (registerEnabled === false) {
+    return (
+      <div className="min-h-screen bg-[#F0F4F8] flex items-center justify-center p-6">
+        <div className="bg-white rounded-2xl shadow-xl border border-[#E2E8F0] p-10 max-w-md w-full text-center">
+          <div className="w-20 h-20 bg-[#FFF3E0] rounded-full flex items-center justify-center mx-auto mb-5">
+            <span className="text-4xl">🔒</span>
+          </div>
+          <h2 className="text-[#1A2332] mb-2" style={{ fontSize: '1.4rem', fontWeight: 700 }}>注册暂未开放</h2>
+          <p className="text-[#64748B] text-sm mb-6 leading-relaxed">
+            平台自助注册功能当前已关闭，请联系实验中心管理员为您开通账号。
+          </p>
+          <Link
+            to="/login"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[#0B5394] text-white rounded-xl text-sm font-medium hover:bg-[#1565C0] transition-colors"
+          >
+            返回登录 <ArrowRight size={15} />
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (done) {
     return (
@@ -120,33 +245,42 @@ export function RegisterPage() {
 
         {/* Progress steps */}
         {step > 0 && (
-          <div className="flex items-center mt-6">
-            {STEPS.map((s, i) => (
-              <div key={s} className="flex items-center flex-1 last:flex-none">
-                <div className={`flex items-center gap-2 ${i > 0 ? 'flex-1' : ''}`}>
-                  {i > 0 && (
-                    <div className={`flex-1 h-0.5 ${i <= step ? 'bg-[#0B5394]' : 'bg-[#E2E8F0]'}`} />
-                  )}
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                    i < step ? 'bg-[#0B5394] text-white' :
-                    i === step ? 'bg-[#1E88E5] text-white ring-4 ring-[#1E88E5]/20' :
-                    'bg-[#E2E8F0] text-[#94A3B8]'
-                  }`}>
+          <>
+            <div className="relative mt-6">
+              {/* 灰色底轨 */}
+              <div className="absolute top-4 left-4 right-4 h-0.5 bg-[#E2E8F0]" />
+              {/* 已完成填充轨 */}
+              <div
+                className="absolute top-4 left-4 h-0.5 bg-[#0B5394] transition-all duration-300"
+                style={{ width: `calc((100% - 2rem) * ${step / (STEPS.length - 1)})` }}
+              />
+              {/* 步骤圆圈 */}
+              <div className="relative flex justify-between">
+                {STEPS.map((s, i) => (
+                  <div
+                    key={s}
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                      i < step
+                        ? 'bg-[#0B5394] text-white'
+                        : i === step
+                        ? 'bg-[#1E88E5] text-white ring-4 ring-[#1E88E5]/20'
+                        : 'bg-[#E2E8F0] text-[#94A3B8]'
+                    }`}
+                  >
                     {i < step ? <CheckCircle size={16} /> : i + 1}
                   </div>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
-        )}
-        {step > 0 && (
-          <div className="flex justify-between mt-1.5">
-            {STEPS.map((s, i) => (
-              <span key={s} className={`text-xs ${i === step ? 'text-[#0B5394] font-medium' : 'text-[#94A3B8]'}`}>
-                {s}
-              </span>
-            ))}
-          </div>
+            </div>
+            {/* 标签 */}
+            <div className="flex justify-between mt-1.5">
+              {STEPS.map((s, i) => (
+                <span key={s} className={`text-xs ${i === step ? 'text-[#0B5394] font-medium' : 'text-[#94A3B8]'}`}>
+                  {s}
+                </span>
+              ))}
+            </div>
+          </>
         )}
       </div>
 
@@ -204,32 +338,41 @@ export function RegisterPage() {
                 <div>
                   <label className="block text-sm font-medium text-[#1A2332] mb-1.5">真实姓名 *</label>
                   <input type="text" value={form.name} onChange={e => updateForm('name', e.target.value)}
-                    placeholder="请输入真实姓名" className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-xl text-sm focus:outline-none focus:border-[#0B5394] bg-[#F8FAFC]" />
+                    placeholder="请输入真实姓名"
+                    className={`w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none bg-[#F8FAFC] ${errors.name ? 'border-red-400' : 'border-[#E2E8F0] focus:border-[#0B5394]'}`} />
+                  {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#1A2332] mb-1.5">
                     {role === 'student' ? '学号' : role === 'teacher' ? '教工号' : '机构统一代码'} *
                   </label>
                   <input type="text" value={form.id} onChange={e => updateForm('id', e.target.value)}
-                    placeholder={role === 'student' ? '请输入学号' : role === 'teacher' ? '请输入教工号' : '请输入机构代码'}
-                    className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-xl text-sm focus:outline-none focus:border-[#0B5394] bg-[#F8FAFC]" />
+                    placeholder={role === 'student' ? '请输入学号（将作为登录用户名）' : role === 'teacher' ? '请输入教工号（将作为登录用户名）' : '请输入机构代码（将作为登录用户名）'}
+                    className={`w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none bg-[#F8FAFC] ${errors.id ? 'border-red-400' : 'border-[#E2E8F0] focus:border-[#0B5394]'}`} />
+                  {errors.id && <p className="text-red-500 text-xs mt-1">{errors.id}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#1A2332] mb-1.5">
                     {role === 'student' ? '所属班级' : role === 'teacher' ? '所属院系' : '机构名称'} *
                   </label>
                   <input type="text" value={form.dept} onChange={e => updateForm('dept', e.target.value)}
-                    placeholder="请填写" className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-xl text-sm focus:outline-none focus:border-[#0B5394] bg-[#F8FAFC]" />
+                    placeholder="请填写"
+                    className={`w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none bg-[#F8FAFC] ${errors.dept ? 'border-red-400' : 'border-[#E2E8F0] focus:border-[#0B5394]'}`} />
+                  {errors.dept && <p className="text-red-500 text-xs mt-1">{errors.dept}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#1A2332] mb-1.5">手机号码 *</label>
                   <input type="tel" value={form.phone} onChange={e => updateForm('phone', e.target.value)}
-                    placeholder="请输入手机号" className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-xl text-sm focus:outline-none focus:border-[#0B5394] bg-[#F8FAFC]" />
+                    placeholder="请输入手机号"
+                    className={`w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none bg-[#F8FAFC] ${errors.phone ? 'border-red-400' : 'border-[#E2E8F0] focus:border-[#0B5394]'}`} />
+                  {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-[#1A2332] mb-1.5">电子邮箱 *</label>
                   <input type="email" value={form.email} onChange={e => updateForm('email', e.target.value)}
-                    placeholder="审核结果将发送至此邮箱" className="w-full px-4 py-2.5 border border-[#E2E8F0] rounded-xl text-sm focus:outline-none focus:border-[#0B5394] bg-[#F8FAFC]" />
+                    placeholder="审核结果将发送至此邮箱"
+                    className={`w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none bg-[#F8FAFC] ${errors.email ? 'border-red-400' : 'border-[#E2E8F0] focus:border-[#0B5394]'}`} />
+                  {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                 </div>
                 {/* File upload hint */}
                 <div className="sm:col-span-2 p-4 border-2 border-dashed border-[#E2E8F0] rounded-xl flex flex-col items-center gap-2 cursor-pointer hover:border-[#0B5394] hover:bg-[#F0F4F8] transition-all">
@@ -256,13 +399,15 @@ export function RegisterPage() {
                   <label className="block text-sm font-medium text-[#1A2332] mb-1.5">登录密码 *</label>
                   <div className="relative">
                     <input type={showPw ? 'text' : 'password'} value={form.password} onChange={e => updateForm('password', e.target.value)}
-                      placeholder="至少8位，包含字母和数字" className="w-full px-4 pr-12 py-2.5 border border-[#E2E8F0] rounded-xl text-sm focus:outline-none focus:border-[#0B5394] bg-[#F8FAFC]" />
+                      placeholder="至少8位，包含字母和数字"
+                      className={`w-full px-4 pr-12 py-2.5 border rounded-xl text-sm focus:outline-none bg-[#F8FAFC] ${errors.password ? 'border-red-400' : 'border-[#E2E8F0] focus:border-[#0B5394]'}`} />
                     <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8]">
                       {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
+                  {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
                   {/* Password strength */}
-                  {form.password && (
+                  {form.password && !errors.password && (
                     <div className="mt-2">
                       <div className="flex gap-1 mb-1">
                         {[1, 2, 3, 4].map(i => (
@@ -281,23 +426,63 @@ export function RegisterPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-[#1A2332] mb-1.5">确认密码 *</label>
-                  <input type="password" value={form.confirmPassword} onChange={e => updateForm('confirmPassword', e.target.value)}
-                    placeholder="请再次输入密码" className={`w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none bg-[#F8FAFC] ${
-                      form.confirmPassword && form.password !== form.confirmPassword
-                        ? 'border-red-400 focus:border-red-400'
-                        : 'border-[#E2E8F0] focus:border-[#0B5394]'
-                    }`} />
-                  {form.confirmPassword && form.password !== form.confirmPassword && (
-                    <p className="text-red-500 text-xs mt-1">两次密码不一致</p>
-                  )}
+                  <div className="relative">
+                    <input
+                      type={showConfirmPw ? 'text' : 'password'}
+                      value={form.confirmPassword}
+                      onChange={e => updateForm('confirmPassword', e.target.value)}
+                      placeholder="请再次输入密码"
+                      className={`w-full px-4 pr-12 py-2.5 border rounded-xl text-sm focus:outline-none bg-[#F8FAFC] ${errors.confirmPassword ? 'border-red-400' : 'border-[#E2E8F0] focus:border-[#0B5394]'}`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPw(!showConfirmPw)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#64748B]"
+                    >
+                      {showConfirmPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                  {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
                 </div>
 
-                <div className="bg-[#F0F4F8] rounded-xl p-4 text-xs text-[#64748B] space-y-1">
+                {/* 图形验证码 */}
+                {captchaEnabled && (
+                  <div>
+                    <label className="block text-sm font-medium text-[#1A2332] mb-1.5">图形验证码 *</label>
+                    <div className="flex gap-3">
+                      <div className="relative flex-1">
+                        <Shield size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
+                        <input type="text" value={captchaValue} onChange={e => setCaptchaValue(e.target.value)}
+                          placeholder="请输入验证码" maxLength={6}
+                          className={`w-full pl-10 pr-4 py-2.5 border rounded-xl text-sm focus:outline-none bg-[#F8FAFC] ${errors.captcha ? 'border-red-400' : 'border-[#E2E8F0] focus:border-[#0B5394]'}`} />
+                      </div>
+                      <button type="button" onClick={fetchCaptcha} disabled={captchaLoading}
+                        className="flex-shrink-0 w-28 h-11 bg-[#F0F4F8] border border-[#E2E8F0] rounded-xl flex items-center justify-center cursor-pointer overflow-hidden hover:border-[#0B5394] transition-colors">
+                        {captchaLoading ? (
+                          <Loader2 size={18} className="text-[#94A3B8] animate-spin" />
+                        ) : captchaImg ? (
+                          <img src={captchaImg.startsWith('data:') ? captchaImg : `data:image/png;base64,${captchaImg}`} alt="验证码" className="w-full h-full object-fill" />
+                        ) : (
+                          <RefreshCw size={16} className="text-[#94A3B8]" />
+                        )}
+                      </button>
+                    </div>
+                    {errors.captcha && <p className="text-red-500 text-xs mt-1">{errors.captcha}</p>}
+                  </div>
+                )}
+
+                <div className="bg-[#F0F4F8] rounded-xl p-4 text-xs text-[#64748B] space-y-1.5">
                   <p className="font-medium text-[#1A2332] mb-2">密码要求：</p>
-                  {['长度不少于8位', '包含大小写字母', '包含数字', '不使用常见密码'].map(req => (
-                    <p key={req} className="flex items-center gap-2">
-                      <CheckCircle size={12} className={form.password.length >= 8 ? 'text-[#2E7D32]' : 'text-[#CBD5E1]'} />
-                      {req}
+                  {[
+                    { label: '长度不少于8位',      ok: form.password.length >= 8 },
+                    { label: '包含大写字母',        ok: /[A-Z]/.test(form.password) },
+                    { label: '包含小写字母',        ok: /[a-z]/.test(form.password) },
+                    { label: '包含数字',            ok: /[0-9]/.test(form.password) },
+                    { label: '不使用常见密码',      ok: form.password.length >= 8 && !['12345678','password','88888888','admin123','qwerty123'].includes(form.password.toLowerCase()) },
+                  ].map(({ label, ok }) => (
+                    <p key={label} className={`flex items-center gap-2 transition-colors ${ok ? 'text-[#2E7D32]' : 'text-[#94A3B8]'}`}>
+                      <CheckCircle size={12} className={ok ? 'text-[#2E7D32]' : 'text-[#CBD5E1]'} />
+                      {label}
                     </p>
                   ))}
                 </div>
@@ -336,8 +521,8 @@ export function RegisterPage() {
                   教师和机构账号通常需要1-3个工作日完成审核。
                 </p>
               </div>
-              <label className="flex items-start gap-3 cursor-pointer mb-6">
-                <input type="checkbox" className="mt-0.5" />
+              <label className="flex items-start gap-3 cursor-pointer mb-4">
+                <input type="checkbox" checked={agreedToTerms} onChange={e => { setAgreedToTerms(e.target.checked); setSubmitError(''); }} className="mt-0.5" />
                 <span className="text-[#64748B] text-xs leading-relaxed">
                   我已阅读并同意
                   <a href="#" className="text-[#0B5394] hover:underline mx-1">《用户服务协议》</a>
@@ -346,6 +531,11 @@ export function RegisterPage() {
                   ，同意平台对我的账号信息进行审核验证。
                 </span>
               </label>
+              {submitError && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-xl">
+                  <p className="text-red-500 text-sm">{submitError}</p>
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
@@ -354,8 +544,9 @@ export function RegisterPage() {
         {step > 0 && (
           <div className="flex justify-between mt-5">
             <button
-              onClick={() => setStep(step - 1)}
-              className="flex items-center gap-2 px-5 py-2.5 border border-[#E2E8F0] text-[#64748B] rounded-xl text-sm hover:bg-[#F0F4F8] transition-colors"
+              onClick={() => { setStep(step - 1); setErrors({}); }}
+              disabled={loading}
+              className="flex items-center gap-2 px-5 py-2.5 border border-[#E2E8F0] text-[#64748B] rounded-xl text-sm hover:bg-[#F0F4F8] transition-colors disabled:opacity-50"
             >
               <ArrowLeft size={15} /> 上一步
             </button>

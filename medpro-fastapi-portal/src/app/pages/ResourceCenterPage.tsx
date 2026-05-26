@@ -1,10 +1,11 @@
-import { useState, useEffect, ComponentType } from 'react';
+import { useState, useEffect, useRef, ComponentType } from 'react';
 import { Link } from 'react-router';
 import { motion } from 'motion/react';
 import {
   Search, BookOpen, Download, Eye, FileText, Video,
   Music, Image, Package, ChevronRight, Filter,
-  LayoutGrid, List, Clock, ChevronDown, Play, X
+  LayoutGrid, List, Clock, ChevronDown, Play, X,
+  ChevronLeft
 } from 'lucide-react';
 import { getResourceList, getResourceCategories, type Resource, type ResourceCategory } from '../../api/resource';
 
@@ -31,15 +32,8 @@ function formatFileSize(bytes: number | null): string {
   return `${(bytes / 1024 / 1024).toFixed(1)}MB`;
 }
 
-// Digital bookshelf books (static UI decoration)
-const books = [
-  { title: '人体解剖学', edition: '第9版', color: '#0B5394' },
-  { title: '生理学',   edition: '第9版', color: '#00897B' },
-  { title: '病理学',   edition: '第8版', color: '#6A1B9A' },
-  { title: '药理学',   edition: '第8版', color: '#E65100' },
-  { title: '微生物学', edition: '第8版', color: '#1565C0' },
-  { title: '外科学',   edition: '第9版', color: '#880E4F' },
-];
+// Color palette for ebooks without a cover image
+const BOOK_COLORS = ['#0B5394', '#00897B', '#6A1B9A', '#E65100', '#1565C0', '#880E4F', '#1B5E20', '#BF360C', '#283593', '#006064'];
 
 export function ResourceCenterPage() {
   const [search, setSearch] = useState('');
@@ -51,11 +45,18 @@ export function ResourceCenterPage() {
   const [total, setTotal] = useState(0);
   const [categories, setCategories] = useState<ResourceCategory[]>([]);
   const [loading, setLoading] = useState(true);
+  const [ebooks, setEbooks] = useState<Resource[]>([]);
+  const [shelfOffset, setShelfOffset] = useState(0);
+  const shelfRef = useRef<HTMLDivElement>(null);
 
-  const types = ['全部', 'pdf', 'mp4', 'pptx', 'docx'];
+  const types = ['全部', 'pdf', 'mp4', 'pptx', 'docx', 'ebook'];
 
   useEffect(() => {
     getResourceCategories().then(setCategories).catch(() => {});
+    // 单独拉取电子书资源用于数字书架
+    getResourceList({ pageNum: 1, pageSize: 20, status: '0', resourceType: 'ebook' })
+      .then((res) => setEbooks(res.rows))
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -65,7 +66,6 @@ export function ResourceCenterPage() {
       pageSize: 100,
       status: '0',
       ...(selectedCategoryId ? { categoryId: selectedCategoryId } : {}),
-      ...(selectedType !== '全部' ? { resourceName: '' } : {}),
     })
       .then((res) => { setResources(res.rows); setTotal(res.total); })
       .catch(() => {})
@@ -74,9 +74,42 @@ export function ResourceCenterPage() {
 
   const filtered = resources.filter((r) => {
     const matchSearch = (r.resourceName ?? '').toLowerCase().includes(search.toLowerCase());
-    const matchType = selectedType === '全部' || r.fileFormat?.toLowerCase() === selectedType.toLowerCase();
+    const matchType =
+      selectedType === '全部' ||
+      (selectedType === 'ebook'
+        ? r.resourceType === 'ebook'
+        : r.fileFormat?.toLowerCase() === selectedType.toLowerCase());
     return matchSearch && matchType;
   });
+
+  const shelfScrollBy = (direction: 'prev' | 'next') => {
+    const el = shelfRef.current;
+    if (!el) return;
+    const step = el.clientWidth * 0.7;
+    if (direction === 'prev') {
+      el.scrollBy({ left: -step, behavior: 'smooth' });
+    } else {
+      el.scrollBy({ left: step, behavior: 'smooth' });
+    }
+  };
+
+  const [shelfCanPrev, setShelfCanPrev] = useState(false);
+  const [shelfCanNext, setShelfCanNext] = useState(false);
+
+  const handleShelfScroll = () => {
+    const el = shelfRef.current;
+    if (!el) return;
+    setShelfCanPrev(el.scrollLeft > 4);
+    setShelfCanNext(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  };
+
+  useEffect(() => {
+    const el = shelfRef.current;
+    if (!el) return;
+    handleShelfScroll();
+    el.addEventListener('scroll', handleShelfScroll);
+    return () => el.removeEventListener('scroll', handleShelfScroll);
+  }, [ebooks]);
 
   const toggleCategory = (id: number) => {
     setExpandedCategories((prev) =>
@@ -126,28 +159,91 @@ export function ResourceCenterPage() {
               <BookOpen size={18} className="text-[#42A5F5]" />
               数字教材书架
             </h2>
+            {/* 左右翻页按钮 */}
+            {ebooks.length > 0 && (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => shelfScrollBy('prev')}
+                  disabled={!shelfCanPrev}
+                  className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200 ${
+                    shelfCanPrev
+                      ? 'bg-white/10 border border-white/15 text-white hover:bg-[#0B5394] hover:border-[#0B5394] hover:shadow-md'
+                      : 'bg-white/5 border border-white/8 text-white/20 cursor-not-allowed'
+                  }`}
+                >
+                  <ChevronLeft size={15} />
+                </button>
+                <button
+                  onClick={() => shelfScrollBy('next')}
+                  disabled={!shelfCanNext}
+                  className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200 ${
+                    shelfCanNext
+                      ? 'bg-white/10 border border-white/15 text-white hover:bg-[#0B5394] hover:border-[#0B5394] hover:shadow-md'
+                      : 'bg-white/5 border border-white/8 text-white/20 cursor-not-allowed'
+                  }`}
+                >
+                  <ChevronRight size={15} />
+                </button>
+              </div>
+            )}
           </div>
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-4">
-            {books.map((book, i) => (
-              <motion.div
-                key={book.title}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.06 }}
-                className="group cursor-pointer"
-              >
-                <div className="relative rounded-xl overflow-hidden mb-2 shadow-lg group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300">
-                  <div className="aspect-[3/4] relative flex items-center justify-center" style={{ backgroundColor: book.color + '22' }}>
-                    <div className="absolute left-0 top-0 bottom-0 w-2 opacity-80" style={{ backgroundColor: book.color }} />
-                    <BookOpen size={28} style={{ color: book.color }} className="opacity-60" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  </div>
-                </div>
-                <p className="text-white text-xs font-medium text-center truncate">{book.title}</p>
-                <p className="text-[#64748B] text-xs text-center">{book.edition}</p>
-              </motion.div>
-            ))}
-          </div>
+
+          {ebooks.length > 0 ? (
+            <div
+              ref={shelfRef}
+              className="flex gap-4 overflow-x-auto"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              onScroll={handleShelfScroll}
+            >
+              {ebooks.map((book, i) => {
+                const color = BOOK_COLORS[i % BOOK_COLORS.length];
+                return (
+                  <motion.div
+                    key={book.resourceId}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.06 }}
+                    className="group cursor-pointer flex-shrink-0"
+                    style={{ width: 96 }}
+                    onClick={() => book.fileUrl && window.open(book.fileUrl, '_blank', 'noopener,noreferrer')}
+                  >
+                    <div className="relative rounded-xl overflow-hidden mb-2 shadow-lg group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300">
+                      {book.coverImage ? (
+                        <div className="aspect-[3/4]">
+                          <img
+                            src={book.coverImage}
+                            alt={book.resourceName ?? ''}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).style.display = 'none';
+                              (e.currentTarget.nextSibling as HTMLElement).style.display = 'flex';
+                            }}
+                          />
+                          <div className="aspect-[3/4] hidden items-center justify-center" style={{ backgroundColor: color + '22' }}>
+                            <div className="absolute left-0 top-0 bottom-0 w-2 opacity-80" style={{ backgroundColor: color }} />
+                            <BookOpen size={28} style={{ color }} className="opacity-60" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="aspect-[3/4] relative flex items-center justify-center" style={{ backgroundColor: color + '22' }}>
+                          <div className="absolute left-0 top-0 bottom-0 w-2 opacity-80" style={{ backgroundColor: color }} />
+                          <BookOpen size={28} style={{ color }} className="opacity-60" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-white text-xs font-medium text-center line-clamp-2 leading-snug">{book.resourceName}</p>
+                  </motion.div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="py-8 text-center">
+              <BookOpen size={32} className="text-white/20 mx-auto mb-2" />
+              <p className="text-white/40 text-sm">暂无电子书资源，请在后台资源管理中添加类型为「电子书」的资源</p>
+            </div>
+          )}
         </div>
 
         {/* Main Content: Sidebar + List */}
@@ -184,7 +280,7 @@ export function ResourceCenterPage() {
           <div className="lg:col-span-3 space-y-4">
             {/* Toolbar */}
             <div className="bg-white rounded-2xl border border-[#E2E8F0] p-4 flex flex-wrap items-center gap-3">
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 {types.map((type) => (
                   <button
                     key={type}
@@ -203,7 +299,7 @@ export function ResourceCenterPage() {
                         </span>
                       );
                     })()}
-                    {type}
+                    {type === 'ebook' ? '电子书' : type}
                   </button>
                 ))}
               </div>

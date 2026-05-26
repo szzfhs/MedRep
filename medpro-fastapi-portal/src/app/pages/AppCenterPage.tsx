@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   AppWindow, Search, Eye, Play, X, Monitor, Layers,
@@ -251,9 +251,11 @@ function LaunchModal({ app, onClose }: { app: SimSystem; onClose: () => void }) 
 
 /* ──────────────────────────── App Card ──────────────────────────── */
 
-function AppCard({ app, onLaunch }: { app: SimSystem; onLaunch: (a: SimSystem) => void }) {
+const AppCard = forwardRef<HTMLDivElement, { app: SimSystem; onLaunch: (a: SimSystem) => void }>(
+  function AppCard({ app, onLaunch }, ref) {
   return (
     <motion.div
+      ref={ref}
       layout
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
@@ -264,8 +266,9 @@ function AppCard({ app, onLaunch }: { app: SimSystem; onLaunch: (a: SimSystem) =
       {/* Cover */}
       <div className="relative h-44 overflow-hidden bg-[#EFF6FF]">
         <img
-          src={app.cover_image}
+          src={app.cover_image || '/placeholder.svg'}
           alt={app.system_name}
+          onError={e => { e.currentTarget.src = '/placeholder.svg'; }}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
@@ -330,7 +333,7 @@ function AppCard({ app, onLaunch }: { app: SimSystem; onLaunch: (a: SimSystem) =
       </div>
     </motion.div>
   );
-}
+});
 
 /* ──────────────────────────── Main Page ──────────────────────────── */
 

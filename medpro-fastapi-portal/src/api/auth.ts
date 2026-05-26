@@ -37,7 +37,7 @@ export interface UserInfo {
 export interface RegisterParams {
   username: string;
   password: string;
-  confirm_password: string;
+  confirmPassword: string;
   code?: string;
   uuid?: string;
 }
@@ -59,14 +59,15 @@ export async function login(params: LoginParams): Promise<string> {
   const res = await request.post('/login', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
-  // 后端返回 { code: 200, data: { access_token, token_type } }
-  return res.data.data.access_token;
+  // 后端使用 dict_content 直接合并到根对象，返回结构：{ code, msg, token, success }
+  return res.data.token;
 }
 
 // 获取当前用户信息（需要 token）
 export async function getInfo(): Promise<UserInfo> {
   const res = await request.get('/getInfo');
-  return res.data.data;
+  // 后端使用 model_content 直接合并到根对象，返回结构：{ code, permissions, roles, user, ... }
+  return res.data;
 }
 
 // 注册

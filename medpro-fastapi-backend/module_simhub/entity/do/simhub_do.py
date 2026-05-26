@@ -491,3 +491,88 @@ class VfTeacherProfile(Base):
     title = Column(String(50), nullable=True, server_default="''", comment='职称')
     introduction = Column(Text, nullable=True, comment='简介')
     avatar_url = Column(String(200), nullable=True, server_default="''", comment='头像URL')
+
+
+class VfTermConfig(Base):
+    """学年学期配置表"""
+
+    __tablename__ = 'vf_term_config'
+    __table_args__ = {'comment': '学年学期配置表'}
+
+    term_id = Column(BigInteger, primary_key=True, autoincrement=True, comment='学期ID')
+    term_name = Column(String(100), nullable=False, comment='学年学期名称')
+    term_code = Column(String(50), nullable=True, server_default="''", comment='学期编码')
+    school_year = Column(String(20), nullable=True, server_default="''", comment='学年')
+    semester = Column(CHAR(1), nullable=True, server_default='1', comment='学期(1=第一学期,2=第二学期)')
+    start_date = Column(DateTime, nullable=True, comment='开始日期')
+    end_date = Column(DateTime, nullable=True, comment='结束日期')
+    is_current = Column(CHAR(1), nullable=True, server_default='0', comment='是否当前学期(0=否,1=是)')
+    sort_order = Column(Integer, nullable=True, server_default='0', comment='排序')
+    status = Column(CHAR(1), nullable=True, server_default='0', comment='状态(0=正常,1=停用)')
+    remark = Column(String(500), nullable=True, server_default="''", comment='备注')
+    create_by = Column(String(64), nullable=True, server_default="''", comment='创建者')
+    create_time = Column(DateTime, nullable=True, comment='创建时间', default=datetime.now)
+    update_by = Column(String(64), nullable=True, server_default="''", comment='更新者')
+    update_time = Column(DateTime, nullable=True, comment='更新时间', onupdate=datetime.now)
+    del_flag = Column(CHAR(1), nullable=True, server_default='0', comment='删除标志(0=存在,2=删除)')
+
+
+class VfClassAdmin(Base):
+    """行政班级表"""
+
+    __tablename__ = 'vf_class_admin'
+    __table_args__ = {'comment': '行政班级表'}
+
+    class_id = Column(BigInteger, primary_key=True, autoincrement=True, comment='班级ID')
+    class_name = Column(String(100), nullable=False, comment='班级名称')
+    class_code = Column(String(50), nullable=True, server_default="''", comment='班级编号')
+    dept_id = Column(
+        BigInteger,
+        nullable=True,
+        server_default=SqlalchemyUtil.get_server_default_null(DataBaseConfig.db_type, False),
+        comment='所属院系ID',
+    )
+    dept_name = Column(String(100), nullable=True, server_default="''", comment='所属院系名称（冗余）')
+    term_id = Column(
+        BigInteger,
+        nullable=True,
+        server_default=SqlalchemyUtil.get_server_default_null(DataBaseConfig.db_type, False),
+        comment='所属学年学期ID',
+    )
+    term_name = Column(String(100), nullable=True, server_default="''", comment='学年学期名称（冗余）')
+    major = Column(String(100), nullable=True, server_default="''", comment='专业')
+    grade = Column(String(20), nullable=True, server_default="''", comment='年级')
+    head_teacher = Column(String(100), nullable=True, server_default="''", comment='班主任姓名')
+    head_teacher_phone = Column(String(20), nullable=True, server_default="''", comment='班主任电话')
+    student_count = Column(Integer, nullable=True, server_default='0', comment='学生人数')
+    sort_order = Column(Integer, nullable=True, server_default='0', comment='排序')
+    status = Column(CHAR(1), nullable=True, server_default='0', comment='状态(0=正常,1=停用)')
+    remark = Column(String(500), nullable=True, server_default="''", comment='备注')
+    create_by = Column(String(64), nullable=True, server_default="''", comment='创建者')
+    create_time = Column(DateTime, nullable=True, comment='创建时间', default=datetime.now)
+    update_by = Column(String(64), nullable=True, server_default="''", comment='更新者')
+    update_time = Column(DateTime, nullable=True, comment='更新时间', onupdate=datetime.now)
+    del_flag = Column(CHAR(1), nullable=True, server_default='0', comment='删除标志(0=存在,2=删除)')
+
+
+class VfClassStudent(Base):
+    """班级学生关联表"""
+
+    __tablename__ = 'vf_class_student'
+    __table_args__ = {'comment': '班级学生关联表'}
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True, comment='ID')
+    class_id = Column(BigInteger, nullable=False, comment='班级ID')
+    user_id = Column(BigInteger, nullable=False, comment='学生用户ID')
+    student_no = Column(String(30), nullable=True, server_default="''", comment='学号（冗余）')
+    student_name = Column(String(100), nullable=True, server_default="''", comment='学生姓名（冗余）')
+    join_date = Column(DateTime, nullable=True, comment='加入日期')
+    is_monitor = Column(CHAR(1), nullable=True, server_default='0', comment='是否班长(0=否,1=是)')
+    position = Column(String(50), nullable=True, server_default="''", comment='班级职务')
+    sort_order = Column(Integer, nullable=True, server_default='0', comment='排序')
+    status = Column(CHAR(1), nullable=True, server_default='0', comment='状态(0=在读,1=休学,2=退学,3=毕业)')
+    remark = Column(String(500), nullable=True, server_default="''", comment='备注')
+    create_by = Column(String(64), nullable=True, server_default="''", comment='创建者')
+    create_time = Column(DateTime, nullable=True, comment='创建时间', default=datetime.now)
+    update_by = Column(String(64), nullable=True, server_default="''", comment='更新者')
+    update_time = Column(DateTime, nullable=True, comment='更新时间', onupdate=datetime.now)
