@@ -100,6 +100,7 @@
 // =============================================
 
 // ------ el-button ------
+// 所有有类型的按钮统一使用渐变实心风格 + 白色文字，覆盖 plain 变体，确保文字清晰可读
 .el-button {
   border-radius: 8px;
   font-weight: 500;
@@ -109,10 +110,18 @@
   &--primary {
     background: linear-gradient(135deg, #0B5394 0%, #1E88E5 100%);
     border-color: transparent;
+    color: #fff;
+
+    &.is-plain {
+      background: linear-gradient(135deg, #0B5394 0%, #1E88E5 100%);
+      border-color: transparent;
+      color: #fff;
+    }
 
     &:hover, &:focus {
       background: linear-gradient(135deg, #093F72 0%, #1565C0 100%);
       border-color: transparent;
+      color: #fff;
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(11, 83, 148, 0.35);
     }
@@ -124,23 +133,73 @@
   &--success {
     background: linear-gradient(135deg, #2E7D32 0%, #43A047 100%);
     border-color: transparent;
+    color: #fff;
+
+    &.is-plain {
+      background: linear-gradient(135deg, #2E7D32 0%, #43A047 100%);
+      border-color: transparent;
+      color: #fff;
+    }
+
     &:hover, &:focus {
       background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 100%);
       border-color: transparent;
+      color: #fff;
     }
   }
 
   &--danger {
     background: linear-gradient(135deg, #E53935 0%, #EF5350 100%);
     border-color: transparent;
+    color: #fff;
+
+    &.is-plain {
+      background: linear-gradient(135deg, #E53935 0%, #EF5350 100%);
+      border-color: transparent;
+      color: #fff;
+    }
+
     &:hover, &:focus {
       background: linear-gradient(135deg, #C62828 0%, #E53935 100%);
       border-color: transparent;
+      color: #fff;
+    }
+  }
+
+  &--info {
+    background: linear-gradient(135deg, #475569 0%, #64748B 100%);
+    border-color: transparent;
+    color: #fff;
+
+    &.is-plain {
+      background: linear-gradient(135deg, #475569 0%, #64748B 100%);
+      border-color: transparent;
+      color: #fff;
+    }
+
+    &:hover, &:focus {
+      background: linear-gradient(135deg, #334155 0%, #475569 100%);
+      border-color: transparent;
+      color: #fff;
     }
   }
 
   &--warning {
-    border-radius: 8px;
+    background: linear-gradient(135deg, #E65100 0%, #FB8C00 100%);
+    border-color: transparent;
+    color: #fff;
+
+    &.is-plain {
+      background: linear-gradient(135deg, #E65100 0%, #FB8C00 100%);
+      border-color: transparent;
+      color: #fff;
+    }
+
+    &:hover, &:focus {
+      background: linear-gradient(135deg, #BF360C 0%, #E65100 100%);
+      border-color: transparent;
+      color: #fff;
+    }
   }
 
   &--text {
