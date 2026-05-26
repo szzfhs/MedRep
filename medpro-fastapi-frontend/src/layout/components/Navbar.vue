@@ -154,11 +154,22 @@ async function toggleTheme(event) {
   overflow: hidden;
   position: relative;
   background: var(--navbar-bg);
-  box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+  box-shadow: 0 1px 0 #E2E8F0, 0 2px 8px rgba(11, 83, 148, 0.06);
   display: flex;
   align-items: center;
-  // padding: 0 8px;
   box-sizing: border-box;
+
+  // 顶部品牌渐变条
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #0B5394 0%, #1E88E5 50%, #00897B 100%);
+    z-index: 10;
+  }
 
   .hamburger-container {
     line-height: 46px;
@@ -172,7 +183,7 @@ async function toggleTheme(event) {
     margin-right: 8px;
 
     &:hover {
-      background: rgba(0, 0, 0, 0.025);
+      background: rgba(11, 83, 148, 0.06);
     }
   }
 
@@ -215,15 +226,18 @@ async function toggleTheme(event) {
       padding: 0 8px;
       height: 100%;
       font-size: 18px;
-      color: #5a5e66;
+      color: #475569;
       vertical-align: text-bottom;
 
       &.hover-effect {
         cursor: pointer;
-        transition: background 0.3s;
+        transition: background 0.25s, color 0.25s;
+        border-radius: 8px;
+        margin: 0 2px;
 
         &:hover {
-          background: rgba(0, 0, 0, 0.025);
+          background: rgba(11, 83, 148, 0.07);
+          color: #0B5394;
         }
       }
 
@@ -242,13 +256,22 @@ async function toggleTheme(event) {
     }
 
     .avatar-container {
-      margin-right: 0px;
+      margin-right: 4px;
       padding-right: 0px;
 
       .avatar-wrapper {
         margin-top: 10px;
         right: 8px;
         position: relative;
+        display: flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: 8px;
+        transition: background 0.25s;
+
+        &:hover {
+          background: rgba(11, 83, 148, 0.07);
+        }
 
         .user-avatar {
           cursor: pointer;
@@ -257,15 +280,21 @@ async function toggleTheme(event) {
           margin-right: 8px;
           border-radius: 50%;
           vertical-align: middle;
-          border-style: none;
+          border: 2px solid #E2E8F0;
+          transition: border-color 0.2s;
+          box-sizing: border-box;
+
+          &:hover {
+            border-color: #0B5394;
+          }
         }
 
-        .user-nickname{
+        .user-nickname {
           position: relative;
           left: 0px;
-          // bottom: 10px;
-          font-size: 14px;
-          font-weight: bold;
+          font-size: 13px;
+          font-weight: 600;
+          color: #1A2332;
         }
 
         i {

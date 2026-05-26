@@ -64,11 +64,22 @@ const getLogoTextColor = computed(() => {
 
 .sidebar-logo-container {
   position: relative;
-  height: 50px;
-  line-height: 50px;
+  height: 56px;
+  line-height: 56px;
   background: v-bind(getLogoBackground);
   text-align: center;
   overflow: hidden;
+
+  // 品牌底部渐变分隔线
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 30%, rgba(30,136,229,0.4) 50%, rgba(255,255,255,0.15) 70%, transparent 100%);
+  }
 
   & .sidebar-logo-link {
     height: 100%;
@@ -78,18 +89,20 @@ const getLogoTextColor = computed(() => {
       width: 32px;
       height: 32px;
       vertical-align: middle;
-      margin-right: 12px;
+      margin-right: 10px;
+      border-radius: 6px;
     }
 
     & .sidebar-title {
       display: inline-block;
       margin: 0;
       color: v-bind(getLogoTextColor);
-      font-weight: 600;
-      line-height: 50px;
-      font-size: 14px;
+      font-weight: 700;
+      line-height: 56px;
+      font-size: 15px;
       font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
       vertical-align: middle;
+      letter-spacing: 0.5px;
     }
   }
 

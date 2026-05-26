@@ -241,11 +241,11 @@ function handleScroll() {
 
 <style lang="scss" scoped>
 .tags-view-container {
-  height: 34px;
+  height: 36px;
   width: 100%;
   background: var(--tags-bg, #fff);
-  border-bottom: 1px solid var(--tags-item-border, #d8dce5);
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .12), 0 0 3px 0 rgba(0, 0, 0, .04);
+  border-bottom: 1px solid var(--tags-item-border, #E2E8F0);
+  box-shadow: 0 1px 4px rgba(11, 83, 148, 0.06);
   .tags-view-wrapper {
     .tags-view-item {
       display: inline-block;
@@ -253,13 +253,15 @@ function handleScroll() {
       cursor: pointer;
       height: 26px;
       line-height: 26px;
-      border: 1px solid var(--tags-item-border, #d8dce5);
-      color: var(--tags-item-text, #495060);
+      border: 1px solid var(--tags-item-border, #E2E8F0);
+      color: var(--tags-item-text, #475569);
       background: var(--tags-item-bg, #fff);
-      padding: 0 8px;
+      padding: 0 10px;
       font-size: 12px;
       margin-left: 5px;
-      margin-top: 4px;
+      margin-top: 5px;
+      border-radius: 6px;
+      transition: color 0.2s, background 0.2s, border-color 0.2s, box-shadow 0.2s;
 
       &:first-of-type {
         margin-left: 15px;
@@ -269,20 +271,28 @@ function handleScroll() {
         margin-right: 15px;
       }
 
+      &:not(.active):hover {
+        color: #0B5394;
+        border-color: #B8CFDF;
+        background: #E9F0F5;
+      }
+
       &.active {
-        background-color: #42b983;
+        background-color: #0B5394;
         color: #fff;
-        border-color: #42b983;
+        border-color: #0B5394;
+        box-shadow: 0 2px 6px rgba(11, 83, 148, 0.3);
 
         &::before {
           content: '';
-          background: #fff;
+          background: rgba(255, 255, 255, 0.9);
           display: inline-block;
-          width: 8px;
-          height: 8px;
+          width: 7px;
+          height: 7px;
           border-radius: 50%;
           position: relative;
           margin-right: 5px;
+          vertical-align: middle;
         }
       }
     }
@@ -298,21 +308,27 @@ function handleScroll() {
     z-index: 3000;
     position: absolute;
     list-style-type: none;
-    padding: 5px 0;
-    border-radius: 4px;
+    padding: 6px 0;
+    border-radius: 10px;
     font-size: 12px;
     font-weight: 400;
     color: var(--tags-item-text, #333);
-    box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, .3);
-    border: 1px solid var(--el-border-color-light, #e4e7ed);
+    box-shadow: 0 4px 16px rgba(11, 83, 148, 0.15), 0 1px 4px rgba(0,0,0,0.08);
+    border: 1px solid var(--el-border-color-light, #E2E8F0);
+    min-width: 130px;
 
     li {
       margin: 0;
-      padding: 7px 16px;
+      padding: 8px 16px;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
 
       &:hover {
-        background: var(--tags-item-hover, #eee);
+        background: #EBF4FF;
+        color: #0B5394;
       }
     }
   }
