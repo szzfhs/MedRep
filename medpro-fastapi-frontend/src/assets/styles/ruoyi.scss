@@ -295,7 +295,7 @@
 .sortable-ghost{
 	opacity: .8;
 	color: #fff!important;
-	background: #42b983!important;
+	background: #0B5394!important;
 }
 
 /* 表格右侧工具栏样式 */
@@ -306,4 +306,90 @@
 /* 分割面板样式 */
 .splitpanes.default-theme .splitpanes__pane {
   background-color: var(--splitpanes-default-bg) !important;
+}
+
+// =============================================
+// Phase 4 — app-container 页面布局卡片化（CSS-only）
+// 适用于全部 simhub 业务页面（无需改动 Vue 文件）
+// =============================================
+
+// 卡片化 mixin，直接子元素和 el-col 内均适用
+@mixin page-card-layout($parent) {
+  // 搜索表单 → 搜索卡片
+  #{$parent} > .el-form--inline {
+    background: #ffffff;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 16px 20px 6px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+
+    .el-form-item { margin-bottom: 12px; }
+  }
+
+  // 工具栏行 → 表格卡片顶部
+  #{$parent} > .el-row.mb8 {
+    background: #FAFBFD;
+    border: 1px solid #E2E8F0;
+    border-bottom: 1px solid #F0F4F8;
+    border-radius: 12px 12px 0 0;
+    padding: 10px 16px !important;
+    margin-bottom: 0 !important;
+    align-items: center;
+  }
+
+  // 数据表格 → 表格卡片中部
+  #{$parent} > .el-table {
+    border-left: 1px solid #E2E8F0 !important;
+    border-right: 1px solid #E2E8F0 !important;
+    border-top: none !important;
+
+    .el-table__inner-wrapper::before { display: none; }
+  }
+
+  // 分页 → 表格卡片底部
+  #{$parent} > .pagination-container {
+    background: #ffffff;
+    border: 1px solid #E2E8F0;
+    border-top: 1px solid #F0F4F8;
+    border-radius: 0 0 12px 12px;
+    padding: 10px 20px 12px;
+    margin-top: 0 !important;
+  }
+}
+
+// 标准布局（class-admin / course / news / question / regulation）
+@include page-card-layout('.app-container');
+
+// 树+表格二列布局（experiment / resource — 表格部分在 el-col 内）
+@include page-card-layout('.app-container .el-col:not(:first-child)');
+
+// 暗黑模式
+html.dark {
+  .app-container > .el-form--inline,
+  .app-container .el-col:not(:first-child) > .el-form--inline {
+    background: var(--el-bg-color);
+    border-color: var(--el-border-color);
+    box-shadow: none;
+  }
+
+  .app-container > .el-row.mb8,
+  .app-container .el-col:not(:first-child) > .el-row.mb8 {
+    background: var(--el-bg-color-page);
+    border-color: var(--el-border-color);
+    border-bottom-color: var(--el-border-color-light);
+  }
+
+  .app-container > .el-table,
+  .app-container .el-col:not(:first-child) > .el-table {
+    border-left-color: var(--el-border-color) !important;
+    border-right-color: var(--el-border-color) !important;
+  }
+
+  .app-container > .pagination-container,
+  .app-container .el-col:not(:first-child) > .pagination-container {
+    background: var(--el-bg-color);
+    border-color: var(--el-border-color);
+    border-top-color: var(--el-border-color-light);
+  }
 }
