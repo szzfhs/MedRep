@@ -103,10 +103,8 @@
 /** 表单布局 **/
 .form-header {
     font-size:15px;
-	color:#6379bb;
-	border-bottom:1px solid #ddd;
-	margin:8px 10px 25px 10px;
-	padding-bottom:5px
+	color:#0B5394;
+	border-bottom:1px solid #E2E8F0;
 }
 
 /** 表格布局 **/
@@ -145,9 +143,9 @@
 /* tree border */
 .tree-border {
     margin-top: 5px;
-    border: 1px solid var(--el-border-color-light, #e5e6e7);
+    border: 1px solid var(--el-border-color-light, #E2E8F0);
     background: var(--el-bg-color, #FFFFFF) none;
-    border-radius:4px;
+    border-radius: 8px;
     width: 100%;
 }
 
@@ -170,7 +168,7 @@
 /** 表格更多操作下拉样式 */
 .el-table .el-dropdown-link {
 	cursor: pointer;
-	color: #409EFF;
+	color: #0B5394;
 	margin-left: 10px;
 }
 
@@ -196,11 +194,12 @@
 }
 
 .list-group-item {
-	border-bottom: 1px solid #e7eaec;
-	border-top: 1px solid #e7eaec;
+	border-bottom: 1px solid #E2E8F0;
+	border-top: 1px solid #E2E8F0;
 	margin-bottom: -1px;
-	padding: 11px 0px;
+	padding: 12px 0px;
 	font-size: 13px;
+	color: #475569;
 }
 
 .pull-right {
@@ -392,4 +391,71 @@ html.dark {
     border-color: var(--el-border-color);
     border-top-color: var(--el-border-color-light);
   }
+}
+
+// =============================================
+// Phase 5 — 系统管理页特殊布局适配
+// =============================================
+
+// user/index.vue: splitpanes 内的搜索+表格卡片化
+// 渲染结构: .app-container > .el-row > .splitpanes > .splitpanes__pane > .el-col
+@include page-card-layout('.app-container .splitpanes__pane .el-col');
+
+// 左侧部门树面板卡片化
+.app-container .splitpanes__pane:first-child .el-col {
+  > .head-container {
+    background: #ffffff;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+
+    // 第一个 head-container（搜索输入框）去掉底部间距
+    &:first-child {
+      padding-bottom: 10px;
+    }
+  }
+}
+
+// 部门树 input 框
+.head-container .el-input {
+  .el-input__wrapper {
+    background-color: #F8FAFC;
+  }
+}
+
+// 个人中心页面 list-group 增强
+.list-group-striped {
+  > .list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    svg.svg-icon {
+      margin-right: 6px;
+      color: #0B5394;
+    }
+
+    .pull-right {
+      color: #1A2332;
+      font-weight: 500;
+    }
+  }
+}
+
+// 个人中心卡片标题增强
+.box-card {
+  .el-card__header {
+    font-weight: 600;
+    color: #1A2332;
+    font-size: 14px;
+  }
+}
+
+// 暗黑模式：splitpanes 面板
+html.dark .app-container .splitpanes__pane:first-child .el-col > .head-container {
+  background: var(--el-bg-color);
+  border-color: var(--el-border-color);
+  box-shadow: none;
 }
