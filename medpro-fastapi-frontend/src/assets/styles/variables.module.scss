@@ -8,35 +8,35 @@ $tiffany: #4AB7BD;
 $yellow: #FEC171;
 $panGreen: #30B08F;
 
-// 默认主题变量
-$menuText: #bfcbd9;
-$menuActiveText: #409eff;
-$menuBg: #304156;
-$menuHover: #263445;
+// 默认主题变量（深色侧栏 SimHub 品牌色）
+$menuText: #94A3B8;
+$menuActiveText: #ffffff;
+$menuBg: #0B1929;
+$menuHover: #1E2D3D;
 
 // 浅色主题theme-light
 $menuLightBg: #ffffff;
-$menuLightHover: #f0f1f5;
-$menuLightText: #303133;
-$menuLightActiveText: #409EFF;
+$menuLightHover: #F0F4F8;
+$menuLightText: #475569;
+$menuLightActiveText: #0B5394;
 
 // 基础变量
 $base-sidebar-width: 200px;
 $sideBarWidth: 200px;
 
 // 菜单暗色变量
-$base-menu-color: #bfcbd9;
-$base-menu-color-active: #f4f4f5;
-$base-menu-background: #304156;
-$base-sub-menu-background: #1f2d3d;
-$base-sub-menu-hover: #001528;
+$base-menu-color: #94A3B8;
+$base-menu-color-active: #ffffff;
+$base-menu-background: #0B1929;
+$base-sub-menu-background: #0F1E2D;
+$base-sub-menu-hover: #1E2D3D;
 
-// 组件变量
-$--color-primary: #409EFF;
-$--color-success: #67C23A;
-$--color-warning: #E6A23C;
-$--color-danger: #F56C6C;
-$--color-info: #909399;
+// 组件变量（SimHub 品牌色系）
+$--color-primary: #0B5394;
+$--color-success: #2E7D32;
+$--color-warning: #FB8C00;
+$--color-danger: #E53935;
+$--color-info: #64748B;
 
 :export {
   menuText: $menuText;
@@ -67,17 +67,96 @@ $--color-info: #909399;
 
 // CSS变量定义
 :root {
-  /* 亮色模式变量 */
+  /* ── 亮色模式布局变量 ─────────────────── */
   --sidebar-bg: #{$menuBg};
   --sidebar-text: #{$menuText};
   --menu-hover: #{$menuHover};
-  
+
   --navbar-bg: #ffffff;
-  --navbar-text: #303133;
-  
+  --navbar-text: #1A2332;
+
   /* splitpanes default-theme 变量 */
   --splitpanes-default-bg: #ffffff;
 
+  /* ── Element Plus 主题色覆盖 ─────────── */
+  --el-color-primary:         #0B5394;
+  --el-color-primary-light-3: #3B77B3;
+  --el-color-primary-light-5: #85AAC9;
+  --el-color-primary-light-7: #B8CFDF;
+  --el-color-primary-light-8: #D3E1EC;
+  --el-color-primary-light-9: #E9F0F5;
+  --el-color-primary-dark-2:  #093F72;
+
+  --el-color-success:         #2E7D32;
+  --el-color-success-light-3: #5EA362;
+  --el-color-success-light-9: #E8F5E9;
+  --el-color-success-dark-2:  #1B5E20;
+
+  --el-color-warning:         #FB8C00;
+  --el-color-warning-light-3: #FCAB40;
+  --el-color-warning-light-9: #FFF8E1;
+  --el-color-warning-dark-2:  #E65100;
+
+  --el-color-danger:          #E53935;
+  --el-color-danger-light-3:  #EE6D6A;
+  --el-color-danger-light-9:  #FFEBEE;
+  --el-color-danger-dark-2:   #C62828;
+
+  --el-color-info:            #64748B;
+  --el-color-info-light-3:    #8EA0B8;
+  --el-color-info-light-9:    #F0F4F8;
+  --el-color-info-dark-2:     #475569;
+
+  /* ── 文字色 ──────────────────────────── */
+  --el-text-color-primary:       #1A2332;
+  --el-text-color-regular:       #475569;
+  --el-text-color-secondary:     #64748B;
+  --el-text-color-placeholder:   #94A3B8;
+  --el-text-color-disabled:      #CBD5E1;
+
+  /* ── 边框色 ──────────────────────────── */
+  --el-border-color:             #E2E8F0;
+  --el-border-color-light:       #F0F4F8;
+  --el-border-color-lighter:     #F8FAFC;
+  --el-border-color-extra-light: #FAFBFD;
+  --el-border-color-dark:        #D1D9E0;
+  --el-border-color-darker:      #B8C5D0;
+
+  /* ── 背景色 ──────────────────────────── */
+  --el-bg-color:                 #FFFFFF;
+  --el-bg-color-page:            #F0F4F8;
+  --el-bg-color-overlay:         #FFFFFF;
+
+  /* ── 填充色 ──────────────────────────── */
+  --el-fill-color-blank:         #FFFFFF;
+  --el-fill-color:               #F8FAFC;
+  --el-fill-color-light:         #FAFBFD;
+  --el-fill-color-lighter:       #F0F4F8;
+  --el-fill-color-extra-light:   #F8FAFC;
+  --el-fill-color-dark:          #EEF2F6;
+  --el-fill-color-darker:        #E2E8F0;
+  --el-fill-color-disabled:      #F5F7FA;
+
+  /* ── 圆角 ────────────────────────────── */
+  --el-border-radius-base:       8px;
+  --el-border-radius-small:      6px;
+  --el-border-radius-round:      20px;
+
+  /* ── 阴影 ────────────────────────────── */
+  --el-box-shadow:               0 2px 8px rgba(11, 83, 148, 0.08);
+  --el-box-shadow-light:         0 1px 4px rgba(0, 0, 0, 0.06);
+  --el-box-shadow-lighter:       0 0 6px rgba(0, 0, 0, 0.04);
+  --el-box-shadow-dark:          0 4px 16px rgba(11, 83, 148, 0.15);
+
+  /* ── 组件高度 ────────────────────────── */
+  --el-component-size-large:     40px;
+  --el-component-size:           36px;
+  --el-component-size-small:     28px;
+
+  /* ── 字号 ────────────────────────────── */
+  --el-font-size-base:           13px;
+  --el-font-size-small:          12px;
+  --el-font-size-extra-small:    11px;
 }
 
 // 暗黑模式变量

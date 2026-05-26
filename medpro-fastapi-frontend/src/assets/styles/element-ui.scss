@@ -94,3 +94,284 @@
 .el-dropdown .el-dropdown-link{
   color: var(--el-color-primary) !important;
 }
+
+// =============================================
+// SimHub Medical Platform — Element Plus 主题覆盖
+// =============================================
+
+// ------ el-button ------
+.el-button {
+  border-radius: 8px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  transition: all 0.2s ease;
+
+  &--primary {
+    background: linear-gradient(135deg, #0B5394 0%, #1E88E5 100%);
+    border-color: transparent;
+
+    &:hover, &:focus {
+      background: linear-gradient(135deg, #093F72 0%, #1565C0 100%);
+      border-color: transparent;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(11, 83, 148, 0.35);
+    }
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  &--success {
+    background: linear-gradient(135deg, #2E7D32 0%, #43A047 100%);
+    border-color: transparent;
+    &:hover, &:focus {
+      background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 100%);
+      border-color: transparent;
+    }
+  }
+
+  &--danger {
+    background: linear-gradient(135deg, #E53935 0%, #EF5350 100%);
+    border-color: transparent;
+    &:hover, &:focus {
+      background: linear-gradient(135deg, #C62828 0%, #E53935 100%);
+      border-color: transparent;
+    }
+  }
+
+  &--warning {
+    border-radius: 8px;
+  }
+
+  &--text {
+    font-weight: 500;
+    &:hover { background-color: var(--el-color-primary-light-9); }
+  }
+}
+
+// ------ el-input ------
+.el-input__wrapper {
+  border-radius: 8px;
+  background-color: #F8FAFC;
+  box-shadow: 0 0 0 1px #E2E8F0 inset;
+  transition: box-shadow 0.2s ease, background-color 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 0 0 1px #0B5394 inset;
+    background-color: #ffffff;
+  }
+  &.is-focus {
+    box-shadow: 0 0 0 1.5px #0B5394 inset;
+    background-color: #ffffff;
+  }
+}
+
+.el-textarea__inner {
+  border-radius: 8px;
+  background-color: #F8FAFC;
+  border-color: #E2E8F0;
+  &:focus { border-color: #0B5394; background-color: #ffffff; }
+}
+
+.el-select {
+  .el-input__wrapper.is-focus { box-shadow: 0 0 0 1.5px #0B5394 inset !important; }
+}
+
+// ------ el-table ------
+.el-table {
+  border-radius: 12px;
+  overflow: hidden;
+
+  th.el-table__cell {
+    background-color: #F0F4F8 !important;
+    color: #475569;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    height: 44px !important;
+    border-bottom: 2px solid #E2E8F0;
+  }
+
+  td.el-table__cell {
+    color: #1A2332;
+    border-bottom-color: #F0F4F8;
+  }
+
+  .el-table__row:hover td.el-table__cell {
+    background-color: #EBF4FF;
+  }
+
+  .el-table__row--striped td.el-table__cell {
+    background-color: #FAFBFD;
+  }
+}
+
+// ------ el-card ------
+.el-card {
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.25s ease;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(11, 83, 148, 0.1);
+  }
+
+  &.is-always-shadow {
+    box-shadow: 0 2px 8px rgba(11, 83, 148, 0.08);
+  }
+
+  .el-card__header {
+    border-bottom: 1px solid #F0F4F8;
+    padding: 16px 20px;
+    font-weight: 600;
+    color: #1A2332;
+  }
+
+  .el-card__body {
+    padding: 20px;
+  }
+}
+
+// ------ el-dialog ------
+.el-dialog {
+  border-radius: 16px;
+  overflow: hidden;
+
+  .el-dialog__header {
+    background: linear-gradient(135deg, #0B5394 0%, #1E88E5 100%);
+    padding: 18px 24px;
+    margin-right: 0;
+
+    .el-dialog__title {
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .el-dialog__headerbtn {
+      top: 50%;
+      transform: translateY(-50%);
+      right: 20px;
+
+      .el-dialog__close {
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 18px;
+        &:hover { color: #ffffff; }
+      }
+    }
+  }
+
+  .el-dialog__body {
+    padding: 24px;
+  }
+
+  .el-dialog__footer {
+    padding: 16px 24px;
+    border-top: 1px solid #F0F4F8;
+  }
+}
+
+// ------ el-tag ------
+.el-tag {
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+
+  &--success {
+    background-color: #E8F5E9;
+    border-color: #C8E6C9;
+    color: #2E7D32;
+  }
+  &--warning {
+    background-color: #FFF8E1;
+    border-color: #FFE082;
+    color: #E65100;
+  }
+  &--danger {
+    background-color: #FFEBEE;
+    border-color: #FFCDD2;
+    color: #C62828;
+  }
+  &--info {
+    background-color: #F0F4F8;
+    border-color: #E2E8F0;
+    color: #64748B;
+  }
+}
+
+// ------ el-menu (dark sidebar) ------
+.el-menu {
+  border-right: none !important;
+
+  .el-menu-item, .el-sub-menu__title {
+    border-radius: 8px;
+    margin: 2px 8px;
+    height: 44px;
+    line-height: 44px;
+    font-size: 13px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .el-menu-item.is-active {
+    background: linear-gradient(135deg, rgba(11, 83, 148, 0.9) 0%, rgba(30, 136, 229, 0.9) 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(11, 83, 148, 0.3);
+  }
+}
+
+// ------ el-pagination ------
+.el-pagination {
+  .el-pager li {
+    border-radius: 6px;
+    font-size: 13px;
+
+    &.is-active {
+      background-color: #0B5394;
+      color: #ffffff;
+    }
+
+    &:hover:not(.is-active) {
+      color: #0B5394;
+    }
+  }
+
+  .btn-prev, .btn-next {
+    border-radius: 6px;
+    &:hover { color: #0B5394; }
+  }
+}
+
+// ------ el-form ------
+.el-form-item__label {
+  color: #475569;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+// ------ el-select dropdown ------
+.el-select-dropdown__item {
+  font-size: 13px;
+  &.selected { color: #0B5394; font-weight: 600; }
+  &:hover { background-color: #EBF4FF; }
+}
+
+// ------ el-tooltip ------
+.el-tooltip__popper {
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+// ------ el-steps ------
+.el-step__head.is-finish .el-step__icon,
+.el-step__head.is-process .el-step__icon {
+  border-color: #0B5394;
+  color: #0B5394;
+}
+
+// ------ el-tabs ------
+.el-tabs__active-bar { background-color: #0B5394; }
+.el-tabs__item.is-active { color: #0B5394; }
+.el-tabs__item:hover { color: #1E88E5; }
