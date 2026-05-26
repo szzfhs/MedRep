@@ -216,7 +216,28 @@
 }
 
 .card-box {
-	margin-bottom: 10px;
+	margin-bottom: 16px;
+
+	// 服务器/缓存监控页：原生 HTML 表格单元格美化
+	.el-table__cell {
+		padding: 10px 12px;
+		font-size: 13px;
+		border-bottom: 1px solid var(--el-border-color-lighter, #F1F5F9);
+
+		.cell {
+			padding: 0;
+			color: var(--el-text-color-regular);
+		}
+	}
+
+	thead .el-table__cell {
+		background: var(--el-fill-color-light, #F8FAFC);
+		font-weight: 600;
+		color: var(--el-text-color-secondary);
+		font-size: 12px;
+
+		.cell { color: var(--el-text-color-secondary); }
+	}
 }
 
 /* button color */
@@ -242,31 +263,31 @@
 
 /* text color */
 .text-navy {
-	color: #1ab394;
+	color: #00897B;
 }
 
 .text-primary {
-	color: inherit;
+	color: var(--el-color-primary);
 }
 
 .text-success {
-	color: #1c84c6;
+	color: var(--el-color-success);
 }
 
 .text-info {
-	color: #23c6c8;
+	color: var(--el-color-info);
 }
 
 .text-warning {
-	color: #f8ac59;
+	color: var(--el-color-warning);
 }
 
 .text-danger {
-	color: #ed5565;
+	color: var(--el-color-danger);
 }
 
 .text-muted {
-	color: #888888;
+	color: var(--el-text-color-placeholder);
 }
 
 /* image */

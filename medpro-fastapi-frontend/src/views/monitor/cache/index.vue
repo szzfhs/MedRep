@@ -79,8 +79,9 @@ function getList() {
     proxy.$modal.closeLoading();
     cache.value = response.data;
 
-    const commandstatsIntance = echarts.init(commandstats.value, "macarons");
+    const commandstatsIntance = echarts.init(commandstats.value);
     commandstatsIntance.setOption({
+      color: ['#0B5394','#00897B','#1E88E5','#E65100','#7B1FA2','#00695C','#1565C0','#558B2F'],
       tooltip: {
         trigger: "item",
         formatter: "{a} <br/>{b} : {c} ({d}%)"
@@ -98,8 +99,9 @@ function getList() {
         }
       ]
     });
-    const usedmemoryInstance = echarts.init(usedmemory.value, "macarons");
+    const usedmemoryInstance = echarts.init(usedmemory.value);
     usedmemoryInstance.setOption({
+      color: ['#0B5394'],
       tooltip: {
         formatter: "{b} <br/>{a} : " + cache.value.info.used_memory_human
       },
@@ -109,8 +111,10 @@ function getList() {
           type: "gauge",
           min: 0,
           max: 1000,
+          axisLine: { lineStyle: { color: [[0.3,'#00897B'],[0.7,'#1E88E5'],[1,'#0B5394']], width: 20 } },
           detail: {
-            formatter: cache.value.info.used_memory_human
+            formatter: cache.value.info.used_memory_human,
+            color: '#0B5394'
           },
           data: [
             {
