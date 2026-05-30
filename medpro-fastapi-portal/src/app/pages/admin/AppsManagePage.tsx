@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Search, Plus, Edit, Trash2, Eye, Filter,
@@ -7,8 +7,55 @@ import {
   Monitor, Cpu, Image as ImageIcon, Tag, Layers,
 } from 'lucide-react';
 import {
-  mockApps as initialApps, SimSystem, SYS_CATEGORIES, HW_LABELS, HwSupport,
-} from '../../data/appsData';
+  getAdminSimSystemList, createSimSystem, updateSimSystem, deleteSimSystem,
+  AdminSimSystem, SaveSimSystemParams,
+} from '@/api/school-admin';
+
+export type HwSupport = 'helmet' | 'pc' | 'zspace' | 'webgl';
+
+export interface SimSystem {
+  sim_system_id: number;
+  system_name: string;
+  system_detail: string;
+  cover_image: string;
+  hw_recommend: string;
+  hw_support: HwSupport[];
+  sys_category: string;
+  view_count: number;
+  status: '0' | '1';
+  create_time: string;
+  exp_count: number;
+  launch_url: string;
+}
+
+export const SYS_CATEGORIES = ['全部', '解剖学', '外科学', '细胞生物学', '药理学', '神经科学', '心脏病学', '病理学', '生理学'];
+
+export const HW_LABELS: Record<HwSupport, { label: string; color: string; bg: string }> = {
+  helmet: { label: 'VR头盔', color: 'text-[#6D28D9]', bg: 'bg-[#EDE9FE]' },
+  pc:     { label: 'PC端',   color: 'text-[#0B5394]', bg: 'bg-[#DBEAFE]' },
+  zspace: { label: 'zSpace', color: 'text-[#065F46]', bg: 'bg-[#D1FAE5]' },
+  webgl:  { label: 'WebGL',  color: 'text-[#92400E]', bg: 'bg-[#FEF3C7]' },
+};
+
+function mapApiSimSystem(s: AdminSimSystem): SimSystem {
+  const hwArr = (s.hwSupport ?? '').split(',').map(h => h.trim()).filter(h =>
+    ['helmet', 'pc', 'zspace', 'webgl'].includes(h)
+  ) as HwSupport[];
+  return {
+    sim_system_id: s.simSystemId,
+    system_name: s.systemName,
+    system_detail: s.systemDetail ?? '',
+    cover_image: s.coverImage ?? '',
+    hw_recommend: s.hwRecommend ?? '',
+    hw_support: hwArr.length ? hwArr : ['webgl'],
+    sys_category: s.sysCategory ?? '',
+    view_count: s.viewCount ?? 0,
+    status: s.status ?? '1',
+    create_time: s.createTime ?? '',
+    exp_count: s.expCount ?? 0,
+    launch_url: '',
+  };
+}
 
 const PAGE_SIZE = 8;
 const HW_OPTIONS: HwSupport[] = ['webgl', 'pc', 'helmet', 'zspace'];
@@ -344,7 +391,7 @@ function DetailView({ app, onClose }: { app: SimSystem; onClose: () => void }) {
 
 /* ───────── Main page ───────── */
 export function AppsManagePage() {
-  const [apps, setApps] = useState<SimSystem[]>(initialApps);
+  const [apps, setApps] = useState<SimSystem[]>([]);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('全部');
   const [statusFilter, setStatusFilter] = useState<'all' | '0' | '1'>('all');
@@ -358,6 +405,15 @@ export function AppsManagePage() {
     | null;
   const [modal, setModal] = useState<ModalState>(null);
 
+  const fetchData = useCallback(async () => {
+    try {
+      const res = await getAdminSimSystemList({ pageNum: 1, pageSize: 9999 });
+      setApps((res.rows ?? []).map(mapApiSimSystem));
+    } catch {/* ignore */}
+  }, []);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+
   /* filtered list */
   const filtered = apps.filter(a => {
     const matchSearch = !search || a.system_name.includes(search) || a.sys_category.includes(search);
@@ -370,38 +426,44 @@ export function AppsManagePage() {
   const pageData = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   /* CRUD helpers */
-  const handleCreate = (data: FormData) => {
-    const newApp: SimSystem = {
-      ...data,
-      sim_system_id: Math.max(0, ...apps.map(a => a.sim_system_id)) + 1,
-      view_count: 0,
-      create_by: 'admin',
-      create_time: new Date().toLocaleString(),
-      exp_count: 0,
-      images: [],
+  const handleCreate = async (data: FormData) => {
+    const params: SaveSimSystemParams = {
+      systemName: data.system_name,
+      sysCategory: data.sys_category,
+      coverImage: data.cover_image,
+      hwSupport: data.hw_support.join(','),
+      hwRecommend: data.hw_recommend,
+      systemDetail: data.system_detail,
+      status: data.status,
     };
-    setApps(prev => [newApp, ...prev]);
-    setModal(null);
+    try { await createSimSystem(params); setModal(null); fetchData(); } catch {/* ignore */}
   };
 
-  const handleEdit = (data: FormData) => {
+  const handleEdit = async (data: FormData) => {
     if (modal?.type !== 'edit') return;
-    setApps(prev => prev.map(a =>
-      a.sim_system_id === modal.app.sim_system_id ? { ...a, ...data } : a
-    ));
-    setModal(null);
+    const params: SaveSimSystemParams & { simSystemId: number } = {
+      simSystemId: modal.app.sim_system_id,
+      systemName: data.system_name,
+      sysCategory: data.sys_category,
+      coverImage: data.cover_image,
+      hwSupport: data.hw_support.join(','),
+      hwRecommend: data.hw_recommend,
+      systemDetail: data.system_detail,
+      status: data.status,
+    };
+    try { await updateSimSystem(params); setModal(null); fetchData(); } catch {/* ignore */}
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (modal?.type !== 'delete') return;
-    setApps(prev => prev.filter(a => a.sim_system_id !== modal.app.sim_system_id));
-    setModal(null);
+    try { await deleteSimSystem(modal.app.sim_system_id); setModal(null); fetchData(); } catch {/* ignore */}
   };
 
-  const toggleStatus = (id: number) => {
-    setApps(prev => prev.map(a =>
-      a.sim_system_id === id ? { ...a, status: a.status === '0' ? '1' : '0' } : a
-    ));
+  const toggleStatus = async (id: number, currentStatus: '0' | '1') => {
+    try {
+      await updateSimSystem({ simSystemId: id, status: currentStatus === '0' ? '1' : '0' });
+      fetchData();
+    } catch {/* ignore */}
   };
 
   /* stats */
@@ -559,7 +621,7 @@ export function AppsManagePage() {
                     {/* Status */}
                     <td className="px-4 py-3">
                       <button
-                        onClick={() => toggleStatus(app.sim_system_id)}
+                        onClick={() => toggleStatus(app.sim_system_id, app.status)}
                         title="点击切换状态"
                         className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all hover:opacity-80 ${
                           app.status === '0'

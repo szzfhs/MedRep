@@ -28,7 +28,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 function resolveRole(userInfo: UserInfo | null): AuthState['role'] {
   if (!userInfo) return null;
   const roles = userInfo.roles ?? [];
-  if (roles.includes('admin') || userInfo.permissions?.includes('*:*:*')) return 'admin';
+  if (roles.includes('admin') || roles.includes('simhub_admin') || userInfo.permissions?.includes('*:*:*')) return 'admin';
   if (roles.includes('teacher')) return 'teacher';
   return 'student';
 }

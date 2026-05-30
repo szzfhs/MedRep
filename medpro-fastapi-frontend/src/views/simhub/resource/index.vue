@@ -43,6 +43,12 @@
             <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
             <el-button icon="Refresh" @click="resetQuery">重置</el-button>
           </el-form-item>
+          <el-form-item label="所属学校" prop="tenantId">
+            <el-select v-model="queryParams.tenantId" placeholder="全部" clearable style="width:180px" @change="handleQuery">
+              <el-option label="平台数据" :value="0" />
+              <el-option v-for="t in tenantOptions" :key="t.tenantId" :label="t.tenantName" :value="t.tenantId" />
+            </el-select>
+          </el-form-item>
         </el-form>
 
         <el-row :gutter="10" class="mb8">
@@ -178,10 +184,12 @@ import {
   listResourceCategoryTree, addResourceCategory, updateResourceCategory, delResourceCategory,
   listResource, getResource, addResource, updateResource, delResource
 } from '@/api/simhub/resource'
+import { useTenantOptions } from '@/composables/useTenantOptions'
 
 const { proxy } = getCurrentInstance()
 const { vf_resource_type } = proxy.useDict('vf_resource_type')
 const dict = reactive({ type: { vf_resource_type } })
+const { tenantOptions } = useTenantOptions()
 
 // ——— 分类树 ———
 const categoryTree = ref([])
@@ -227,7 +235,7 @@ const dialogTitle = ref('')
 
 const data = reactive({
   form: {},
-  queryParams: { pageNum: 1, pageSize: 10, resourceName: undefined, resourceType: undefined, categoryId: undefined },
+  queryParams: { pageNum: 1, pageSize: 10, resourceName: undefined, resourceType: undefined, categoryId: undefined, tenantId: undefined },
   rules: {
     resourceName: [{ required: true, message: '资源名称不能为空', trigger: 'blur' }],
     resourceType: [{ required: true, message: '资源类型不能为空', trigger: 'change' }],

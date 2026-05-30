@@ -27,6 +27,7 @@ class DeptModel(BaseModel):
     create_time: datetime | None = Field(default=None, description='创建时间')
     update_by: str | None = Field(default=None, description='更新者')
     update_time: datetime | None = Field(default=None, description='更新时间')
+    tenant_id: int | None = Field(default=None, description='所属租户ID（NULL=平台通用，非NULL=学校专属）')
 
     @NotBlank(field_name='dept_name', message='部门名称不能为空')
     @Size(field_name='dept_name', min_length=0, max_length=30, message='部门名称长度不能超过30个字符')

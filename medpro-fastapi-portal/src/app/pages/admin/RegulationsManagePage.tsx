@@ -1,13 +1,38 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Search, Plus, Edit, Trash2, X, Shield,
   FileText, CheckCircle, Clock, Paperclip, ToggleLeft, ToggleRight,
   Download, Eye
 } from 'lucide-react';
-import { regulations as initialRegs } from '../../data/mockData';
+import {
+  getAdminRegulationList, createRegulation, updateRegulation, deleteRegulation,
+  AdminRegulation, SaveRegulationParams,
+} from '@/api/school-admin';
 
-type Reg = typeof initialRegs[0] & { status?: 'published' | 'draft'; content?: string };
+interface Reg {
+  _id: number;
+  id: string;
+  title: string;
+  category: string;
+  date: string;
+  attachment: boolean;
+  content: string;
+  status: 'published' | 'draft';
+}
+
+function mapApiReg(r: AdminRegulation): Reg {
+  return {
+    _id: r.regId,
+    id: String(r.regId),
+    title: r.title,
+    category: r.category ?? '',
+    date: r.publishDate?.slice(0, 10) ?? r.createTime?.slice(0, 10) ?? '',
+    attachment: r.hasAttachment,
+    content: r.content ?? '',
+    status: r.status === '1' ? 'published' : 'draft',
+  };
+}
 
 const CATEGORIES = ['管理规定', '管理办法', '操作规范', '工作流程', '用户协议', '政策文件'];
 
@@ -52,9 +77,8 @@ const emptyForm: FormData = {
 };
 
 export function RegulationsManagePage() {
-  const [data, setData] = useState<Reg[]>(
-    initialRegs.map(r => ({ ...r, status: 'published' as const, content: '' }))
-  );
+  const [data, setData] = useState<Reg[]>([]);
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
   const [showForm, setShowForm] = useState(false);
@@ -62,6 +86,20 @@ export function RegulationsManagePage() {
   const [deleteItem, setDeleteItem] = useState<Reg | null>(null);
   const [viewItem, setViewItem] = useState<Reg | null>(null);
   const [form, setForm] = useState<FormData>(emptyForm);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const result = await getAdminRegulationList({ pageSize: 9999 });
+      setData((result.rows ?? []).map(mapApiReg));
+    } catch {
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
 
   const filtered = data.filter(r => {
     const q = search.toLowerCase();
@@ -76,21 +114,42 @@ export function RegulationsManagePage() {
     setEditItem(item); setShowForm(true);
   };
 
-  const handleSave = () => {
-    if (editItem) {
-      setData(prev => prev.map(r => r.id === editItem.id ? { ...r, ...form } : r));
-    } else {
-      setData(prev => [{ ...form, id: String(Date.now()) }, ...prev]);
-    }
-    setShowForm(false); setEditItem(null);
+  const handleSave = async () => {
+    const params: SaveRegulationParams = {
+      title: form.title,
+      category: form.category,
+      publishDate: form.date,
+      hasAttachment: form.attachment,
+      content: form.content,
+      status: form.status === 'published' ? '1' : '0',
+    };
+    try {
+      if (editItem) {
+        await updateRegulation({ ...params, regId: editItem._id });
+      } else {
+        await createRegulation(params);
+      }
+      setShowForm(false); setEditItem(null);
+      fetchData();
+    } catch {/* ignore */}
   };
 
-  const handleDelete = () => {
-    if (deleteItem) { setData(prev => prev.filter(r => r.id !== deleteItem.id)); setDeleteItem(null); }
+  const handleDelete = async () => {
+    if (!deleteItem) return;
+    try {
+      await deleteRegulation(deleteItem._id);
+      setDeleteItem(null);
+      fetchData();
+    } catch {/* ignore */}
   };
 
-  const toggleStatus = (id: string) => {
-    setData(prev => prev.map(r => r.id === id ? { ...r, status: r.status === 'published' ? 'draft' : 'published' } : r));
+  const toggleStatus = async (id: string) => {
+    const item = data.find(r => r.id === id);
+    if (!item) return;
+    try {
+      await updateRegulation({ regId: item._id, status: item.status === 'published' ? '0' : '1' });
+      fetchData();
+    } catch {/* ignore */}
   };
 
   const inputCls = "w-full px-3 py-2.5 border border-[#E2E8F0] rounded-xl text-sm text-[#1A2332] focus:outline-none focus:border-[#0B5394] bg-white";

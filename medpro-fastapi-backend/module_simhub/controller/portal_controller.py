@@ -294,3 +294,50 @@ async def portal_sim_system_detail(
     if result is None:
         return ResponseUtil.failure(msg='系统不存在')
     return ResponseUtil.success(data=result)
+
+
+# ——— 租户解析（Portal 多租户支持）———
+
+@portal_controller.get(
+    '/resolve-tenant',
+    summary='门户-通过子域名解析租户信息',
+    response_model=DataResponseModel,
+)
+async def portal_resolve_tenant(
+    request: Request,
+    subdomain: Annotated[str, Query(description='子域名前缀，如：hzsf')],
+    query_db: Annotated[AsyncSession, DBSessionDependency()],
+) -> Response:
+    """
+    Portal 前端启动时调用，通过子域名识别当前所属学校。
+    前端可从 window.location.hostname 提取前缀传入。
+    """
+    from module_simhub.service.tenant_service import TenantService
+    result = await TenantService.resolve_tenant_by_subdomain(query_db, subdomain)
+    if result is None:
+        return ResponseUtil.failure(msg=f'未找到子域名 "{subdomain}" 对应的学校租户')
+    return ResponseUtil.success(data=result)
+
+
+@portal_controller.get(
+    '/tenant-info',
+    summary='门户-获取当前登录用户所属租户信息（需登录）',
+    response_model=DataResponseModel,
+    dependencies=[PreAuthDependency()],
+)
+async def portal_tenant_info(
+    request: Request,
+    query_db: Annotated[AsyncSession, DBSessionDependency()],
+    current_user: Annotated[CurrentUserModel, CurrentUserDependency()],
+) -> Response:
+    """
+    登录后获取当前用户绑定的学校信息。
+    平台用户（admin，tenant_id=NULL）返回 null。
+    """
+    from module_simhub.service.tenant_service import TenantService
+    user_tenant_id = getattr(current_user.user, 'tenant_id', None)
+    if user_tenant_id is None:
+        return ResponseUtil.success(data=None)
+    result = await TenantService.get_tenant_detail(query_db, user_tenant_id)
+    return ResponseUtil.success(data=result)
+

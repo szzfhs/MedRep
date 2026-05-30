@@ -64,8 +64,9 @@ async def get_system_dept_tree(
     request: Request,
     query_db: Annotated[AsyncSession, DBSessionDependency()],
     data_scope_sql: Annotated[ColumnElement, DataScopeDependency(SysDept)],
+    tenant_id: int | None = Query(default=None, description='租户ID，不传则返回全部'),
 ) -> Response:
-    dept_query_result = await DeptService.get_dept_tree_services(query_db, DeptModel(), data_scope_sql)
+    dept_query_result = await DeptService.get_dept_tree_services(query_db, DeptModel(tenant_id=tenant_id), data_scope_sql)
     logger.info('获取成功')
 
     return ResponseUtil.success(data=dept_query_result)

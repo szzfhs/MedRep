@@ -1,13 +1,42 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Search, Plus, Edit, Trash2, ChevronLeft, ChevronRight,
   X, Upload, FolderOpen, FileText, Video, File,
   Download, Filter
 } from 'lucide-react';
-import { resources as initialResources, courses } from '../../data/mockData';
+import {
+  getAdminResourceList, createResource, updateResource, deleteResource,
+  AdminResource, SaveResourceParams,
+} from '@/api/school-admin';
 
-type Resource = typeof initialResources[0];
+interface Resource {
+  _id: number;
+  id: string;
+  name: string;
+  type: string;
+  size: string;
+  course: string;
+  chapter: string;
+  description: string;
+  uploadDate: string;
+  downloads: number;
+}
+
+function mapApiResource(r: AdminResource): Resource {
+  return {
+    _id: r.resourceId,
+    id: String(r.resourceId),
+    name: r.resourceName,
+    type: (r.resourceType ?? r.fileFormat ?? 'OTHER').toUpperCase(),
+    size: r.fileSize ? `${(r.fileSize / 1024 / 1024).toFixed(1)}MB` : '',
+    course: '',
+    chapter: '',
+    description: r.description ?? '',
+    uploadDate: r.createTime?.slice(0, 10) ?? '',
+    downloads: r.downloadCount ?? 0,
+  };
+}
 
 const FILE_TYPES = ['PDF', 'VIDEO', 'PPT', 'DOCX', 'ZIP', 'EXE', 'OTHER'];
 const PAGE_SIZE = 6;
@@ -63,7 +92,8 @@ type FormData = {
 const emptyForm: FormData = { name: '', type: 'PDF', size: '', course: '', chapter: '', description: '' };
 
 export function ResourcesManagePage() {
-  const [data, setData] = useState<Resource[]>(initialResources);
+  const [data, setData] = useState<Resource[]>([]);
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState('');
   const [filterCourse, setFilterCourse] = useState('');
@@ -76,7 +106,21 @@ export function ResourcesManagePage() {
   const [selected, setSelected] = useState<string[]>([]);
   const [dragOver, setDragOver] = useState(false);
 
-  const courseNames = [...new Set(courses.map(c => c.title))];
+  const courseNames: string[] = [];
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const result = await getAdminResourceList({ pageSize: 9999 });
+      setData((result.rows ?? []).map(mapApiResource));
+    } catch {
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
 
   const filtered = data.filter(r => {
     const q = search.toLowerCase();
@@ -94,21 +138,31 @@ export function ResourcesManagePage() {
     setEditItem(item); setShowForm(true);
   };
 
-  const handleSave = () => {
-    if (editItem) {
-      setData(prev => prev.map(r => r.id === editItem.id ? { ...r, ...form } : r));
-    } else {
-      const newItem: Resource = {
-        ...form, id: String(Date.now()),
-        uploadDate: new Date().toISOString().slice(0, 10), downloads: 0,
-      };
-      setData(prev => [newItem, ...prev]);
-    }
-    setShowForm(false); setEditItem(null);
+  const handleSave = async () => {
+    const params: SaveResourceParams = {
+      resourceName: form.name,
+      resourceType: form.type,
+      description: form.description,
+      status: '1',
+    };
+    try {
+      if (editItem) {
+        await updateResource({ ...params, resourceId: editItem._id });
+      } else {
+        await createResource(params);
+      }
+      setShowForm(false); setEditItem(null);
+      fetchData();
+    } catch {/* ignore */}
   };
 
-  const handleDelete = () => {
-    if (deleteItem) { setData(prev => prev.filter(r => r.id !== deleteItem.id)); setDeleteItem(null); }
+  const handleDelete = async () => {
+    if (!deleteItem) return;
+    try {
+      await deleteResource(deleteItem._id);
+      setDeleteItem(null);
+      fetchData();
+    } catch {/* ignore */}
   };
 
   const toggleSelect = (id: string) => setSelected(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]);

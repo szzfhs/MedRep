@@ -67,6 +67,11 @@ class ExperimentDao:
             conditions.append(VfExperiment.exp_type == query.exp_type)
         if query.status is not None:
             conditions.append(VfExperiment.status == query.status)
+        if query.tenant_id is not None:
+            if query.tenant_id == 0:
+                conditions.append(VfExperiment.tenant_id.is_(None))
+            else:
+                conditions.append(VfExperiment.tenant_id == query.tenant_id)
 
         count_result = await db.execute(select(func.count()).where(*conditions))
         total = count_result.scalar() or 0

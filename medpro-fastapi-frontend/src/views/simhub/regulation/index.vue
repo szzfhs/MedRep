@@ -7,6 +7,12 @@
       <el-form-item label="分类" prop="category">
         <el-input v-model="queryParams.category" placeholder="请输入分类" clearable style="width:140px" />
       </el-form-item>
+      <el-form-item label="所属学校" prop="tenantId">
+        <el-select v-model="queryParams.tenantId" placeholder="全部" clearable style="width:180px" @change="handleQuery">
+          <el-option label="平台数据" :value="0" />
+          <el-option v-for="t in tenantOptions" :key="t.tenantId" :label="t.tenantName" :value="t.tenantId" />
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
         <el-button icon="Refresh" @click="resetQuery">重置</el-button>
@@ -102,8 +108,10 @@
 
 <script setup name="SimhubRegulation">
 import { listRegulation, getRegulation, addRegulation, updateRegulation, delRegulation } from '@/api/simhub/regulation'
+import { useTenantOptions } from '@/composables/useTenantOptions'
 
 const { proxy } = getCurrentInstance()
+const { tenantOptions } = useTenantOptions()
 const regulationList = ref([])
 const open = ref(false)
 const loading = ref(true)
@@ -116,7 +124,7 @@ const dialogTitle = ref('')
 
 const data = reactive({
   form: {},
-  queryParams: { pageNum: 1, pageSize: 10, title: undefined, category: undefined },
+  queryParams: { pageNum: 1, pageSize: 10, title: undefined, category: undefined, tenantId: undefined },
   rules: { title: [{ required: true, message: '标题不能为空', trigger: 'blur' }] }
 })
 const { queryParams, form, rules } = toRefs(data)

@@ -20,6 +20,12 @@
           <el-option label="启用" value="1" /><el-option label="停用" value="0" />
         </el-select>
       </el-form-item>
+      <el-form-item label="所属学校" prop="tenantId">
+        <el-select v-model="queryParams.tenantId" placeholder="全部" clearable style="width:180px" @change="handleQuery">
+          <el-option label="平台数据" :value="0" />
+          <el-option v-for="t in tenantOptions" :key="t.tenantId" :label="t.tenantName" :value="t.tenantId" />
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
         <el-button icon="Refresh" @click="resetQuery">重置</el-button>
@@ -179,10 +185,12 @@
 
 <script setup name="SimhubQuestion">
 import { listQuestion, getQuestion, addQuestion, updateQuestion, delQuestion } from '@/api/simhub/question'
+import { useTenantOptions } from '@/composables/useTenantOptions'
 
 const { proxy } = getCurrentInstance()
 const { vf_question_type } = proxy.useDict('vf_question_type')
 const dict = reactive({ type: { vf_question_type } })
+const { tenantOptions } = useTenantOptions()
 
 const questionList = ref([])
 const open = ref(false)
@@ -203,7 +211,7 @@ const data = reactive({
   form: {},
   queryParams: {
     pageNum: 1, pageSize: 10,
-    questionName: undefined, questionType: undefined, difficulty: undefined, status: undefined
+    questionName: undefined, questionType: undefined, difficulty: undefined, status: undefined, tenantId: undefined
   },
   rules: {
     questionName: [{ required: true, message: '习题名称不能为空', trigger: 'blur' }],

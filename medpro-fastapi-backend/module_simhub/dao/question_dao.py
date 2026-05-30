@@ -22,6 +22,11 @@ class QuestionDao:
             conditions.append(VfQuestion.difficulty == query.difficulty)
         if query.status is not None:
             conditions.append(VfQuestion.status == query.status)
+        if query.tenant_id is not None:
+            if query.tenant_id == 0:
+                conditions.append(VfQuestion.tenant_id.is_(None))
+            else:
+                conditions.append(VfQuestion.tenant_id == query.tenant_id)
 
         count_result = await db.execute(select(func.count()).where(*conditions))
         total = count_result.scalar() or 0

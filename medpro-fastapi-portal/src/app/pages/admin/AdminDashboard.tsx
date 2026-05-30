@@ -1,56 +1,65 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import {
   Users, FlaskConical, BookOpen, FolderOpen, TrendingUp,
-  Eye, Download, Plus, CheckCircle, Clock, AlertCircle,
-  ArrowUpRight, ArrowRight, Newspaper
+  Plus, Clock, ArrowUpRight, ArrowRight, Newspaper, Loader2
 } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { experiments, courses, news } from '../../data/mockData';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { getSchoolDashboard, SchoolDashboard, VisitTrendItem, UserTypeStat } from '@/api/school-admin';
 
-const statCards = [
-  { label: '注册用户总数', value: '12,847', change: '+234', trend: 'up', icon: Users, color: '#0B5394', bg: '#E3F2FD', desc: '本月新增' },
-  { label: '虚拟实验项目', value: '52', change: '+3', trend: 'up', icon: FlaskConical, color: '#00897B', bg: '#E0F2F1', desc: '本月新增' },
-  { label: '实验课程', value: '18', change: '+2', trend: 'up', icon: BookOpen, color: '#6A1B9A', bg: '#F3E5F5', desc: '本月发布' },
-  { label: '教学资源数', value: '384', change: '+28', trend: 'up', icon: FolderOpen, color: '#E65100', bg: '#FFF3E0', desc: '本月上传' },
-];
+const STAT_META = [
+  { key: 'userCount',       growthKey: 'userGrowth',       label: '注册用户总数', desc: '本月新增', icon: Users,       color: '#0B5394', bg: '#E3F2FD' },
+  { key: 'experimentCount', growthKey: 'experimentGrowth', label: '虚拟实验项目', desc: '本月新增', icon: FlaskConical, color: '#00897B', bg: '#E0F2F1' },
+  { key: 'courseCount',     growthKey: 'courseGrowth',     label: '实验课程',     desc: '本月发布', icon: BookOpen,     color: '#6A1B9A', bg: '#F3E5F5' },
+  { key: 'resourceCount',   growthKey: 'resourceGrowth',   label: '教学资源数',   desc: '本月上传', icon: FolderOpen,   color: '#E65100', bg: '#FFF3E0' },
+] as const;
 
-const visitData = [
-  { name: '1月', visits: 3200, experiments: 1400 },
-  { name: '2月', visits: 2800, experiments: 1200 },
-  { name: '3月', visits: 4100, experiments: 1800 },
-  { name: '4月', visits: 3900, experiments: 1700 },
-  { name: '5月', visits: 5200, experiments: 2300 },
-  { name: '6月', visits: 4800, experiments: 2100 },
-  { name: '7月', visits: 3600, experiments: 1600 },
-  { name: '8月', visits: 2900, experiments: 1300 },
-  { name: '9月', visits: 5800, experiments: 2600 },
-  { name: '10月', visits: 6200, experiments: 2900 },
-  { name: '11月', visits: 5400, experiments: 2400 },
-  { name: '12月', visits: 4900, experiments: 2200 },
-];
+const DEFAULT_VISIT_DATA: VisitTrendItem[] = [
+  '1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月',
+].map(name => ({ name, visits: 0, experiments: 0 }));
 
-const userTypeData = [
-  { name: '学生', value: 10234, color: '#0B5394' },
-  { name: '教师', value: 1876, color: '#00897B' },
-  { name: '机构', value: 487, color: '#6A1B9A' },
-  { name: '管理员', value: 250, color: '#F57F17' },
-];
-
-const pendingTasks = [
-  { type: '用户审核', desc: '新教师账号申请待审核', count: 5, color: '#F57F17', icon: Users },
-  { type: '内容审核', desc: '新实验项目待发布', count: 2, color: '#0B5394', icon: FlaskConical },
-  { type: '资源上传', desc: '课件资源等待处理', count: 8, color: '#00897B', icon: FolderOpen },
-];
-
-const recentActivity = [
-  { action: '新用户注册', detail: '李明同学完成学生账号注册', time: '5分钟前', type: 'success' },
-  { action: '实验上线', detail: '《微生物培养与检测》实验项目已发布', time: '1小时前', type: 'info' },
-  { action: '课程更新', detail: '人体解剖学课程第3章内容已更新', time: '2小时前', type: 'info' },
-  { action: '资源上传', detail: '外科学教研室上传了5个课件资源', time: '3小时前', type: 'success' },
-  { action: '系统警告', detail: '存储空间使用率已达到75%', time: '昨天', type: 'warning' },
+const DEFAULT_USER_TYPES: UserTypeStat[] = [
+  { name: '学生', value: 0, color: '#0B5394' },
+  { name: '教师', value: 0, color: '#00897B' },
+  { name: '管理员', value: 0, color: '#F57F17' },
 ];
 
 export function AdminDashboard() {
+  const [dashboard, setDashboard] = useState<SchoolDashboard | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const pendingTasks = [
+    { type: '用户审核', desc: '新教师账号申请待审核', count: 5, color: '#F57F17', icon: Users },
+    { type: '内容审核', desc: '新实验项目待发布', count: 2, color: '#0B5394', icon: FlaskConical },
+    { type: '资源上传', desc: '课件资源等待处理', count: 8, color: '#00897B', icon: FolderOpen },
+  ];
+
+  const recentActivity = [
+    { action: '新用户注册', detail: '系统检测到新用户完成注册', time: '5分钟前', type: 'success' },
+    { action: '实验上线', detail: '新虚拟实验项目已发布', time: '1小时前', type: 'info' },
+    { action: '课程更新', detail: '课程内容已更新', time: '2小时前', type: 'info' },
+    { action: '资源上传', detail: '新教学资源已上传', time: '3小时前', type: 'success' },
+  ];
+
+  useEffect(() => {
+    setLoading(true);
+    getSchoolDashboard()
+      .then(setDashboard)
+      .catch(() => {/* 后端未就绪时静默忽略，使用默认值显示 */})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const visitData = dashboard?.visitTrend ?? DEFAULT_VISIT_DATA;
+  const userTypeData = dashboard?.userTypeStats ?? DEFAULT_USER_TYPES;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64 text-[#94A3B8]">
+        <Loader2 size={24} className="animate-spin mr-2" /> 加载中…
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 space-y-6">
       {/* Page Title */}
@@ -66,27 +75,31 @@ export function AdminDashboard() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {statCards.map((card, i) => (
-          <motion.div
-            key={card.label}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.08 }}
-            className="bg-white rounded-2xl border border-[#E2E8F0] p-5 hover:shadow-md transition-shadow"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: card.bg }}>
-                <card.icon size={20} style={{ color: card.color }} />
+        {STAT_META.map((card, i) => {
+          const value = dashboard ? (dashboard as any)[card.key] as number : 0;
+          const growth = dashboard ? (dashboard as any)[card.growthKey] as string : '—';
+          return (
+            <motion.div
+              key={card.label}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.08 }}
+              className="bg-white rounded-2xl border border-[#E2E8F0] p-5 hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: card.bg }}>
+                  <card.icon size={20} style={{ color: card.color }} />
+                </div>
+                <span className="flex items-center gap-1 text-xs text-[#2E7D32] bg-[#E8F5E9] px-2 py-0.5 rounded-lg">
+                  <ArrowUpRight size={11} />
+                  {growth}
+                </span>
               </div>
-              <span className="flex items-center gap-1 text-xs text-[#2E7D32] bg-[#E8F5E9] px-2 py-0.5 rounded-lg">
-                <ArrowUpRight size={11} />
-                {card.change}
-              </span>
-            </div>
-            <div className="text-[#1A2332] font-bold text-2xl mb-0.5">{card.value}</div>
-            <div className="text-[#64748B] text-xs">{card.label}</div>
-          </motion.div>
-        ))}
+              <div className="text-[#1A2332] font-bold text-2xl mb-0.5">{value.toLocaleString()}</div>
+              <div className="text-[#64748B] text-xs">{card.label}</div>
+            </motion.div>
+          );
+        })}
       </div>
 
       {/* Charts Row */}

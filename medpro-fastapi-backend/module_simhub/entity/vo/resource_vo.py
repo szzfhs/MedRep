@@ -95,3 +95,4 @@ class ResourcePageQueryModel(BaseModel):
     course_id: int | None = Field(default=None, description='课程ID')
     section_id: int | None = Field(default=None, description='章节ID')
     status: str | None = Field(default=None, description='状态')
+    tenant_id: int | None = Field(default=None, description='租户ID（None=全部，0=平台数据，N=指定学校）')

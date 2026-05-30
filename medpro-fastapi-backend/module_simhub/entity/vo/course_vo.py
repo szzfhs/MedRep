@@ -111,6 +111,7 @@ class CoursePageQueryModel(BaseModel):
     teacher_id: int | None = Field(default=None, description='教师ID')
     status: str | None = Field(default=None, description='状态')
     course_category: str | None = Field(default=None, description='课程分类')
+    tenant_id: int | None = Field(default=None, description='租户ID（None=全部，0=平台数据，N=指定学校）')
 
 
 class EnrollmentModel(BaseModel):

@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import {
   Settings, Bell, Shield, Database, Globe,
   Save, CheckCircle, Eye, EyeOff, RefreshCw,
   Server, Mail, Smartphone, Moon, Sun
 } from 'lucide-react';
+import { getSchoolSettings, updateSchoolSettings } from '@/api/school-admin';
 
 const TABS = [
   { key: 'general', label: '基础设置', icon: Settings },
@@ -76,10 +77,67 @@ export function SettingsPage() {
     backupFreq: 'weekly',
   });
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    try {
+      await updateSchoolSettings({
+        siteName: general.siteName,
+        siteSubtitle: general.siteSubtitle,
+        siteUrl: general.siteUrl,
+        contactEmail: general.contactEmail,
+        contactPhone: general.contactPhone,
+        icp: general.icp,
+        allowRegister: general.allowRegister,
+        requireApproval: general.requireApproval,
+        sessionTimeout: Number(security.sessionTimeout),
+        maxLoginAttempts: Number(security.maxLoginAttempts),
+        enableCaptcha: security.enableCaptcha,
+        uploadLimit: Number(storage.uploadLimit),
+        allowedTypes: storage.allowedTypes,
+        emailNewUser: notification.emailNewUser,
+        emailNewExperiment: notification.emailNewExperiment,
+        emailSystemAlert: notification.emailSystemAlert,
+        smsAlert: notification.smsAlert,
+        browserNotify: notification.browserNotify,
+      });
+    } catch {/* ignore */}
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   };
+
+  useEffect(() => {
+    getSchoolSettings().then(s => {
+      setGeneral(prev => ({
+        ...prev,
+        siteName: s.siteName ?? prev.siteName,
+        siteSubtitle: s.siteSubtitle ?? prev.siteSubtitle,
+        siteUrl: s.siteUrl ?? prev.siteUrl,
+        contactEmail: s.contactEmail ?? prev.contactEmail,
+        contactPhone: s.contactPhone ?? prev.contactPhone,
+        icp: s.icp ?? prev.icp,
+        allowRegister: s.allowRegister ?? prev.allowRegister,
+        requireApproval: s.requireApproval ?? prev.requireApproval,
+      }));
+      setSecurity(prev => ({
+        ...prev,
+        sessionTimeout: String(s.sessionTimeout ?? prev.sessionTimeout),
+        maxLoginAttempts: String(s.maxLoginAttempts ?? prev.maxLoginAttempts),
+        enableCaptcha: s.enableCaptcha ?? prev.enableCaptcha,
+      }));
+      setNotification(prev => ({
+        ...prev,
+        emailNewUser: s.emailNewUser ?? prev.emailNewUser,
+        emailNewExperiment: s.emailNewExperiment ?? prev.emailNewExperiment,
+        emailSystemAlert: s.emailSystemAlert ?? prev.emailSystemAlert,
+        smsAlert: s.smsAlert ?? prev.smsAlert,
+        browserNotify: s.browserNotify ?? prev.browserNotify,
+      }));
+      setStorage(prev => ({
+        ...prev,
+        uploadLimit: String(s.uploadLimit ?? prev.uploadLimit),
+        allowedTypes: s.allowedTypes ?? prev.allowedTypes,
+      }));
+    }).catch(() => {/* ignore */});
+  }, []);
 
   const inputCls = "w-full px-3 py-2.5 border border-[#E2E8F0] rounded-xl text-sm text-[#1A2332] focus:outline-none focus:border-[#0B5394] bg-white";
   const selectCls = "w-full px-3 py-2.5 border border-[#E2E8F0] rounded-xl text-sm text-[#1A2332] focus:outline-none focus:border-[#0B5394] bg-white";

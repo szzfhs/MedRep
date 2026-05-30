@@ -65,3 +65,4 @@ class SimSystemPageQueryModel(BaseModel):
     sys_category: str | None = Field(default=None, description='系统分类')
     hw_support: str | None = Field(default=None, description='支持硬件设备')
     status: str | None = Field(default=None, description='状态')
+    tenant_id: int | None = Field(default=None, description='租户ID（None=全部，0=平台数据，N=指定学校）')

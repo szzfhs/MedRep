@@ -44,6 +44,8 @@ class VfCenterInfo(Base):
     team_intro = Column(Text, nullable=True, comment='团队介绍（富文本，旧）')
     update_by = Column(String(64), nullable=True, server_default="''", comment='更新者')
     update_time = Column(DateTime, nullable=True, comment='更新时间', onupdate=datetime.now)
+    # 多租户字段
+    tenant_id = Column(BigInteger, nullable=True, comment='租户ID（NULL=平台级配置）')
 
 
 class VfOrgMember(Base):
@@ -58,6 +60,7 @@ class VfOrgMember(Base):
     dept = Column(String(50), nullable=True, server_default="''", comment='职责描述（如：统筹管理）')
     color = Column(String(20), nullable=True, server_default='#0B5394', comment='显示颜色')
     sort_order = Column(Integer, nullable=True, server_default='0', comment='排序')
+    tenant_id = Column(BigInteger, nullable=True, comment='租户ID（NULL=平台级）')
 
 
 class VfTeamMember(Base):
@@ -74,6 +77,7 @@ class VfTeamMember(Base):
     image_url = Column(String(200), nullable=True, server_default="''", comment='头像图片URL')
     sort_order = Column(Integer, nullable=True, server_default='0', comment='排序')
     status = Column(CHAR(1), nullable=True, server_default='0', comment='状态(0=正常,1=停用)')
+    tenant_id = Column(BigInteger, nullable=True, comment='租户ID（NULL=平台级）')
 
 
 class VfNews(Base):
@@ -101,6 +105,9 @@ class VfNews(Base):
     update_by = Column(String(64), nullable=True, server_default="''", comment='更新者')
     update_time = Column(DateTime, nullable=True, comment='更新时间', onupdate=datetime.now)
     del_flag = Column(CHAR(1), nullable=True, server_default='0', comment='删除标志(0=正常,2=删除)')
+    # 多租户字段
+    tenant_id = Column(BigInteger, nullable=True, comment='租户ID（NULL=平台级，非NULL=学校自建）')
+    source_type = Column(String(10), nullable=True, server_default='platform', comment='内容来源(platform=平台创建,tenant=学校创建)')
 
 
 class VfRegulation(Base):
@@ -121,6 +128,9 @@ class VfRegulation(Base):
     update_by = Column(String(64), nullable=True, server_default="''", comment='更新者')
     update_time = Column(DateTime, nullable=True, comment='更新时间', onupdate=datetime.now)
     del_flag = Column(CHAR(1), nullable=True, server_default='0', comment='删除标志')
+    # 多租户字段
+    tenant_id = Column(BigInteger, nullable=True, comment='租户ID（NULL=平台级，非NULL=学校自建）')
+    source_type = Column(String(10), nullable=True, server_default='platform', comment='内容来源(platform=平台创建,tenant=学校创建)')
 
 
 class VfExperimentCategory(Base):
@@ -135,6 +145,7 @@ class VfExperimentCategory(Base):
     icon = Column(String(100), nullable=True, server_default="''", comment='图标')
     sort_order = Column(Integer, nullable=True, server_default='0', comment='排序')
     status = Column(CHAR(1), nullable=True, server_default='0', comment='状态(0=正常,1=停用)')
+    tenant_id = Column(BigInteger, nullable=True, comment='租户ID（NULL=平台级分类）')
 
 
 class VfExperiment(Base):
@@ -176,6 +187,9 @@ class VfExperiment(Base):
     update_by = Column(String(64), nullable=True, server_default="''", comment='更新者')
     update_time = Column(DateTime, nullable=True, comment='更新时间', onupdate=datetime.now)
     del_flag = Column(CHAR(1), nullable=True, server_default='0', comment='删除标志')
+    # 多租户字段
+    tenant_id = Column(BigInteger, nullable=True, comment='租户ID（NULL=平台级，非NULL=学校自建）')
+    source_type = Column(String(10), nullable=True, server_default='platform', comment='内容来源(platform=平台创建,tenant=学校创建)')
 
 
 class VfExperimentParticipation(Base):
@@ -228,6 +242,9 @@ class VfCourse(Base):
     update_by = Column(String(64), nullable=True, server_default="''", comment='更新者')
     update_time = Column(DateTime, nullable=True, comment='更新时间', onupdate=datetime.now)
     del_flag = Column(CHAR(1), nullable=True, server_default='0', comment='删除标志')
+    # 多租户字段
+    tenant_id = Column(BigInteger, nullable=True, comment='租户ID（NULL=平台级，非NULL=学校自建）')
+    source_type = Column(String(10), nullable=True, server_default='platform', comment='内容来源(platform=平台创建,tenant=学校创建)')
 
 
 class VfCourseSection(Base):
@@ -297,6 +314,7 @@ class VfResourceCategory(Base):
     parent_id = Column(BigInteger, nullable=True, server_default='0', comment='父分类ID')
     sort_order = Column(Integer, nullable=True, server_default='0', comment='排序')
     status = Column(CHAR(1), nullable=True, server_default='0', comment='状态(0=正常,1=停用)')
+    tenant_id = Column(BigInteger, nullable=True, comment='租户ID（NULL=平台级分类）')
 
 
 class VfResource(Base):
@@ -342,6 +360,9 @@ class VfResource(Base):
     update_by = Column(String(64), nullable=True, server_default="''", comment='更新者')
     update_time = Column(DateTime, nullable=True, comment='更新时间', onupdate=datetime.now)
     del_flag = Column(CHAR(1), nullable=True, server_default='0', comment='删除标志')
+    # 多租户字段
+    tenant_id = Column(BigInteger, nullable=True, comment='租户ID（NULL=平台级，非NULL=学校自建）')
+    source_type = Column(String(10), nullable=True, server_default='platform', comment='内容来源(platform=平台创建,tenant=学校创建)')
 
 
 class VfSectionExperiment(Base):
@@ -406,6 +427,9 @@ class VfSimSystem(Base):
     create_time = Column(DateTime, nullable=True, comment='创建时间', default=datetime.now)
     update_by = Column(String(64), nullable=True, server_default="''", comment='更新者')
     update_time = Column(DateTime, nullable=True, comment='更新时间', onupdate=datetime.now)
+    # 多租户字段
+    tenant_id = Column(BigInteger, nullable=True, comment='租户ID（NULL=平台级，非NULL=学校自建）')
+    source_type = Column(String(10), nullable=True, server_default='platform', comment='内容来源(platform=平台创建,tenant=学校创建)')
 
 
 class VfSimSystemImage(Base):

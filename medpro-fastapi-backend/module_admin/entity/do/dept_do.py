@@ -44,3 +44,4 @@ class SysDept(Base):
     create_time = Column(DateTime, nullable=True, default=datetime.now(), comment='创建时间')
     update_by = Column(String(64), nullable=True, server_default="''", comment='更新者')
     update_time = Column(DateTime, nullable=True, default=datetime.now(), comment='更新时间')
+    tenant_id = Column(BigInteger, nullable=True, comment='所属租户ID（NULL=平台通用，非NULL=学校专属）')

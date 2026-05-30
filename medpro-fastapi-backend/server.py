@@ -13,6 +13,8 @@ from config.get_scheduler import SchedulerUtil
 from exceptions.handle import handle_exception
 from middlewares.handle import handle_middleware
 from module_admin.service.log_service import LogAggregatorService
+# 确保多租户模型被 Base.metadata 感知，触发 create_all 建表
+import module_simhub.entity.do.tenant_do  # noqa: F401
 from sub_applications.handle import handle_sub_applications
 from utils.common_util import worship
 from utils.log_util import logger

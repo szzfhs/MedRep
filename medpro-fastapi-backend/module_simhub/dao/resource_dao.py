@@ -65,6 +65,11 @@ class ResourceDao:
             conditions.append(VfResource.section_id == query.section_id)
         if query.status is not None:
             conditions.append(VfResource.status == query.status)
+        if query.tenant_id is not None:
+            if query.tenant_id == 0:
+                conditions.append(VfResource.tenant_id.is_(None))
+            else:
+                conditions.append(VfResource.tenant_id == query.tenant_id)
 
         count_result = await db.execute(select(func.count()).where(*conditions))
         total = count_result.scalar() or 0

@@ -316,6 +316,7 @@ class UserDao:
                 )
                 if query_object.begin_time and query_object.end_time
                 else True,
+                SysUser.tenant_id.is_(None) if query_object.tenant_id == 0 else (SysUser.tenant_id == query_object.tenant_id if query_object.tenant_id is not None else True),
                 data_scope_sql,
             )
             .join(

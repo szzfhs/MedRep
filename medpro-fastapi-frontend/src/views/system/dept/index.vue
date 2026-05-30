@@ -20,6 +20,12 @@
                />
             </el-select>
          </el-form-item>
+         <el-form-item label="所属学校" prop="tenantId">
+            <el-select v-model="queryParams.tenantId" placeholder="全部学校" clearable style="width: 200px" @change="handleQuery">
+               <el-option label="平台通用" :value="0" />
+               <el-option v-for="t in tenantOptions" :key="t.tenantId" :label="t.tenantName" :value="t.tenantId" />
+            </el-select>
+         </el-form-item>
          <el-form-item>
             <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
             <el-button icon="Refresh" @click="resetQuery">重置</el-button>
@@ -71,7 +77,7 @@
             <template #default="scope">
                <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:dept:edit']">修改</el-button>
                <el-button link type="primary" icon="Plus" @click="handleAdd(scope.row)" v-hasPermi="['system:dept:add']">新增</el-button>
-               <el-button v-if="scope.row.parentId != 0" link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:dept:remove']">删除</el-button>
+               <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['system:dept:remove']">删除</el-button>
             </template>
          </el-table-column>
       </el-table>
@@ -142,9 +148,11 @@
 
 <script setup name="Dept">
 import { listDept, getDept, delDept, addDept, updateDept, listDeptExcludeChild } from "@/api/system/dept";
+import { useTenantOptions } from "@/composables/useTenantOptions";
 
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict("sys_normal_disable");
+const { tenantOptions } = useTenantOptions();
 
 const deptList = ref([]);
 const open = ref(false);
@@ -154,15 +162,26 @@ const title = ref("");
 const deptOptions = ref([]);
 const isExpandAll = ref(true);
 const refreshTable = ref(true);
+const submitting = ref(false);
 
 const data = reactive({
   form: {},
   queryParams: {
     deptName: undefined,
-    status: undefined
+    status: undefined,
+    tenantId: undefined
   },
   rules: {
-    parentId: [{ required: true, message: "上级部门不能为空", trigger: "blur" }],
+    parentId: [{
+      validator: (rule, value, callback) => {
+        if (deptOptions.value && deptOptions.value.length > 0 && (value === undefined || value === null || value === '')) {
+          callback(new Error('上级部门不能为空'));
+        } else {
+          callback();
+        }
+      },
+      trigger: 'change'
+    }],
     deptName: [{ required: true, message: "部门名称不能为空", trigger: "blur" }],
     orderNum: [{ required: true, message: "显示排序不能为空", trigger: "blur" }],
     email: [{ type: "email", message: "请输入正确的邮箱地址", trigger: ["blur", "change"] }],
@@ -211,12 +230,16 @@ function resetQuery() {
 /** 新增按钮操作 */
 function handleAdd(row) {
   reset();
-  listDept().then(response => {
+  const tenantFilter = queryParams.value.tenantId !== undefined ? { tenant_id: queryParams.value.tenantId } : {};
+  listDept(tenantFilter).then(response => {
     deptOptions.value = proxy.handleTree(response.data, "deptId");
   });
   if (row != undefined) {
     form.value.parentId = row.deptId;
+  } else {
+    form.value.parentId = 0;
   }
+  form.value.tenantId = queryParams.value.tenantId;
   open.value = true;
   title.value = "添加部门";
 }
@@ -231,7 +254,8 @@ function toggleExpandAll() {
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset();
-  listDeptExcludeChild(row.deptId).then(response => {
+  const tenantId = row.tenantId;
+  listDeptExcludeChild(row.deptId, tenantId !== undefined ? { tenant_id: tenantId } : {}).then(response => {
     deptOptions.value = proxy.handleTree(response.data, "deptId");
   });
   getDept(row.deptId).then(response => {
@@ -242,20 +266,22 @@ function handleUpdate(row) {
 }
 /** 提交按钮 */
 function submitForm() {
+  if (submitting.value) return;
   proxy.$refs["deptRef"].validate(valid => {
     if (valid) {
+      submitting.value = true;
       if (form.value.deptId != undefined) {
         updateDept(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");
           open.value = false;
           getList();
-        });
+        }).finally(() => { submitting.value = false; });
       } else {
         addDept(form.value).then(response => {
           proxy.$modal.msgSuccess("新增成功");
           open.value = false;
           getList();
-        });
+        }).finally(() => { submitting.value = false; });
       }
     }
   });

@@ -14,6 +14,12 @@
           <el-option label="新建" value="0" /><el-option label="已审核" value="1" /><el-option label="已发布" value="2" />
         </el-select>
       </el-form-item>
+      <el-form-item label="所属学校" prop="tenantId">
+        <el-select v-model="queryParams.tenantId" placeholder="全部" clearable style="width:180px" @change="handleQuery">
+          <el-option label="平台数据" :value="0" />
+          <el-option v-for="t in tenantOptions" :key="t.tenantId" :label="t.tenantName" :value="t.tenantId" />
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
         <el-button icon="Refresh" @click="resetQuery">重置</el-button>
@@ -378,10 +384,12 @@ import { listCourse, getCourse, addCourse, updateCourse, delCourse, addSection, 
 import { getSectionQuestions, bindSectionQuestion, unbindSectionQuestion, listQuestion } from '@/api/simhub/question'
 import { listExperiment } from '@/api/simhub/experiment'
 import { listResource } from '@/api/simhub/resource'
+import { useTenantOptions } from '@/composables/useTenantOptions'
 
 const { proxy } = getCurrentInstance()
 const { vf_course_category, vf_question_type, vf_resource_type } = proxy.useDict('vf_course_category', 'vf_question_type', 'vf_resource_type')
 const dict = reactive({ type: { vf_course_category, vf_question_type, vf_resource_type } })
+const { tenantOptions } = useTenantOptions()
 
 const courseList = ref([])
 const open = ref(false)
@@ -430,7 +438,7 @@ const seBankQuery = ref({ pageNum: 1, pageSize: 10, expName: undefined })
 
 const data = reactive({
   form: {},
-  queryParams: { pageNum: 1, pageSize: 10, courseName: undefined, courseCategory: undefined, status: undefined },
+  queryParams: { pageNum: 1, pageSize: 10, courseName: undefined, courseCategory: undefined, status: undefined, tenantId: undefined },
   rules: { courseName: [{ required: true, message: '课程名称不能为空', trigger: 'blur' }] }
 })
 const { queryParams, form, rules } = toRefs(data)

@@ -10,6 +10,12 @@
           <el-option label="草稿" value="0" /><el-option label="已发布" value="1" />
         </el-select>
       </el-form-item>
+      <el-form-item label="所属学校" prop="tenantId">
+        <el-select v-model="queryParams.tenantId" placeholder="全部" clearable style="width:180px" @change="handleQuery">
+          <el-option label="平台数据" :value="0" />
+          <el-option v-for="t in tenantOptions" :key="t.tenantId" :label="t.tenantName" :value="t.tenantId" />
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
         <el-button icon="Refresh" @click="resetQuery">重置</el-button>
@@ -105,8 +111,10 @@
 
 <script setup name="SimhubNews">
 import { listNews, getNews, addNews, updateNews, delNews } from '@/api/simhub/news'
+import { useTenantOptions } from '@/composables/useTenantOptions'
 
 const { proxy } = getCurrentInstance()
+const { tenantOptions } = useTenantOptions()
 
 const newsList = ref([])
 const open = ref(false)
@@ -120,7 +128,7 @@ const dialogTitle = ref('')
 
 const data = reactive({
   form: {},
-  queryParams: { pageNum: 1, pageSize: 10, title: undefined, status: undefined },
+  queryParams: { pageNum: 1, pageSize: 10, title: undefined, status: undefined, tenantId: undefined },
   rules: {
     title: [{ required: true, message: '标题不能为空', trigger: 'blur' }],
     content: [{ required: true, message: '内容不能为空', trigger: 'blur' }]

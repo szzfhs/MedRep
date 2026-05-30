@@ -1,13 +1,54 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Search, Plus, Edit, Trash2, ChevronLeft, ChevronRight,
   X, Upload, BookOpen, Star, Users, CheckCircle, Clock,
   ToggleLeft, ToggleRight, Tag, Eye
 } from 'lucide-react';
-import { courses as initialCourses } from '../../data/mockData';
+import {
+  getAdminCourseList, createCourse, updateCourse, deleteCourse,
+  AdminCourse, SaveCourseParams,
+} from '@/api/school-admin';
 
-type Course = typeof initialCourses[0] & { status?: 'published' | 'draft' };
+interface Course {
+  _id: number;
+  id: string;
+  title: string;
+  subtitle: string;
+  teacher: string;
+  department: string;
+  category: string;
+  totalHours: number;
+  chapters: number;
+  description: string;
+  status: 'published' | 'draft';
+  students: number;
+  rating: number;
+  reviews: number;
+  publishDate: string;
+  image: string;
+}
+
+function mapApiCourse(c: AdminCourse): Course {
+  return {
+    _id: c.courseId,
+    id: String(c.courseId),
+    title: c.courseName,
+    subtitle: c.subtitle ?? '',
+    teacher: c.teacherName ?? '',
+    department: c.department ?? '',
+    category: c.courseCategory ?? '',
+    totalHours: c.totalHours ?? 0,
+    chapters: c.totalSections ?? 0,
+    description: c.description ?? '',
+    status: c.status === '1' ? 'published' : 'draft',
+    students: c.enrollCount ?? 0,
+    rating: 0,
+    reviews: 0,
+    publishDate: c.publishDate ?? '',
+    image: c.coverImage ?? '/placeholder.svg',
+  };
+}
 
 const CATEGORIES = ['基础医学', '临床医学', '药学', '护理学', '公共卫生'];
 const DEPARTMENTS = ['基础医学院', '临床医学院', '药学院', '护理学院', '微生物学与免疫学', '生理学教研室', '外科学教研室'];
@@ -64,9 +105,8 @@ const emptyForm: FormData = {
 };
 
 export function CoursesManagePage() {
-  const [data, setData] = useState<Course[]>(
-    initialCourses.map(c => ({ ...c, status: 'published' as const }))
-  );
+  const [data, setData] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
@@ -76,6 +116,20 @@ export function CoursesManagePage() {
   const [deleteItem, setDeleteItem] = useState<Course | null>(null);
   const [form, setForm] = useState<FormData>(emptyForm);
   const [selected, setSelected] = useState<string[]>([]);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const result = await getAdminCourseList({ pageSize: 9999 });
+      setData((result.rows ?? []).map(mapApiCourse));
+    } catch {
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
 
   const filtered = data.filter(c => {
     const q = search.toLowerCase();
@@ -99,30 +153,46 @@ export function CoursesManagePage() {
     setEditItem(item); setShowForm(true);
   };
 
-  const handleSave = () => {
-    if (editItem) {
-      setData(prev => prev.map(c => c.id === editItem.id
-        ? { ...c, ...form, totalHours: Number(form.totalHours), chapters: Number(form.chapters) } : c));
-    } else {
-      const newItem: Course = {
-        ...emptyForm, ...form,
-        totalHours: Number(form.totalHours), chapters: Number(form.chapters),
-        id: String(Date.now()), students: 0, rating: 0, reviews: 0,
-        publishDate: new Date().toISOString().slice(0, 10), outline: [],
-        image: '/placeholder.svg',
-      };
-      setData(prev => [newItem, ...prev]);
-    }
-    setShowForm(false);
+  const handleSave = async () => {
+    const params: SaveCourseParams = {
+      courseName: form.title,
+      subtitle: form.subtitle,
+      teacherName: form.teacher,
+      department: form.department,
+      courseCategory: form.category,
+      totalHours: Number(form.totalHours),
+      totalSections: Number(form.chapters),
+      description: form.description,
+      status: form.status === 'published' ? '1' : '0',
+    };
+    try {
+      if (editItem) {
+        await updateCourse({ ...params, courseId: editItem._id });
+      } else {
+        await createCourse(params);
+      }
+      setShowForm(false);
+      fetchData();
+    } catch {/* ignore */}
   };
 
-  const handleDelete = () => {
-    if (deleteItem) { setData(prev => prev.filter(c => c.id !== deleteItem.id)); setDeleteItem(null); }
+  const handleDelete = async () => {
+    if (!deleteItem) return;
+    try {
+      await deleteCourse(deleteItem._id);
+      setDeleteItem(null);
+      fetchData();
+    } catch {/* ignore */}
   };
 
-  const toggleStatus = (id: string) => {
-    setData(prev => prev.map(c => c.id === id
-      ? { ...c, status: c.status === 'published' ? 'draft' : 'published' } : c));
+  const toggleStatus = async (id: string) => {
+    const course = data.find(c => c.id === id);
+    if (!course) return;
+    const newStatus = course.status === 'published' ? '0' : '1';
+    try {
+      await updateCourse({ courseId: course._id, status: newStatus });
+      fetchData();
+    } catch {/* ignore */}
   };
 
   const toggleSelect = (id: string) => setSelected(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]);

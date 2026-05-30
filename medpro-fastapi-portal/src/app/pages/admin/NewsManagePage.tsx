@@ -1,12 +1,43 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Search, Plus, Edit, Trash2, ChevronLeft, ChevronRight,
   X, Eye, CheckCircle, Clock, Newspaper, ToggleLeft, ToggleRight
 } from 'lucide-react';
-import { news as initialNews } from '../../data/mockData';
+import {
+  getAdminNewsList, createNews, updateNews, deleteNews,
+  AdminNews, SaveNewsParams,
+} from '@/api/school-admin';
 
-type NewsItem = typeof initialNews[0] & { status?: 'published' | 'draft' };
+interface NewsItem {
+  _id: number;
+  id: string;
+  title: string;
+  category: string;
+  author: string;
+  summary: string;
+  content: string;
+  status: 'published' | 'draft';
+  date: string;
+  views: number;
+  image: string;
+}
+
+function mapApiNews(n: AdminNews): NewsItem {
+  return {
+    _id: n.newsId,
+    id: String(n.newsId),
+    title: n.title,
+    category: n.category ?? '',
+    author: n.author ?? '',
+    summary: n.summary ?? '',
+    content: n.content ?? '',
+    status: n.status === '1' ? 'published' : 'draft',
+    date: n.publishTime?.slice(0, 10) ?? n.createTime?.slice(0, 10) ?? '',
+    views: n.viewCount ?? 0,
+    image: n.coverImage ?? '/placeholder.svg',
+  };
+}
 
 const CATEGORIES = ['重要新闻', '教学通知', '平台动态', '培训通知', '合作交流', '规章制度'];
 const PAGE_SIZE = 5;
@@ -48,9 +79,8 @@ type FormData = { title: string; category: string; author: string; summary: stri
 const emptyForm: FormData = { title: '', category: '平台动态', author: '', summary: '', content: '', status: 'draft' };
 
 export function NewsManagePage() {
-  const [data, setData] = useState<NewsItem[]>(
-    initialNews.map(n => ({ ...n, status: 'published' as const }))
-  );
+  const [data, setData] = useState<NewsItem[]>([]);
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
@@ -60,6 +90,20 @@ export function NewsManagePage() {
   const [deleteItem, setDeleteItem] = useState<NewsItem | null>(null);
   const [viewItem, setViewItem] = useState<NewsItem | null>(null);
   const [form, setForm] = useState<FormData>(emptyForm);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const result = await getAdminNewsList({ pageSize: 9999 });
+      setData((result.rows ?? []).map(mapApiNews));
+    } catch {
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
 
   const filtered = data.filter(n => {
     const q = search.toLowerCase();
@@ -78,26 +122,42 @@ export function NewsManagePage() {
     setEditItem(item); setShowForm(true);
   };
 
-  const handleSave = () => {
-    if (editItem) {
-      setData(prev => prev.map(n => n.id === editItem.id ? { ...n, ...form } : n));
-    } else {
-      const newItem: NewsItem = {
-        ...form, id: String(Date.now()),
-        date: new Date().toISOString().slice(0, 10), views: 0,
-        image: '/placeholder.svg',
-      };
-      setData(prev => [newItem, ...prev]);
-    }
-    setShowForm(false); setEditItem(null);
+  const handleSave = async () => {
+    const params: SaveNewsParams = {
+      title: form.title,
+      category: form.category,
+      author: form.author,
+      summary: form.summary,
+      content: form.content,
+      status: form.status === 'published' ? '1' : '0',
+    };
+    try {
+      if (editItem) {
+        await updateNews({ ...params, newsId: editItem._id });
+      } else {
+        await createNews(params);
+      }
+      setShowForm(false); setEditItem(null);
+      fetchData();
+    } catch {/* ignore */}
   };
 
-  const handleDelete = () => {
-    if (deleteItem) { setData(prev => prev.filter(n => n.id !== deleteItem.id)); setDeleteItem(null); }
+  const handleDelete = async () => {
+    if (!deleteItem) return;
+    try {
+      await deleteNews(deleteItem._id);
+      setDeleteItem(null);
+      fetchData();
+    } catch {/* ignore */}
   };
 
-  const toggleStatus = (id: string) => {
-    setData(prev => prev.map(n => n.id === id ? { ...n, status: n.status === 'published' ? 'draft' : 'published' } : n));
+  const toggleStatus = async (id: string) => {
+    const item = data.find(n => n.id === id);
+    if (!item) return;
+    try {
+      await updateNews({ newsId: item._id, status: item.status === 'published' ? '0' : '1' });
+      fetchData();
+    } catch {/* ignore */}
   };
 
   const inputCls = "w-full px-3 py-2.5 border border-[#E2E8F0] rounded-xl text-sm text-[#1A2332] focus:outline-none focus:border-[#0B5394] bg-white";

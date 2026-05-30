@@ -24,6 +24,12 @@
             <el-option label="停用" value="0" />
           </el-select>
         </el-form-item>
+        <el-form-item label="所属学校" prop="tenantId">
+          <el-select v-model="queryParams.tenantId" placeholder="全部" clearable style="width:180px" @change="handleQuery">
+            <el-option label="平台数据" :value="0" />
+            <el-option v-for="t in tenantOptions" :key="t.tenantId" :label="t.tenantName" :value="t.tenantId" />
+          </el-select>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
           <el-button icon="Refresh" @click="resetQuery">重置</el-button>
@@ -199,6 +205,7 @@
 <script setup name="SimhubSimSystem">
 import { listSimSystem, getSimSystem, addSimSystem, updateSimSystem, delSimSystem } from '@/api/simhub/sim_system'
 import request from '@/utils/request'
+import { useTenantOptions } from '@/composables/useTenantOptions'
 
 const baseUrl = import.meta.env.VITE_APP_BASE_API
 
@@ -206,6 +213,7 @@ const { proxy } = getCurrentInstance()
 const { vf_sim_system_category } = proxy.useDict('vf_sim_system_category')
 
 const dict = reactive({ type: { vf_sim_system_category } })
+const { tenantOptions } = useTenantOptions()
 
 const simSystemList = ref([])
 const drawerOpen = ref(false)
@@ -236,7 +244,7 @@ function toggleHw(val) {
 
 const data = reactive({
   form: {},
-  queryParams: { pageNum: 1, pageSize: 10, systemName: undefined, sysCategory: undefined, status: undefined },
+  queryParams: { pageNum: 1, pageSize: 10, systemName: undefined, sysCategory: undefined, status: undefined, tenantId: undefined },
   rules: {
     systemName: [{ required: true, message: '系统名称不能为空', trigger: 'blur' }],
     sysCategory: [{ required: true, message: '系统分类不能为空', trigger: 'change' }]

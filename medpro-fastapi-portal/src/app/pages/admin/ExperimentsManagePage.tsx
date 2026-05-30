@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Search, Plus, Edit, Trash2, Eye, Filter,
@@ -6,9 +6,50 @@ import {
   ChevronLeft, ChevronRight, X, Upload, Tag,
   MoreHorizontal, Globe, Monitor, ToggleLeft, ToggleRight
 } from 'lucide-react';
-import { experiments as initialExperiments } from '../../data/mockData';
+import {
+  getAdminExperimentList, createExperiment, updateExperiment, deleteExperiment,
+  AdminExperiment, SaveExperimentParams,
+} from '@/api/school-admin';
 
-type Experiment = typeof initialExperiments[0] & { status?: 'published' | 'draft' | 'review' };
+interface Experiment {
+  _id: number;
+  id: string;
+  title: string;
+  subtitle: string;
+  category: string;
+  type: string;
+  duration: string;
+  publisher: string;
+  description: string;
+  requirements: string;
+  devices: string;
+  status: 'published' | 'draft' | 'review';
+  tags: string[];
+  participants: number;
+  views: number;
+  image: string;
+}
+
+function mapApiExperiment(e: AdminExperiment): Experiment {
+  return {
+    _id: e.expId,
+    id: String(e.expId),
+    title: e.expName,
+    subtitle: '',
+    category: e.categoryName ?? '',
+    type: e.expType === 'web' ? 'WebGL' : e.expType === 'exe' ? 'VR' : '',
+    duration: e.expDuration ? `${e.expDuration}学时` : '',
+    publisher: '',
+    description: e.description ?? '',
+    requirements: '',
+    devices: '',
+    status: e.status === '1' ? 'published' : 'draft',
+    tags: e.tags ? e.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+    participants: e.participateCount ?? 0,
+    views: 0,
+    image: e.coverImage ?? '/placeholder.svg',
+  };
+}
 
 const CATEGORIES = ['解剖学', '细胞生物学', '药理学', '外科学', '生理学', '神经科学', '微生物学'];
 const TYPES = [{ value: 'WebGL', label: 'Web实验' }, { value: 'VR', label: 'VR客户端' }];
@@ -82,9 +123,8 @@ const emptyForm: FormData = {
 };
 
 export function ExperimentsManagePage() {
-  const [data, setData] = useState<Experiment[]>(
-    initialExperiments.map((e, i) => ({ ...e, status: i % 3 === 2 ? 'review' : 'published' as const }))
-  );
+  const [data, setData] = useState<Experiment[]>([]);
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
   const [filterType, setFilterType] = useState('');
@@ -95,6 +135,20 @@ export function ExperimentsManagePage() {
   const [deleteItem, setDeleteItem] = useState<Experiment | null>(null);
   const [form, setForm] = useState<FormData>(emptyForm);
   const [selected, setSelected] = useState<string[]>([]);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const result = await getAdminExperimentList({ pageSize: 9999 });
+      setData((result.rows ?? []).map(mapApiExperiment));
+    } catch {
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
 
   const filtered = data.filter(e => {
     const q = search.toLowerCase();
@@ -121,35 +175,42 @@ export function ExperimentsManagePage() {
     setShowForm(true);
   };
 
-  const handleSave = () => {
-    const tags = form.tags.split(/[,，]/).map(t => t.trim()).filter(Boolean);
-    if (editItem) {
-      setData(prev => prev.map(e => e.id === editItem.id ? { ...e, ...form, tags } : e));
-    } else {
-      const newItem: Experiment = {
-        ...emptyForm, ...form, tags,
-        id: String(Date.now()), participants: 0, views: 0,
-        typeLabel: form.type === 'WebGL' ? 'Web实验' : 'VR客户端',
-        publishDate: new Date().toISOString().slice(0, 10),
-        launchUrl: '#', relatedCourse: '', materials: [],
-        categoryColor: '#E3F2FD', categoryText: '#0B5394',
-        image: '/placeholder.svg',
-      };
-      setData(prev => [newItem, ...prev]);
-    }
-    setShowForm(false);
+  const handleSave = async () => {
+    const params: SaveExperimentParams = {
+      expName: form.title,
+      expType: form.type === 'WebGL' ? 'web' : 'exe',
+      expDuration: parseInt(form.duration) || undefined,
+      description: form.description,
+      tags: form.tags,
+      status: form.status === 'published' ? '1' : '0',
+    };
+    try {
+      if (editItem) {
+        await updateExperiment({ ...params, expId: editItem._id });
+      } else {
+        await createExperiment(params);
+      }
+      setShowForm(false);
+      fetchData();
+    } catch {/* ignore */}
   };
 
-  const handleDelete = () => {
-    if (deleteItem) {
-      setData(prev => prev.filter(e => e.id !== deleteItem.id));
+  const handleDelete = async () => {
+    if (!deleteItem) return;
+    try {
+      await deleteExperiment(deleteItem._id);
       setDeleteItem(null);
-    }
+      fetchData();
+    } catch {/* ignore */}
   };
 
-  const toggleStatus = (id: string) => {
-    setData(prev => prev.map(e => e.id === id
-      ? { ...e, status: e.status === 'published' ? 'draft' : 'published' } : e));
+  const toggleStatus = async (id: string) => {
+    const exp = data.find(e => e.id === id);
+    if (!exp) return;
+    try {
+      await updateExperiment({ expId: exp._id, status: exp.status === 'published' ? '0' : '1' });
+      fetchData();
+    } catch {/* ignore */}
   };
 
   const toggleSelect = (id: string) => setSelected(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]);
@@ -262,9 +323,9 @@ export function ExperimentsManagePage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex flex-col gap-1">
-                        <span className="text-xs px-2 py-0.5 rounded-md font-medium w-fit" style={{ backgroundColor: exp.categoryColor, color: exp.categoryText }}>{exp.category}</span>
+                        <span className="text-xs px-2 py-0.5 rounded-md font-medium w-fit bg-[#E3F2FD] text-[#0B5394]">{exp.category}</span>
                         <span className="flex items-center gap-1 text-xs text-[#64748B]">
-                          {exp.type === 'WebGL' ? <Globe size={11} /> : <Monitor size={11} />} {exp.typeLabel}
+                          {exp.type === 'WebGL' ? <Globe size={11} /> : <Monitor size={11} />} {exp.type === 'WebGL' ? 'Web实验' : 'VR客户端'}
                         </span>
                       </div>
                     </td>
@@ -276,7 +337,7 @@ export function ExperimentsManagePage() {
                         <StatusIcon size={11} /> {st.label}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-[#94A3B8] text-xs whitespace-nowrap">{exp.publishDate}</td>
+                    <td className="px-4 py-3 text-[#94A3B8] text-xs whitespace-nowrap">{exp.id}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
                         <button title={exp.status === 'published' ? '点击下线' : '点击发布'}

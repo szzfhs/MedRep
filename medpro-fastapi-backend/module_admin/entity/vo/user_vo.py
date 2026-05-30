@@ -47,6 +47,7 @@ class UserModel(BaseModel):
     update_by: str | None = Field(default=None, description='更新者')
     update_time: datetime | None = Field(default=None, description='更新时间')
     remark: str | None = Field(default=None, description='备注')
+    tenant_id: int | None = Field(default=None, description='所属租户ID（NULL=平台用户）')
     admin: bool | None = Field(default=False, description='是否为admin')
 
     @model_validator(mode='after')

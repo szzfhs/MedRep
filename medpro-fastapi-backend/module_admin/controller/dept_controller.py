@@ -38,8 +38,9 @@ async def get_system_dept_tree_for_edit_option(
     dept_id: Annotated[int, Path(description='部门id')],
     query_db: Annotated[AsyncSession, DBSessionDependency()],
     data_scope_sql: Annotated[ColumnElement, DataScopeDependency(SysDept)],
+    tenant_id: int | None = Query(default=None, description='租户ID过滤'),
 ) -> Response:
-    dept_query = DeptModel(deptId=dept_id)
+    dept_query = DeptModel(dept_id=dept_id, tenant_id=tenant_id)
     dept_query_result = await DeptService.get_dept_for_edit_option_services(query_db, dept_query, data_scope_sql)
     logger.info('获取成功')
 

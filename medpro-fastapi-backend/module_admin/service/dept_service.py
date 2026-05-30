@@ -114,9 +114,13 @@ class DeptService:
         if not await cls.check_dept_name_unique_services(query_db, page_object):
             raise ServiceException(message=f'新增部门{page_object.dept_name}失败，部门名称已存在')
         parent_info = await DeptDao.get_dept_by_id(query_db, page_object.parent_id)
-        if parent_info.status != CommonConstant.DEPT_NORMAL:
-            raise ServiceException(message=f'部门{parent_info.dept_name}停用，不允许新增')
-        page_object.ancestors = f'{parent_info.ancestors},{page_object.parent_id}'
+        if parent_info is None:
+            # parent_id=0 表示根部门，无上级
+            page_object.ancestors = '0'
+        else:
+            if parent_info.status != CommonConstant.DEPT_NORMAL:
+                raise ServiceException(message=f'部门{parent_info.dept_name}停用，不允许新增')
+            page_object.ancestors = f'{parent_info.ancestors},{page_object.parent_id}'
         try:
             await DeptDao.add_dept_dao(query_db, page_object)
             await query_db.commit()

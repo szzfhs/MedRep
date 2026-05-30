@@ -129,6 +129,11 @@ class CourseDao:
             conditions.append(VfCourse.status == query.status)
         if query.course_category:
             conditions.append(VfCourse.course_category == query.course_category)
+        if query.tenant_id is not None:
+            if query.tenant_id == 0:
+                conditions.append(VfCourse.tenant_id.is_(None))
+            else:
+                conditions.append(VfCourse.tenant_id == query.tenant_id)
 
         count_result = await db.execute(select(func.count()).where(*conditions))
         total = count_result.scalar() or 0

@@ -92,6 +92,7 @@ class DeptDao:
                         ),
                         SysDept.del_flag == '0',
                         SysDept.status == '0',
+                        SysDept.tenant_id.is_(None) if dept_info.tenant_id == 0 else (SysDept.tenant_id == dept_info.tenant_id if dept_info.tenant_id is not None else True),
                         data_scope_sql,
                     )
                     .order_by(SysDept.order_num)
@@ -139,6 +140,7 @@ class DeptDao:
                         SysDept.status == '0',
                         SysDept.del_flag == '0',
                         SysDept.dept_name.like(f'%{dept_info.dept_name}%') if dept_info.dept_name else True,
+                        SysDept.tenant_id.is_(None) if dept_info.tenant_id == 0 else (SysDept.tenant_id == dept_info.tenant_id if dept_info.tenant_id is not None else True),
                         data_scope_sql,
                     )
                     .order_by(SysDept.order_num)
@@ -172,6 +174,7 @@ class DeptDao:
                         SysDept.dept_id == page_object.dept_id if page_object.dept_id is not None else True,
                         SysDept.status == page_object.status if page_object.status else True,
                         SysDept.dept_name.like(f'%{page_object.dept_name}%') if page_object.dept_name else True,
+                        SysDept.tenant_id.is_(None) if page_object.tenant_id == 0 else (SysDept.tenant_id == page_object.tenant_id if page_object.tenant_id is not None else True),
                         data_scope_sql,
                     )
                     .order_by(SysDept.order_num)

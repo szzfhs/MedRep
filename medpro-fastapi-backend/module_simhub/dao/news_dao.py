@@ -24,6 +24,11 @@ class NewsDao:
             conditions.append(VfNews.create_time >= query.begin_time)
         if query.end_time:
             conditions.append(VfNews.create_time <= query.end_time)
+        if query.tenant_id is not None:
+            if query.tenant_id == 0:
+                conditions.append(VfNews.tenant_id.is_(None))
+            else:
+                conditions.append(VfNews.tenant_id == query.tenant_id)
 
         count_result = await db.execute(select(func.count()).where(*conditions))
         total = count_result.scalar() or 0

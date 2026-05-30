@@ -20,6 +20,11 @@ class RegulationDao:
             conditions.append(VfRegulation.category == query.category)
         if query.status:
             conditions.append(VfRegulation.status == query.status)
+        if query.tenant_id is not None:
+            if query.tenant_id == 0:
+                conditions.append(VfRegulation.tenant_id.is_(None))
+            else:
+                conditions.append(VfRegulation.tenant_id == query.tenant_id)
 
         count_result = await db.execute(select(func.count()).where(*conditions))
         total = count_result.scalar() or 0

@@ -19,6 +19,7 @@
             </div>
             <div class="head-container">
               <el-tree
+                :key="deptTreeKey"
                 :data="deptOptions"
                 :props="{ label: 'label', children: 'children' }"
                 :expand-on-click-node="false"
@@ -73,6 +74,12 @@
                     :label="dict.label"
                     :value="dict.value"
                   />
+                </el-select>
+              </el-form-item>
+              <el-form-item label="所属学校" prop="tenantId">
+                <el-select v-model="queryParams.tenantId" placeholder="全部学校" clearable style="width: 200px" @change="handleTenantChange">
+                  <el-option label="平台用户" :value="0" />
+                  <el-option v-for="t in tenantOptions" :key="t.tenantId" :label="t.tenantName" :value="t.tenantId" />
                 </el-select>
               </el-form-item>
               <el-form-item label="创建时间" style="width: 308px">
@@ -327,6 +334,15 @@
         </el-row>
         <el-row>
           <el-col :span="12">
+            <el-form-item label="所属学校" prop="tenantId">
+              <el-select v-model="form.tenantId" placeholder="平台用户（不绑定学校）" clearable style="width: 100%">
+                <el-option v-for="t in tenantOptions" :key="t.tenantId" :label="t.tenantName" :value="t.tenantId" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
             <el-form-item label="手机号码" prop="phonenumber">
               <el-input
                 v-model="form.phonenumber"
@@ -515,6 +531,7 @@ import {
 } from "@/api/system/user";
 import { Splitpanes, Pane } from "splitpanes";
 import "splitpanes/dist/splitpanes.css";
+import { useTenantOptions } from "@/composables/useTenantOptions";
 
 const router = useRouter();
 const appStore = useAppStore();
@@ -523,6 +540,7 @@ const { sys_normal_disable, sys_user_sex } = proxy.useDict(
   "sys_normal_disable",
   "sys_user_sex"
 );
+const { tenantOptions } = useTenantOptions();
 
 const userList = ref([]);
 const open = ref(false);
@@ -537,6 +555,7 @@ const dateRange = ref([]);
 const deptName = ref("");
 const deptOptions = ref(undefined);
 const enabledDeptOptions = ref(undefined);
+const deptTreeKey = ref(0);
 const initPassword = ref(undefined);
 const postOptions = ref([]);
 const roleOptions = ref([]);
@@ -576,6 +595,7 @@ const data = reactive({
     phonenumber: undefined,
     status: undefined,
     deptId: undefined,
+    tenantId: undefined,
   },
   rules: {
     userName: [
@@ -632,6 +652,13 @@ const filterNode = (value, data) => {
 watch(deptName, (val) => {
   proxy.$refs["deptTreeRef"].filter(val);
 });
+/** 租户变化时重新加载部门树 */
+watch(() => queryParams.value.tenantId, (newVal, oldVal) => {
+  if (newVal !== oldVal) {
+    queryParams.value.deptId = undefined;
+    getDeptTree();
+  }
+}, { immediate: false });
 /** 查询用户列表 */
 function getList() {
   loading.value = true;
@@ -645,12 +672,20 @@ function getList() {
 }
 /** 查询部门下拉树结构 */
 function getDeptTree() {
-  deptTreeSelect().then((response) => {
+  deptTreeSelect({ tenant_id: queryParams.value.tenantId }).then((response) => {
     deptOptions.value = response.data;
     enabledDeptOptions.value = filterDisabledDept(
       JSON.parse(JSON.stringify(response.data))
     );
+    deptTreeKey.value++;
   });
+}
+/** 租户切换：重置部门选择并重新加载部门树 */
+function handleTenantChange() {
+  queryParams.value.deptId = undefined;
+  proxy.$refs['deptTreeRef']?.setCurrentKey(null);
+  getDeptTree();
+  handleQuery();
 }
 /** 过滤禁用的部门 */
 function filterDisabledDept(deptList) {
@@ -826,6 +861,7 @@ function reset() {
   form.value = {
     userId: undefined,
     deptId: undefined,
+    tenantId: undefined,
     userName: undefined,
     nickName: undefined,
     password: undefined,

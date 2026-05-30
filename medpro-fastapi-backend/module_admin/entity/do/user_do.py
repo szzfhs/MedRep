@@ -45,6 +45,12 @@ class SysUser(Base):
         server_default=SqlalchemyUtil.get_server_default_null(DataBaseConfig.db_type),
         comment='备注',
     )
+    tenant_id = Column(
+        BigInteger,
+        nullable=True,
+        server_default=SqlalchemyUtil.get_server_default_null(DataBaseConfig.db_type, False),
+        comment='所属租户ID（NULL=平台用户/超管，非NULL=绑定某学校）',
+    )
 
 
 class SysUserRole(Base):

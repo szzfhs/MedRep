@@ -44,6 +44,12 @@
               <el-option label="启用" value="1" /><el-option label="停用" value="0" />
             </el-select>
           </el-form-item>
+          <el-form-item label="所属学校" prop="tenantId">
+            <el-select v-model="queryParams.tenantId" placeholder="全部" clearable style="width:180px" @change="handleQuery">
+              <el-option label="平台数据" :value="0" />
+              <el-option v-for="t in tenantOptions" :key="t.tenantId" :label="t.tenantName" :value="t.tenantId" />
+            </el-select>
+          </el-form-item>
           <el-form-item>
             <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
             <el-button icon="Refresh" @click="resetQuery">重置</el-button>
@@ -205,10 +211,10 @@ import {
   listExperiment, getExperiment, addExperiment, updateExperiment, delExperiment
 } from '@/api/simhub/experiment'
 import { getSimSystemOptions } from '@/api/simhub/sim_system'
+import { useTenantOptions } from '@/composables/useTenantOptions'
 
 const { proxy } = getCurrentInstance()
-
-// ——— 实验系统选项 ———
+const { tenantOptions } = useTenantOptions()
 const simSystemOptions = ref([])
 function loadSimSystemOptions() {
   getSimSystemOptions().then(res => { simSystemOptions.value = res.data || [] })
@@ -268,7 +274,7 @@ const dialogTitle = ref('')
 
 const data = reactive({
   form: {},
-  queryParams: { pageNum: 1, pageSize: 10, expName: undefined, categoryId: undefined, simSystemId: undefined, status: undefined },
+  queryParams: { pageNum: 1, pageSize: 10, expName: undefined, categoryId: undefined, simSystemId: undefined, status: undefined, tenantId: undefined },
   rules: { expName: [{ required: true, message: '实验名称不能为空', trigger: 'blur' }] }
 })
 const { queryParams, form, rules } = toRefs(data)

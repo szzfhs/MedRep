@@ -1,13 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Save, Plus, Trash2, Edit, X, FlaskConical,
   Users, Image, CheckCircle, Eye, RefreshCw
 } from 'lucide-react';
-import { teamMembers as initialTeam, stats as initialStats } from '../../data/mockData';
+import {
+  getAdminCenterInfo, updateCenterInfo, createTeamMember, updateTeamMember, deleteTeamMember,
+  AdminTeamMember,
+} from '@/api/school-admin';
 
-type TeamMember = typeof initialTeam[0];
+interface TeamMember {
+  _id: number;
+  id: string;
+  name: string;
+  title: string;
+  specialty: string;
+  bio: string;
+  image: string;
+}
 type StatItem = { label: string; value: string; unit: string; icon: string };
+
+function mapApiTeamMember(m: AdminTeamMember): TeamMember {
+  return {
+    _id: m.id,
+    id: String(m.id),
+    name: m.name,
+    title: m.titleRole ?? '',
+    specialty: m.specialty ?? '',
+    bio: m.bio ?? '',
+    image: m.imageUrl ?? '',
+  };
+}
 
 const defaultIntro = {
   title: '虚拟仿真实验教学中心',
@@ -57,8 +80,13 @@ function ConfirmDialog({ message, onConfirm, onCancel }: { message: string; onCo
 export function LabIntroManagePage() {
   const [intro, setIntro] = useState(defaultIntro);
   const [introForm, setIntroForm] = useState(defaultIntro);
-  const [team, setTeam] = useState<TeamMember[]>(initialTeam);
-  const [stats, setStats] = useState<StatItem[]>(initialStats);
+  const [team, setTeam] = useState<TeamMember[]>([]);
+  const [stats, setStats] = useState<StatItem[]>([
+    { label: '虚拟实验项目', value: '-', unit: '个', icon: 'flask' },
+    { label: '实验课程', value: '-', unit: '门', icon: 'book' },
+    { label: '注册用户', value: '-', unit: '人', icon: 'users' },
+    { label: '操作学时', value: '-', unit: '学时', icon: 'clock' },
+  ]);
   const [formMode, setFormMode] = useState<FormMode>(null);
   const [editMember, setEditMember] = useState<TeamMember | null>(null);
   const [editStat, setEditStat] = useState<StatItem | null>(null);
@@ -67,18 +95,65 @@ export function LabIntroManagePage() {
   const [statForm, setStatForm] = useState({ label: '', value: '', unit: '', icon: '' });
   const [savedIntro, setSavedIntro] = useState(false);
 
+  const fetchData = useCallback(async () => {
+    try {
+      const result = await getAdminCenterInfo();
+      if (result.info) {
+        setIntro({
+          title: result.info.centerName ?? defaultIntro.title,
+          subtitle: result.info.centerSlogan ?? defaultIntro.subtitle,
+          description: result.info.description ?? defaultIntro.description,
+          vision: defaultIntro.vision,
+          mission: defaultIntro.mission,
+        });
+        if (result.info.statExperiments || result.info.statStudents) {
+          setStats([
+            { label: '虚拟实验项目', value: result.info.statExperiments ?? '-', unit: '个', icon: 'flask' },
+            { label: '实验课程', value: result.info.statCourses ?? '-', unit: '门', icon: 'book' },
+            { label: '注册用户', value: result.info.statStudents ?? '-', unit: '人', icon: 'users' },
+            { label: '成立年份', value: result.info.statFoundedYear ?? '-', unit: '年', icon: 'clock' },
+          ]);
+        }
+      }
+      setTeam((result.teamMembers ?? []).map(mapApiTeamMember));
+    } catch {/* ignore */}
+  }, []);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+
   const openEditIntro = () => { setIntroForm({ ...intro }); setFormMode('intro'); };
-  const saveIntro = () => { setIntro({ ...introForm }); setFormMode(null); setSavedIntro(true); setTimeout(() => setSavedIntro(false), 2000); };
+  const saveIntro = async () => {
+    try {
+      await updateCenterInfo({
+        centerName: introForm.title,
+        centerSlogan: introForm.subtitle,
+        description: introForm.description,
+      });
+      setIntro({ ...introForm }); setFormMode(null); setSavedIntro(true); setTimeout(() => setSavedIntro(false), 2000);
+    } catch {/* ignore */}
+  };
 
   const openAddMember = () => { setMemberForm({ name: '', title: '', specialty: '', bio: '', image: '' }); setEditMember(null); setFormMode('member'); };
   const openEditMember = (m: TeamMember) => { setMemberForm({ name: m.name, title: m.title, specialty: m.specialty, bio: m.bio, image: m.image }); setEditMember(m); setFormMode('member'); };
-  const saveMember = () => {
-    if (editMember) {
-      setTeam(prev => prev.map(m => m.id === editMember.id ? { ...m, ...memberForm } : m));
-    } else {
-      setTeam(prev => [...prev, { ...memberForm, id: String(Date.now()) }]);
-    }
-    setFormMode(null);
+  const saveMember = async () => {
+    const memberData = {
+      name: memberForm.name,
+      titleRole: memberForm.title,
+      specialty: memberForm.specialty,
+      bio: memberForm.bio,
+      imageUrl: memberForm.image,
+      sortOrder: null,
+      status: '1',
+    };
+    try {
+      if (editMember) {
+        await updateTeamMember({ ...memberData, id: editMember._id });
+      } else {
+        await createTeamMember(memberData);
+      }
+      setFormMode(null);
+      fetchData();
+    } catch {/* ignore */}
   };
 
   const openEditStat = (s: StatItem) => { setStatForm({ ...s }); setEditStat(s); setFormMode('stat'); };
@@ -311,7 +386,7 @@ export function LabIntroManagePage() {
       <AnimatePresence>
         {deleteMember && (
           <ConfirmDialog message={`确认删除团队成员「${deleteMember.name}」？`}
-            onConfirm={() => { setTeam(prev => prev.filter(m => m.id !== deleteMember.id)); setDeleteMember(null); }}
+            onConfirm={async () => { if (!deleteMember) return; try { await deleteTeamMember(deleteMember._id); setDeleteMember(null); fetchData(); } catch {/* ignore */} }}
             onCancel={() => setDeleteMember(null)} />
         )}
       </AnimatePresence>
