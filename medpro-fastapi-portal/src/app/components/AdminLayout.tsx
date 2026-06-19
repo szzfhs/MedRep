@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router';
 import {
-  FlaskConical, LayoutDashboard, Users, BookOpen, Newspaper,
-  Shield, FolderOpen, Settings, ChevronLeft, ChevronRight,
+  FlaskConical, LayoutDashboard, Users, BookOpen,
+  FolderOpen, ChevronLeft, ChevronRight,
   Bell, User, LogOut, Microscope, ChevronDown, AppWindow,
 } from 'lucide-react';
 
@@ -20,26 +20,12 @@ const menuGroups = [
     ],
   },
   {
-    label: '内容管理',
-    items: [
-      { path: '/admin/news', label: '新闻资讯', icon: Newspaper },
-      { path: '/admin/regulations', label: '规章制度', icon: Shield },
-      { path: '/admin/lab-intro', label: '中心介绍', icon: FlaskConical },
-    ],
-  },
-  {
     label: '教学资源',
     items: [
       { path: '/admin/experiments', label: '实验项目管理', icon: Microscope },
       { path: '/admin/courses', label: '课程管理', icon: BookOpen },
       { path: '/admin/resources', label: '资源中心管理', icon: FolderOpen },
       { path: '/admin/apps', label: '应用管理', icon: AppWindow },
-    ],
-  },
-  {
-    label: '系统',
-    items: [
-      { path: '/admin/settings', label: '系统设置', icon: Settings },
     ],
   },
 ];
@@ -132,7 +118,6 @@ export function AdminLayout() {
                location.pathname.includes('users') ? '账户管理' :
                location.pathname.includes('experiments') ? '实验项目管理' :
                location.pathname.includes('courses') ? '课程管理' :
-               location.pathname.includes('news') ? '新闻资讯管理' :
                location.pathname.includes('resources') ? '资源管理' : '管理控制台'}
             </p>
           </div>

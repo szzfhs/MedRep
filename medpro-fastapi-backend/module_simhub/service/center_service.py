@@ -17,23 +17,23 @@ from module_simhub.entity.vo.center_vo import (
 class CenterService:
 
     @classmethod
-    async def get_center_info(cls, db: AsyncSession) -> dict | None:
-        obj = await CenterDao.get_center_info(db)
+    async def get_center_info(cls, db: AsyncSession, tenant_id: int | None = None) -> dict | None:
+        obj = await CenterDao.get_center_info(db, tenant_id)
         if obj is None:
             return None
         return CenterInfoModel.model_validate(obj).model_dump(by_alias=True)
 
     @classmethod
-    async def update_center_info(cls, db: AsyncSession, update_by: str, data: EditCenterInfoModel) -> CrudResponseModel:
-        await CenterDao.upsert_center_info(db, update_by, data)
+    async def update_center_info(cls, db: AsyncSession, update_by: str, data: EditCenterInfoModel, tenant_id: int | None = None) -> CrudResponseModel:
+        await CenterDao.upsert_center_info(db, update_by, data, tenant_id)
         await db.commit()
         return CrudResponseModel(is_success=True, message='更新成功')
 
     # ===== 组织架构成员 =====
 
     @classmethod
-    async def get_org_members(cls, db: AsyncSession) -> list[dict]:
-        objs = await CenterDao.get_org_members(db)
+    async def get_org_members(cls, db: AsyncSession, tenant_id: int | None = None) -> list[dict]:
+        objs = await CenterDao.get_org_members(db, tenant_id)
         return [OrgMemberModel.model_validate(o).model_dump(by_alias=True) for o in objs]
 
     @classmethod
@@ -63,11 +63,11 @@ class CenterService:
     # ===== 核心团队成员 =====
 
     @classmethod
-    async def get_team_members(cls, db: AsyncSession, include_disabled: bool = False) -> list[dict]:
+    async def get_team_members(cls, db: AsyncSession, include_disabled: bool = False, tenant_id: int | None = None) -> list[dict]:
         if include_disabled:
-            objs = await CenterDao.get_all_team_members(db)
+            objs = await CenterDao.get_all_team_members(db, tenant_id)
         else:
-            objs = await CenterDao.get_team_members(db)
+            objs = await CenterDao.get_team_members(db, tenant_id)
         return [TeamMemberModel.model_validate(o).model_dump(by_alias=True) for o in objs]
 
     @classmethod
@@ -95,11 +95,11 @@ class CenterService:
         return CrudResponseModel(is_success=True, message='删除成功')
 
     @classmethod
-    async def get_full_center_info(cls, db: AsyncSession) -> dict:
+    async def get_full_center_info(cls, db: AsyncSession, tenant_id: int | None = None) -> dict:
         """获取完整中心信息（含组织架构和团队成员），用于门户展示"""
-        info = await cls.get_center_info(db)
-        org_members = await cls.get_org_members(db)
-        team_members = await cls.get_team_members(db)
+        info = await cls.get_center_info(db, tenant_id)
+        org_members = await cls.get_org_members(db, tenant_id)
+        team_members = await cls.get_team_members(db, tenant_id=tenant_id)
         return {
             'info': info or {},
             'orgMembers': org_members,

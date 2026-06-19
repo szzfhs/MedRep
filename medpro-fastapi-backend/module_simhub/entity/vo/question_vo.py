@@ -24,6 +24,7 @@ class QuestionModel(BaseModel):
     create_time: datetime | None = Field(default=None, description='创建时间')
     update_by: str | None = Field(default=None, description='更新者')
     update_time: datetime | None = Field(default=None, description='更新时间')
+    tenant_id: int | None = Field(default=None, description='租户ID')
 
 
 class AddQuestionModel(BaseModel):

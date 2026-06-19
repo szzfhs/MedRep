@@ -1,0 +1,18 @@
+# 开发环境 Dockerfile
+# 仅安装 node_modules，源代码通过 docker-compose volume 挂载实现 Vite HMR 热更新
+FROM node:18-slim
+
+WORKDIR /app
+
+# 仅复制依赖清单（利用 Docker 层缓存）
+COPY package.json package-lock.json ./
+
+# 设置 npm 镜像源并安装依赖
+RUN npm config set registry https://registry.npmmirror.com \
+    && npm install
+
+# 暴露 Vite 开发服务器端口
+EXPOSE 9398
+
+# 启动 Vite 开发服务器（vite.config.js 中已配置 host: true 绑定 0.0.0.0）
+CMD ["npm", "run", "dev"]

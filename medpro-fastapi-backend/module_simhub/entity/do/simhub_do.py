@@ -226,6 +226,8 @@ class VfCourse(Base):
     department = Column(String(100), nullable=True, server_default="''", comment='所属院系')
     cover_image = Column(String(200), nullable=True, server_default="''", comment='封面图URL')
     description = Column(Text, nullable=True, comment='课程介绍（富文本）')
+    learning_outcomes = Column(Text, nullable=True, comment='学习收获（JSON数组或多行文本）')
+    certificate_info = Column(String(500), nullable=True, server_default="''", comment='课程证书信息')
     course_category = Column(CHAR(1), nullable=True, server_default='1', comment='课程分类(1=理论课,2=实验课,3=理实一体化课)')
     category = Column(String(100), nullable=True, server_default="''", comment='课程分类（旧字段，已废弃）')
     total_sections = Column(Integer, nullable=True, server_default='0', comment='章节数')
@@ -263,6 +265,8 @@ class VfCourseSection(Base):
     has_resource = Column(CHAR(1), nullable=True, server_default='0', comment='是否有课件资源(0=否,1=是)')
     has_experiment = Column(CHAR(1), nullable=True, server_default='0', comment='是否有虚拟实验(0=否,1=是)')
     has_test = Column(CHAR(1), nullable=True, server_default='0', comment='是否有在线测试(0=否,1=是)')
+    has_micro_video = Column(CHAR(1), nullable=True, server_default='0', comment='是否有微课视频(0=否,1=是)')
+    has_extension = Column(CHAR(1), nullable=True, server_default='0', comment='是否有拓展资源(0=否,1=是)')
     description = Column(Text, nullable=True, comment='章节简介')
     status = Column(CHAR(1), nullable=True, server_default='0', comment='状态(0=正常,1=停用)')
     create_time = Column(DateTime, nullable=True, comment='创建时间', default=datetime.now)
@@ -467,6 +471,32 @@ class VfQuestion(Base):
     create_time = Column(DateTime, nullable=True, comment='创建时间', default=datetime.now)
     update_by = Column(String(64), nullable=True, server_default="''", comment='更新者')
     update_time = Column(DateTime, nullable=True, comment='更新时间', onupdate=datetime.now)
+
+
+class VfLessonPrep(Base):
+    """备课草稿表"""
+
+    __tablename__ = 'vf_lesson_prep'
+    __table_args__ = {'comment': '备课草稿表'}
+
+    prep_id = Column(BigInteger, primary_key=True, autoincrement=True, comment='备课ID')
+    course_id = Column(
+        BigInteger,
+        nullable=True,
+        server_default=SqlalchemyUtil.get_server_default_null(DataBaseConfig.db_type, False),
+        comment='关联已有课程ID（NULL=全新课程草稿）',
+    )
+    teacher_id = Column(BigInteger, nullable=False, comment='教师用户ID')
+    prep_name = Column(String(200), nullable=True, server_default="''", comment='备课标题')
+    current_step = Column(Integer, nullable=True, server_default='1', comment='当前编辑步骤(1~5)')
+    basic_info_json = Column(Text, nullable=True, comment='步骤1基本信息草稿（JSON）')
+    outline_json = Column(MEDIUMTEXT, nullable=True, comment='步骤2大纲草稿（JSON树）')
+    resource_config_json = Column(MEDIUMTEXT, nullable=True, comment='步骤3资源配置草稿（JSON，key=sectionId）')
+    status = Column(CHAR(1), nullable=True, server_default='0', comment='状态(0=草稿,1=待审核,2=已发布)')
+    create_time = Column(DateTime, nullable=True, comment='创建时间', default=datetime.now)
+    update_time = Column(DateTime, nullable=True, comment='更新时间', onupdate=datetime.now)
+    tenant_id = Column(BigInteger, nullable=True, comment='租户ID')
+    del_flag = Column(CHAR(1), nullable=True, server_default='0', comment='删除标志')
 
 
 class VfSectionQuestion(Base):

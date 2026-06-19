@@ -7,6 +7,7 @@ import {
   Filter, LayoutGrid, List, Star
 } from 'lucide-react';
 import { getExperimentList, type Experiment } from '../../api/experiment';
+import { useAuth } from '../../stores/auth';
 
 // 分类色板（按索引循环）
 const COLOR_PALETTE = [
@@ -27,6 +28,7 @@ function mapExpType(expType: string | null) {
 }
 
 export function ExperimentsPage() {
+  const { tenantId } = useAuth();
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('全部');
   const [activeType, setActiveType] = useState('全部类型');
@@ -39,14 +41,14 @@ export function ExperimentsPage() {
 
   useEffect(() => {
     setLoading(true);
-    getExperimentList({ pageNum: 1, pageSize: 100, status: '1' })
+    getExperimentList({ pageNum: 1, pageSize: 100, status: '1', tenantId: tenantId ?? undefined })
       .then((res) => {
         setExperiments(res.rows);
         setTotal(res.total);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [tenantId]);
 
   // 动态分类列表
   const categories = ['全部', ...Array.from(new Set(experiments.map((e) => e.categoryName).filter(Boolean) as string[]))];

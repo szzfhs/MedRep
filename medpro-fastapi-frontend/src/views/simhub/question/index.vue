@@ -70,6 +70,12 @@
       <el-table-column label="创建时间" prop="createTime" width="120" align="center">
         <template #default="{ row }"><span>{{ parseTime(row.createTime, '{y}-{m}-{d}') }}</span></template>
       </el-table-column>
+      <el-table-column label="所属学校" prop="tenantId" width="150" align="center">
+        <template #default="{ row }">
+          <el-tag v-if="row.tenantId" type="primary" size="small">{{ tenantOptions.find(t => t.tenantId === row.tenantId)?.tenantName || `租户#${row.tenantId}` }}</el-tag>
+          <el-tag v-else type="info" size="small">平台数据</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" width="160">
         <template #default="{ row }">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(row)" v-hasPermi="['simhub:question:edit']">修改</el-button>

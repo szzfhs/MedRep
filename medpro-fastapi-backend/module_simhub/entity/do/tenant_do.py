@@ -19,6 +19,7 @@ class VfTenant(Base):
     tenant_code = Column(String(50), nullable=False, unique=True, comment='租户编码（如：hzsf，用于子域名等）')
     tenant_name = Column(String(200), nullable=False, comment='机构名称（如：杭州师范大学）')
     subdomain = Column(String(100), nullable=True, comment='子域名前缀（如：hzsf），NULL 表示未配置')
+    domain = Column(String(200), nullable=True, comment='租户完整二级域名（如：hzsf.medpro.com），用于门户访问')
     logo_url = Column(String(200), nullable=True, server_default="''", comment='Logo 图片 URL')
     theme_config = Column(Text, nullable=True, comment='主题配置 JSON（颜色/字体等）')
     contact_email = Column(String(100), nullable=True, server_default="''", comment='联系邮箱')

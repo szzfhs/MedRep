@@ -4,48 +4,61 @@
 #  用法：./medpro.sh [命令]
 #
 #  命令列表：
-#    start          启动全部服务（docker + 后端 + 前端 + 门户）
-#    stop           停止所有进程
-#    restart        重启所有进程
-#    start:be       仅启动后端
-#    stop:be        仅停止后端
-#    restart:be     仅重启后端
-#    start:fe       仅启动前端
-#    stop:fe        仅停止前端
-#    restart:fe     仅重启前端
-#    start:portal   仅启动门户
-#    stop:portal    仅停止门户
-#    restart:portal 仅重启门户
-#    docker:start   启动 Docker 容器（MySQL + Redis）
-#    docker:stop    停止 Docker 容器
-#    status         查看所有服务状态
-#    logs:be        实时查看后端日志
-#    logs:fe        实时查看前端日志
-#    logs:portal    实时查看门户日志
+#    start           启动全部服务（docker + 后端 + 前端 + 门户 + AI）
+#    stop            停止所有进程
+#    restart         重启所有进程
+#    start:be        仅启动后端
+#    stop:be         仅停止后端
+#    restart:be      仅重启后端
+#    start:fe        仅启动前端
+#    stop:fe         仅停止前端
+#    restart:fe      仅重启前端
+#    start:portal    仅启动门户
+#    stop:portal     仅停止门户
+#    restart:portal  仅重启门户
+#    start:ai        仅启动 OpenMAIC AI
+#    stop:ai         仅停止 OpenMAIC AI
+#    restart:ai      仅重启 OpenMAIC AI
+#    docker:start    启动 Docker 容器（MySQL + Redis）
+#    docker:stop     停止 Docker 容器
+#    status          查看所有服务状态
+#    logs:be         实时查看后端日志
+#    logs:fe         实时查看前端日志
+#    logs:portal     实时查看门户日志
+#    logs:ai         实时查看 OpenMAIC 日志
 # =============================================================
 
-set -e
+set -euo pipefail
 
 # ---------- 路径配置 ----------
 PROJECT_ROOT="$(cd "$(dirname "$0")" && pwd)"
 BACKEND_DIR="$PROJECT_ROOT/medpro-fastapi-backend"
 FRONTEND_DIR="$PROJECT_ROOT/medpro-fastapi-frontend"
 PORTAL_DIR="$PROJECT_ROOT/medpro-fastapi-portal"
+OPENMAIC_DIR="$PROJECT_ROOT/OpenMAIC"
 PYTHON="$BACKEND_DIR/.venv/bin/python"
 
 # ---------- 日志文件 ----------
 BE_LOG="/tmp/medpro-backend.log"
 FE_LOG="/tmp/medpro-frontend.log"
 PORTAL_LOG="/tmp/medpro-portal.log"
+AI_LOG="/tmp/medpro-openmaic.log"
 
 # ---------- PID 文件 ----------
 BE_PID_FILE="/tmp/medpro-backend.pid"
 FE_PID_FILE="/tmp/medpro-frontend.pid"
 PORTAL_PID_FILE="/tmp/medpro-portal.pid"
+AI_PID_FILE="/tmp/medpro-openmaic.pid"
 
 # ---------- Docker 容器 ----------
 MYSQL_CONTAINER="Medpro-mysql"
 REDIS_CONTAINER="Medpro-redis"
+
+# ---------- OpenMAIC 端口 ----------
+OPENMAIC_PORT="${OPENMAIC_PORT:-3000}"
+
+# ---------- 代理配置（用于后端/OpenMAIC 访问境外 AI API）----------
+PROXY_HOST="http://127.0.0.1:7897"
 
 # ---------- 颜色 ----------
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
@@ -69,7 +82,7 @@ stop_proc() {
     if is_running "$pid_file"; then
         local pid
         pid=$(cat "$pid_file")
-        kill "$pid" 2>/dev/null
+        kill "$pid" 2>/dev/null || true
         sleep 1
         kill -9 "$pid" 2>/dev/null || true
         rm -f "$pid_file"
@@ -77,6 +90,17 @@ stop_proc() {
     else
         warn "$name 未在运行"
     fi
+}
+
+# 等待端口监听就绪（最多 $3 秒）
+wait_port() {
+    local port="$1" name="$2" timeout="${3:-30}"
+    local i=0
+    while ! ss -tlnp 2>/dev/null | grep -q ":${port} "; do
+        ((i++))
+        [[ $i -gt $timeout ]] && { error "$name 端口 $port 等待超时"; return 1; }
+        sleep 1
+    done
 }
 
 # ---------- Docker ----------
@@ -124,26 +148,31 @@ start_backend() {
         return 1
     fi
     cd "$BACKEND_DIR"
+    # Clash 代理，供后端调用 Google Gemini 等境外 AI API 使用
+    export HTTP_PROXY="$PROXY_HOST"
+    export HTTPS_PROXY="$PROXY_HOST"
+    export NO_PROXY="localhost,127.0.0.1,::1"
     nohup "$PYTHON" app.py --env=dev > "$BE_LOG" 2>&1 &
     local pid=$!
     echo "$pid" > "$BE_PID_FILE"
     sleep 3
     if is_running "$BE_PID_FILE"; then
         ok "后端已启动（PID: $pid）"
-        info "API 地址: http://127.0.0.1:9099"
+        info "API 地址: http://127.0.0.1:9399"
         info "日志文件: $BE_LOG"
     else
         error "后端启动失败，查看日志: $BE_LOG"
         tail -20 "$BE_LOG"
+        return 1
     fi
 }
 
 stop_backend() {
     section "停止后端"
     stop_proc "$BE_PID_FILE" "后端"
-    # 清理可能残留的占用 9099 端口的进程
+    # 清理可能残留的占用 9399 端口的进程
     local stale_pid
-    stale_pid=$(lsof -ti :9099 2>/dev/null || true)
+    stale_pid=$(lsof -ti :9399 2>/dev/null || true)
     if [[ -n "$stale_pid" ]]; then
         kill -9 $stale_pid 2>/dev/null || true
         ok "已清理残留后端进程（PID: $stale_pid）"
@@ -169,7 +198,7 @@ start_frontend() {
     sleep 5
     if is_running "$FE_PID_FILE"; then
         ok "前端已启动（PID: $pid）"
-        info "访问地址: http://localhost:3000"
+        info "访问地址: http://localhost:9398"
         info "日志文件: $FE_LOG"
     else
         error "前端启动失败，查看日志: $FE_LOG"
@@ -203,7 +232,7 @@ start_portal() {
     sleep 5
     if is_running "$PORTAL_PID_FILE"; then
         ok "门户已启动（PID: $pid）"
-        info "访问地址: http://localhost:5173"
+        info "访问地址: http://localhost:9397"
         info "日志文件: $PORTAL_LOG"
     else
         error "门户启动失败，查看日志: $PORTAL_LOG"
@@ -214,6 +243,65 @@ start_portal() {
 stop_portal() {
     section "停止门户"
     stop_proc "$PORTAL_PID_FILE" "门户"
+}
+
+# ---------- OpenMAIC AI ----------
+start_openmaic() {
+    section "启动 OpenMAIC AI"
+    if is_running "$AI_PID_FILE"; then
+        warn "OpenMAIC 已在运行（PID: $(cat "$AI_PID_FILE")）"
+        return
+    fi
+
+    # 检查 .env.local 是否存在
+    if [[ ! -f "$OPENMAIC_DIR/.env.local" ]]; then
+        warn ".env.local 不存在，将从 .env.example 复制模板"
+        cp "$OPENMAIC_DIR/.env.example" "$OPENMAIC_DIR/.env.local"
+        warn "请编辑 $OPENMAIC_DIR/.env.local，填入至少一个 LLM API Key，然后重新运行"
+        return 1
+    fi
+
+    # 安装依赖（pnpm 优先，需 Node.js >= 20.9.0）
+    if [[ ! -d "$OPENMAIC_DIR/node_modules" ]]; then
+        info "安装 OpenMAIC 依赖（使用 pnpm）..."
+        cd "$OPENMAIC_DIR"
+        pnpm install --registry=https://registry.npmmirror.com
+    fi
+
+    cd "$OPENMAIC_DIR"
+    # 同步代理设置，供 OpenMAIC 访问境外 LLM API
+    export HTTP_PROXY="$PROXY_HOST"
+    export HTTPS_PROXY="$PROXY_HOST"
+    export NO_PROXY="localhost,127.0.0.1,::1"
+    nohup pnpm run dev --port "$OPENMAIC_PORT" > "$AI_LOG" 2>&1 &
+    local pid=$!
+    echo "$pid" > "$AI_PID_FILE"
+
+    # 等待 Next.js dev server 就绪（最多 30 秒）
+    info "等待 OpenMAIC 启动（端口 $OPENMAIC_PORT）..."
+    local i=0
+    until ss -tlnp 2>/dev/null | grep -q ":${OPENMAIC_PORT} " || ! is_running "$AI_PID_FILE"; do
+        ((i++))
+        [[ $i -gt 30 ]] && break
+        sleep 1
+    done
+
+    if is_running "$AI_PID_FILE"; then
+        ok "OpenMAIC 已启动（PID: $pid）"
+        info "访问地址: http://localhost:${OPENMAIC_PORT}"
+        info "日志文件: $AI_LOG"
+    else
+        error "OpenMAIC 启动失败，查看日志: $AI_LOG"
+        tail -20 "$AI_LOG"
+        return 1
+    fi
+}
+
+stop_openmaic() {
+    section "停止 OpenMAIC AI"
+    stop_proc "$AI_PID_FILE" "OpenMAIC"
+    # 清理可能残留的 next-server 进程
+    pkill -f "next-server" 2>/dev/null || true
 }
 
 # ---------- 状态 ----------
@@ -236,7 +324,7 @@ status() {
     # 后端
     echo -e "\n${BOLD}[ 后端 FastAPI ]${NC}"
     if is_running "$BE_PID_FILE"; then
-        echo -e "  ${GREEN}✔${NC} 运行中（PID: $(cat "$BE_PID_FILE")）  http://127.0.0.1:9099"
+        echo -e "  ${GREEN}✔${NC} 运行中（PID: $(cat "$BE_PID_FILE")）  http://127.0.0.1:9399"
     else
         echo -e "  ${RED}✘${NC} 未运行"
     fi
@@ -244,7 +332,7 @@ status() {
     # 前端
     echo -e "\n${BOLD}[ 前端 Vite ]${NC}"
     if is_running "$FE_PID_FILE"; then
-        echo -e "  ${GREEN}✔${NC} 运行中（PID: $(cat "$FE_PID_FILE")）  http://localhost:3000"
+        echo -e "  ${GREEN}✔${NC} 运行中（PID: $(cat "$FE_PID_FILE")）  http://localhost:9398"
     else
         echo -e "  ${RED}✘${NC} 未运行"
     fi
@@ -252,9 +340,20 @@ status() {
     # 门户
     echo -e "\n${BOLD}[ 门户 Vite ]${NC}"
     if is_running "$PORTAL_PID_FILE"; then
-        echo -e "  ${GREEN}✔${NC} 运行中（PID: $(cat "$PORTAL_PID_FILE")）  http://localhost:5173"
+        echo -e "  ${GREEN}✔${NC} 运行中（PID: $(cat "$PORTAL_PID_FILE")）  http://localhost:9397"
     else
         echo -e "  ${RED}✘${NC} 未运行"
+    fi
+
+    # OpenMAIC
+    echo -e "\n${BOLD}[ OpenMAIC AI（Next.js）]${NC}"
+    if is_running "$AI_PID_FILE"; then
+        echo -e "  ${GREEN}✔${NC} 运行中（PID: $(cat "$AI_PID_FILE")）  http://localhost:${OPENMAIC_PORT}"
+    else
+        echo -e "  ${RED}✘${NC} 未运行"
+        if [[ ! -f "$OPENMAIC_DIR/.env.local" ]]; then
+            echo -e "  ${YELLOW}  ⚠  .env.local 未配置，请先复制 .env.example 并填入 API Key${NC}"
+        fi
     fi
     echo ""
 }
@@ -266,14 +365,17 @@ case "${1:-}" in
         start_backend
         start_frontend
         start_portal
+        start_openmaic
         status
         ;;
     stop)
+        stop_openmaic
         stop_portal
         stop_frontend
         stop_backend
         ;;
     restart)
+        stop_openmaic
         stop_portal
         stop_frontend
         stop_backend
@@ -281,51 +383,64 @@ case "${1:-}" in
         start_backend
         start_frontend
         start_portal
+        start_openmaic
         status
         ;;
-    start:be)   start_backend ;;
-    stop:be)    stop_backend ;;
-    restart:be) stop_backend; sleep 1; start_backend ;;
-    start:fe)      start_frontend ;;
-    stop:fe)       stop_frontend ;;
-    restart:fe)    stop_frontend; sleep 1; start_frontend ;;
-    start:portal)  start_portal ;;
-    stop:portal)   stop_portal ;;
+    start:be)       start_backend ;;
+    stop:be)        stop_backend ;;
+    restart:be)     stop_backend; sleep 1; start_backend ;;
+    start:fe)       start_frontend ;;
+    stop:fe)        stop_frontend ;;
+    restart:fe)     stop_frontend; sleep 1; start_frontend ;;
+    start:portal)   start_portal ;;
+    stop:portal)    stop_portal ;;
     restart:portal) stop_portal; sleep 1; start_portal ;;
-    docker:start)  docker_start ;;
-    docker:stop)   docker_stop ;;
-    status)        status ;;
-    logs:be)       tail -f "$BE_LOG" ;;
-    logs:fe)       tail -f "$FE_LOG" ;;
-    logs:portal)   tail -f "$PORTAL_LOG" ;;
+    start:ai)       start_openmaic ;;
+    stop:ai)        stop_openmaic ;;
+    restart:ai)     stop_openmaic; sleep 1; start_openmaic ;;
+    docker:start)   docker_start ;;
+    docker:stop)    docker_stop ;;
+    status)         status ;;
+    logs:be)        tail -f "$BE_LOG" ;;
+    logs:fe)        tail -f "$FE_LOG" ;;
+    logs:portal)    tail -f "$PORTAL_LOG" ;;
+    logs:ai)        tail -f "$AI_LOG" ;;
     *)
         echo -e "${BOLD}MedPro 开发环境管理脚本${NC}"
         echo ""
         echo "用法: $0 <命令>"
         echo ""
         echo -e "${BOLD}全局命令：${NC}"
-        echo "  start           启动全部（Docker + 后端 + 前端 + 门户）"
+        echo "  start           启动全部（Docker + 后端 + 前端 + 门户 + OpenMAIC AI）"
         echo "  stop            停止所有服务"
         echo "  restart         重启所有服务"
         echo "  status          查看所有服务状态"
         echo ""
         echo -e "${BOLD}后端命令：${NC}"
-        echo "  start:be        启动后端"
+        echo "  start:be        启动后端（FastAPI :9399）"
         echo "  stop:be         停止后端"
         echo "  restart:be      重启后端"
         echo "  logs:be         实时查看后端日志"
         echo ""
         echo -e "${BOLD}前端命令：${NC}"
-        echo "  start:fe        启动前端"
+        echo "  start:fe        启动前端（Vite :9398）"
         echo "  stop:fe         停止前端"
         echo "  restart:fe      重启前端"
         echo "  logs:fe         实时查看前端日志"
         echo ""
         echo -e "${BOLD}门户命令：${NC}"
-        echo "  start:portal    启动门户"
+        echo "  start:portal    启动门户（Vite :9397）"
         echo "  stop:portal     停止门户"
         echo "  restart:portal  重启门户"
         echo "  logs:portal     实时查看门户日志"
+        echo ""
+        echo -e "${BOLD}OpenMAIC AI 命令：${NC}"
+        echo "  start:ai        启动 OpenMAIC（Next.js :${OPENMAIC_PORT}）"
+        echo "  stop:ai         停止 OpenMAIC"
+        echo "  restart:ai      重启 OpenMAIC"
+        echo "  logs:ai         实时查看 OpenMAIC 日志"
+        echo "  提示: 首次启动前请确保 OpenMAIC/.env.local 已配置 LLM API Key"
+        echo "        可通过 OPENMAIC_PORT=xxxx ./medpro.sh start:ai 自定义端口"
         echo ""
         echo -e "${BOLD}Docker 命令：${NC}"
         echo "  docker:start    启动 MySQL + Redis 容器"

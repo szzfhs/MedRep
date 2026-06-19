@@ -18,6 +18,15 @@ SET @sql = IF(
 );
 PREPARE s FROM @sql; EXECUTE s; DEALLOCATE PREPARE s;
 
+-- sys_dept.tenant_id
+SET @sql = IF(
+  (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+   WHERE TABLE_SCHEMA=@db AND TABLE_NAME='sys_dept' AND COLUMN_NAME='tenant_id')=0,
+  'ALTER TABLE sys_dept ADD COLUMN tenant_id BIGINT NULL COMMENT "所属租户ID（NULL=平台通用，非NULL=学校专属）"',
+  'SELECT "sys_dept.tenant_id already exists" AS msg'
+);
+PREPARE s FROM @sql; EXECUTE s; DEALLOCATE PREPARE s;
+
 -- vf_center_info.tenant_id
 SET @sql = IF(
   (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS

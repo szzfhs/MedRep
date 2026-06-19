@@ -19,6 +19,7 @@ from module_simhub.entity.vo.news_vo import NewsPageQueryModel
 from module_simhub.entity.vo.regulation_vo import RegulationPageQueryModel
 from module_simhub.entity.vo.resource_vo import ResourcePageQueryModel
 from module_simhub.entity.vo.sim_system_vo import SimSystemPageQueryModel
+from module_simhub.dao.course_dao import CourseSectionDao
 from module_simhub.service.center_service import CenterService
 from module_simhub.service.course_service import CourseService
 from module_simhub.service.experiment_service import ExperimentService
@@ -185,6 +186,20 @@ async def portal_course_detail(
     course = await CourseService.get_course_detail(query_db, course_id)
     sections = await CourseService.get_sections(query_db, course_id)
     return ResponseUtil.success(data={'course': course, 'sections': sections})
+
+
+@portal_controller.get(
+    '/section/{section_id}/resources',
+    summary='门户-章节资源列表',
+    response_model=DataResponseModel,
+)
+async def portal_section_resources(
+    request: Request,
+    section_id: Annotated[int, Path(ge=1)],
+    query_db: Annotated[AsyncSession, DBSessionDependency()],
+) -> Response:
+    resources = await CourseSectionDao.get_section_resources_with_detail(query_db, section_id)
+    return ResponseUtil.success(data=resources)
 
 
 # ——— 资源 ———

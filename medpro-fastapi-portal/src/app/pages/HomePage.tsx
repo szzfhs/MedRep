@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { experiments, news, courses, regulations } from '../data/mockData';
 import { getPlatformStats } from '../../api/stats';
+import { useAuth } from '../../stores/auth';
 
 const HERO_BG = '/placeholder.svg';
 
@@ -44,13 +45,14 @@ function CountUp({ end, duration = 2000 }: { end: number; duration?: number }) {
 }
 
 export function HomePage() {
+  const { tenantId } = useAuth();
   const [activeCategory, setActiveCategory] = useState('全部');
   const categories = ['全部', '解剖学', '生理学', '药理学', '外科学', '微生物学'];
   const [platformStats, setPlatformStats] = useState({ experimentCount: 0, courseCount: 0, userCount: 0, totalDuration: 0 });
 
   useEffect(() => {
-    getPlatformStats().then(setPlatformStats).catch(() => {});
-  }, []);
+    getPlatformStats(tenantId).then(setPlatformStats).catch(() => {});
+  }, [tenantId]);
 
   const statsData = STATS_TEMPLATE.map((s) => ({ ...s, value: platformStats[s.key] }));
 

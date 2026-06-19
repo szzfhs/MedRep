@@ -35,16 +35,16 @@ export default defineConfig({
   assetsInclude: ['**/*.svg', '**/*.csv'],
 
   server: {
-    port: 5173,
+    port: 9397,
     host: '0.0.0.0',
     proxy: {
       '/dev-api': {
-        target: 'http://127.0.0.1:9099',
+        target: 'http://127.0.0.1:9399',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/dev-api/, ''),
       },
       '/profile': {
-        target: 'http://127.0.0.1:9099',
+        target: 'http://127.0.0.1:9399',
         changeOrigin: true,
       },
     },

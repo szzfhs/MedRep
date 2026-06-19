@@ -7,8 +7,8 @@ export interface PlatformStats {
   totalDuration: number;
 }
 
-export function getPlatformStats(): Promise<PlatformStats> {
-  return request.get('/simhub/portal/stats').then((res: any) => res.data.data ?? {
+export function getPlatformStats(tenantId?: number | null): Promise<PlatformStats> {
+  return request.get('/simhub/portal/stats', { params: tenantId != null ? { tenantId } : undefined }).then((res: any) => res.data.data ?? {
     experimentCount: 0,
     courseCount: 0,
     userCount: 0,

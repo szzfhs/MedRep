@@ -20,6 +20,8 @@ class CourseSectionModel(BaseModel):
     has_resource: str | None = Field(default=None, description='是否有课件资源(0=否,1=是)')
     has_experiment: str | None = Field(default=None, description='是否有虚拟实验(0=否,1=是)')
     has_test: str | None = Field(default=None, description='是否有在线测试(0=否,1=是)')
+    has_micro_video: str | None = Field(default=None, description='是否有微课视频(0=否,1=是)')
+    has_extension: str | None = Field(default=None, description='是否有拓展资源(0=否,1=是)')
     description: str | None = Field(default=None, description='描述')
     status: str | None = Field(default=None, description='状态(0=正常,1=停用)')
     create_time: datetime | None = Field(default=None, description='创建时间')
@@ -39,6 +41,8 @@ class AddSectionModel(BaseModel):
     has_resource: str | None = Field(default='0', description='是否有课件资源(0=否,1=是)')
     has_experiment: str | None = Field(default='0', description='是否有虚拟实验(0=否,1=是)')
     has_test: str | None = Field(default='0', description='是否有在线测试(0=否,1=是)')
+    has_micro_video: str | None = Field(default='0', description='是否有微课视频(0=否,1=是)')
+    has_extension: str | None = Field(default='0', description='是否有拓展资源(0=否,1=是)')
     description: str | None = Field(default=None, description='描述')
 
 
@@ -68,10 +72,13 @@ class CourseModel(BaseModel):
     review_count: int | None = Field(default=None, description='评价数')
     publish_date: datetime | None = Field(default=None, description='开课时间')
     sort_order: int | None = Field(default=None, description='排序')
+    learning_outcomes: str | None = Field(default=None, description='学习收获（JSON数组或多行文本）')
+    certificate_info: str | None = Field(default=None, description='课程证书信息')
     create_by: str | None = Field(default=None, description='创建者')
     create_time: datetime | None = Field(default=None, description='创建时间')
     update_by: str | None = Field(default=None, description='更新者')
     update_time: datetime | None = Field(default=None, description='更新时间')
+    tenant_id: int | None = Field(default=None, description='租户ID')
 
 
 class AddCourseModel(BaseModel):
@@ -91,10 +98,50 @@ class AddCourseModel(BaseModel):
     publish_date: datetime | None = Field(default=None, description='开课时间')
     status: Literal['0', '1', '2'] | None = Field(default='0', description='状态(0=新建,1=已审核,2=已发布)')
     sort_order: int | None = Field(default=0, description='排序')
+    learning_outcomes: str | None = Field(default=None, description='学习收获（JSON数组或多行文本）')
+    certificate_info: str | None = Field(default=None, description='课程证书信息')
 
 
 class EditCourseModel(AddCourseModel):
     course_id: int = Field(description='课程ID')
+
+
+# ——— 备课草稿 VO ———
+
+class LessonPrepModel(BaseModel):
+    model_config = ConfigDict(alias_generator=to_camel, from_attributes=True, populate_by_name=True)
+
+    prep_id: int | None = Field(default=None, description='备课ID')
+    course_id: int | None = Field(default=None, description='关联课程ID')
+    teacher_id: int | None = Field(default=None, description='教师用户ID')
+    prep_name: str | None = Field(default=None, description='备课标题')
+    current_step: int | None = Field(default=1, description='当前步骤')
+    basic_info_json: str | None = Field(default=None, description='步骤1基本信息草稿')
+    outline_json: str | None = Field(default=None, description='步骤2大纲草稿')
+    resource_config_json: str | None = Field(default=None, description='步骤3资源配置草稿')
+    status: str | None = Field(default='0', description='状态(0=草稿,1=待审核,2=已发布)')
+    create_time: datetime | None = Field(default=None, description='创建时间')
+    update_time: datetime | None = Field(default=None, description='更新时间')
+
+
+class CreateLessonPrepModel(BaseModel):
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
+    prep_name: str = Field(description='备课标题')
+    course_id: int | None = Field(default=None, description='关联已有课程ID（NULL=全新）')
+
+
+class SavePrepStepModel(BaseModel):
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
+    step: int = Field(ge=1, le=5, description='步骤号(1~5)')
+    data: str = Field(description='该步骤数据（JSON字符串）')
+
+
+class SectionResourceSortModel(BaseModel):
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
+    bind_ids: list[int] = Field(description='绑定记录ID列表（按新顺序排列）')
 
 
 class DeleteCourseModel(BaseModel):

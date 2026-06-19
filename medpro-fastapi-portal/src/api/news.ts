@@ -18,6 +18,7 @@ export interface NewsListQuery {
   pageSize?: number;
   title?: string;
   status?: string;
+  tenantId?: number | null;
 }
 
 export interface PageResult<T> {

@@ -198,6 +198,20 @@
                 :show-overflow-tooltip="true"
               />
               <el-table-column
+                label="所属学校"
+                align="center"
+                key="tenantName"
+                v-if="columns.tenantName.visible"
+                width="130"
+              >
+                <template #default="scope">
+                  <el-tag v-if="scope.row.tenantId" type="success" size="small">
+                    {{ tenantNameMap[scope.row.tenantId] ?? '租户' + scope.row.tenantId }}
+                  </el-tag>
+                  <span v-else class="text-muted" style="color:#c0c4cc">平台用户</span>
+                </template>
+              </el-table-column>
+              <el-table-column
                 label="手机号码"
                 align="center"
                 key="phonenumber"
@@ -334,7 +348,11 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="所属学校" prop="tenantId">
+            <el-form-item
+              label="所属学校"
+              prop="tenantId"
+              :required="tenantRequired"
+            >
               <el-select v-model="form.tenantId" placeholder="平台用户（不绑定学校）" clearable style="width: 100%">
                 <el-option v-for="t in tenantOptions" :key="t.tenantId" :label="t.tenantName" :value="t.tenantId" />
               </el-select>
@@ -542,6 +560,11 @@ const { sys_normal_disable, sys_user_sex } = proxy.useDict(
 );
 const { tenantOptions } = useTenantOptions();
 
+/** 租户ID → 名称 映射（用于列表显示） */
+const tenantNameMap = computed(() =>
+  Object.fromEntries(tenantOptions.value.map(t => [t.tenantId, t.tenantName]))
+);
+
 const userList = ref([]);
 const open = ref(false);
 const loading = ref(true);
@@ -581,6 +604,7 @@ const columns = ref({
   userName: { label: "用户名称", visible: true },
   nickName: { label: "用户昵称", visible: true },
   deptName: { label: "部门", visible: true },
+  tenantName: { label: "所属学校", visible: true },
   phonenumber: { label: "手机号码", visible: true },
   status: { label: "状态", visible: true },
   createTime: { label: "创建时间", visible: true },
@@ -598,6 +622,7 @@ const data = reactive({
     tenantId: undefined,
   },
   rules: {
+    tenantId: [],
     userName: [
       { required: true, message: "用户名称不能为空", trigger: "blur" },
       {
@@ -642,6 +667,27 @@ const data = reactive({
 });
 
 const { queryParams, form, rules } = toRefs(data);
+
+/** 门户角色（选中后必须绑定学校） */
+const PORTAL_ROLE_KEYS = ['teacher', 'student', 'simhub_admin'];
+
+/** 当前所选角色是否包含门户角色 */
+const tenantRequired = computed(() => {
+  const roleIds = form.value.roleIds;
+  if (!roleIds?.length || !roleOptions.value?.length) return false;
+  return roleIds.some(rid => {
+    const role = roleOptions.value.find(r => r.roleId === rid);
+    return role && PORTAL_ROLE_KEYS.includes(role.roleKey);
+  });
+});
+
+/** 角色变化时动态更新 tenantId 校验规则 */
+watch(tenantRequired, (required) => {
+  rules.value.tenantId = required
+    ? [{ required: true, message: '门户角色（教师/学生/校管理员）必须绑定所属学校', trigger: 'change' }]
+    : [];
+  if (!required) userRef.value?.clearValidate('tenantId');
+});
 
 /** 通过条件过滤节点  */
 const filterNode = (value, data) => {

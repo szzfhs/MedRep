@@ -15,7 +15,7 @@ import requests
 
 from common.config import Config
 
-BASE = Config.backend_url  # http://localhost:9099
+BASE = Config.backend_url  # http://localhost:9399
 ADMIN_USER = 'admin'
 ADMIN_PASS = 'admin123'
 

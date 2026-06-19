@@ -83,6 +83,12 @@
               <el-tag :type="row.allowDownload === '0' ? 'success' : 'info'" size="small">{{ row.allowDownload === '0' ? '是' : '否' }}</el-tag>
             </template>
           </el-table-column>
+          <el-table-column label="所属学校" prop="tenantId" width="150" align="center">
+            <template #default="{ row }">
+              <el-tag v-if="row.tenantId" type="primary" size="small">{{ tenantOptions.find(t => t.tenantId === row.tenantId)?.tenantName || `租户#${row.tenantId}` }}</el-tag>
+              <el-tag v-else type="info" size="small">平台数据</el-tag>
+            </template>
+          </el-table-column>
           <el-table-column label="操作" align="center">
             <template #default="{ row }">
               <el-button link type="primary" icon="Edit" @click="handleUpdate(row)" v-hasPermi="['simhub:resource:edit']">修改</el-button>

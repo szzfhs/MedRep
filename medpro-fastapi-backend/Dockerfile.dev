@@ -1,0 +1,19 @@
+# 开发环境 Dockerfile
+# 仅安装 Python 依赖，源代码通过 docker-compose volume 挂载实现热重载
+FROM python:3.12
+
+WORKDIR /app
+
+# 仅复制依赖清单（利用 Docker 层缓存，deps 未变则不重新安装）
+COPY requirements-pg.txt ./requirements-pg.txt
+
+# 安装 Python 依赖
+RUN pip install --no-cache-dir -r requirements-pg.txt \
+    -i https://pypi.tuna.tsinghua.edu.cn/simple \
+    --extra-index-url https://pypi.org/simple
+
+# 暴露端口
+EXPOSE 9399
+
+# 启动命令：加载 docker-dev 环境配置，uvicorn 热重载由 APP_RELOAD=true 驱动
+CMD ["python", "app.py", "--env=docker-dev"]

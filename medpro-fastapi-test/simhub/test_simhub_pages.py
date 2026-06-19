@@ -3,11 +3,11 @@ SimHub 管理后台 — 页面功能冒烟测试（Phase 2 闭环验收）
 
 测试策略：
   - 通过 API 直接完整走通每个页面的增删改查流程（与页面调用的 API 完全一致）
-  - 同时验证 Vite 前端代理 /dev-api → 9099 后端可正常转发
+  - 同时验证 Vite 前端代理 /dev-api → 9399 后端可正常转发
   - 额外验证后端 /getRouters 返回 SimHub 菜单（证明菜单注册正确）
 
 前置条件：
-  1. 后端运行在 http://localhost:9099
+  1. 后端运行在 http://localhost:9399
   2. 管理后台前端运行在 http://localhost:3003（vite dev）
   3. 验证码已禁用
 """
@@ -15,7 +15,7 @@ SimHub 管理后台 — 页面功能冒烟测试（Phase 2 闭环验收）
 import requests
 import pytest
 
-BACKEND = 'http://localhost:9099'
+BACKEND = 'http://localhost:9399'
 FRONTEND = 'http://localhost:3003'  # vite dev server (proxy /dev-api -> BACKEND)
 
 

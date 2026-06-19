@@ -15,7 +15,8 @@ const useUserStore = defineStore(
       nickName: '',
       avatar: '',
       roles: [],
-      permissions: []
+      permissions: [],
+      tenantId: null,
     }),
     actions: {
       // 登录
@@ -52,6 +53,7 @@ const useUserStore = defineStore(
             this.id = user.userId
             this.name = user.userName
             this.nickName = user.nickName
+            this.tenantId = user.tenantId ?? null
             this.avatar = avatar
             /* 初始密码提示 */
             if(res.isDefaultModifyPwd) {
@@ -78,6 +80,7 @@ const useUserStore = defineStore(
             this.token = ''
             this.roles = []
             this.permissions = []
+            this.tenantId = null
             removeToken()
             resolve()
           }).catch(error => {

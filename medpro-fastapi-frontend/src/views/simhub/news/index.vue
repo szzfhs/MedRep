@@ -53,6 +53,14 @@
       <el-table-column label="发布时间" prop="publishTime" width="120" align="center">
         <template #default="{ row }"><span>{{ parseTime(row.publishTime, '{y}-{m}-{d}') }}</span></template>
       </el-table-column>
+      <el-table-column label="所属学校" prop="tenantId" width="160" align="center">
+        <template #default="{ row }">
+          <el-tag v-if="row.tenantId" type="primary" size="small">
+            {{ tenantOptions.find(t => t.tenantId === row.tenantId)?.tenantName || `租户#${row.tenantId}` }}
+          </el-tag>
+          <el-tag v-else type="info" size="small">平台数据</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="{ row }">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(row)" v-hasPermi="['simhub:news:edit']">修改</el-button>
@@ -89,6 +97,17 @@
               </el-radio-group>
             </el-form-item>
           </el-col>
+          <el-col :span="16">
+            <el-form-item label="所属学校" prop="tenantId">
+              <el-select v-if="isAdmin" v-model="form.tenantId" placeholder="请选择所属学校" clearable style="width:100%">
+                <el-option label="平台数据" :value="null" />
+                <el-option v-for="t in tenantOptions" :key="t.tenantId" :label="t.tenantName" :value="t.tenantId" />
+              </el-select>
+              <el-tag v-else type="primary">
+                {{ tenantOptions.find(t => t.tenantId === form.tenantId)?.tenantName || (form.tenantId ? `租户#${form.tenantId}` : '平台数据') }}
+              </el-tag>
+            </el-form-item>
+          </el-col>
           <el-col :span="24">
             <el-form-item label="封面图">
               <image-upload v-model="form.coverImage" :limit="1" />
@@ -112,9 +131,12 @@
 <script setup name="SimhubNews">
 import { listNews, getNews, addNews, updateNews, delNews } from '@/api/simhub/news'
 import { useTenantOptions } from '@/composables/useTenantOptions'
+import useUserStore from '@/store/modules/user'
 
 const { proxy } = getCurrentInstance()
 const { tenantOptions } = useTenantOptions()
+const userStore = useUserStore()
+const isAdmin = computed(() => userStore.roles.includes('admin'))
 
 const newsList = ref([])
 const open = ref(false)
@@ -146,7 +168,7 @@ function getList() {
 }
 
 function reset() {
-  form.value = { newsId: undefined, title: undefined, content: undefined, summary: undefined, author: undefined, status: '0', coverImage: undefined }
+  form.value = { newsId: undefined, title: undefined, content: undefined, summary: undefined, author: undefined, status: '0', coverImage: undefined, tenantId: isAdmin.value ? null : userStore.tenantId }
   proxy.resetForm('newsRef')
 }
 

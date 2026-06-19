@@ -29,6 +29,9 @@ export interface UserInfo {
     sex?: string;
     avatar?: string;
     deptId?: number;
+    tenantId?: number | null;
+    tenantName?: string | null;
+    tenantCode?: string | null;
   };
   roles: string[];
   permissions: string[];

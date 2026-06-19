@@ -6,10 +6,12 @@ import {
   X, Play, GraduationCap, Award, LayoutGrid, List
 } from 'lucide-react';
 import { getCourseList, type Course } from '../../api/course';
+import { useAuth } from '../../stores/auth';
 
 const COURSE_CATEGORY_MAP: Record<string, string> = { '1': '理论课', '2': '实验课', '3': '理实一体化课' };
 
 export function CoursesPage() {
+  const { tenantId } = useAuth();
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('全部');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -19,11 +21,11 @@ export function CoursesPage() {
 
   useEffect(() => {
     setLoading(true);
-    getCourseList({ pageNum: 1, pageSize: 100, status: '2' })
+    getCourseList({ pageNum: 1, pageSize: 100, status: '2', tenantId: tenantId ?? undefined })
       .then((res) => { setCourses(res.rows); setTotal(res.total); })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [tenantId]);
 
   const categories = ['全部', ...Object.values(COURSE_CATEGORY_MAP)];
 

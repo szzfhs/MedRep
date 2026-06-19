@@ -1,0 +1,123 @@
+# MedPro 开发环境 Docker Compose
+# 适用于 ARM64 架构（DGX Spark / Ubuntu 24.04）
+#
+# 特性：
+#   - 源代码通过 volume 挂载，修改后自动生效（无需重建镜像）
+#   - 后端：uvicorn --reload 热重载（Python 文件修改立即重启）
+#   - 前端：Vite HMR（Vue 文件修改浏览器实时刷新）
+#   - PostgreSQL 数据持久化（数据卷）
+#
+# 使用方式：
+#   启动：docker compose -f docker-compose.dev.yml up -d
+#   停止：docker compose -f docker-compose.dev.yml down
+#   重建镜像（依赖变更后）：docker compose -f docker-compose.dev.yml build
+#   查看日志：docker compose -f docker-compose.dev.yml logs -f
+
+services:
+
+  # ─────────────────────────── 前端服务 ───────────────────────────
+  medpro-frontend-dev:
+    build:
+      context: ./medpro-fastapi-frontend
+      dockerfile: Dockerfile.dev
+    image: medpro-frontend-dev:latest
+    container_name: medpro-frontend-dev
+    ports:
+      - "9398:9398"   # Vite 开发服务器，浏览器访问 http://<host-ip>:9398
+    environment:
+      # 代理目标指向容器内后端服务（覆盖 vite.config.js 中的 127.0.0.1）
+      - VITE_DEV_PROXY_TARGET=http://medpro-backend-dev:9399
+    volumes:
+      # 挂载前端源代码，Vite 检测到变更后触发 HMR
+      - ./medpro-fastapi-frontend:/app
+      # 使用匿名卷遮蔽宿主机 node_modules，保留容器内已安装的依赖
+      - /app/node_modules
+      - /app/dist
+    depends_on:
+      - medpro-backend-dev
+    networks:
+      - medpro-dev-network
+    restart: unless-stopped
+
+  # ─────────────────────────── 后端服务 ───────────────────────────
+  medpro-backend-dev:
+    build:
+      context: ./medpro-fastapi-backend
+      dockerfile: Dockerfile.dev
+    image: medpro-backend-dev:latest
+    container_name: medpro-backend-dev
+    ports:
+      - "9399:9399"   # FastAPI，可直接访问 http://<host-ip>:9399/docs
+    volumes:
+      # 挂载后端源代码，uvicorn --reload 检测到 .py 文件变更后自动重启
+      - ./medpro-fastapi-backend:/app
+      # 遮蔽宿主机 .venv（避免 x86 venv 破坏容器 ARM 环境）
+      - /app/.venv
+      - /app/__pycache__
+      - /app/.ruff_cache
+      # 日志持久化（可选）
+      - medpro-backend-dev-logs:/app/logs
+    depends_on:
+      medpro-pg-dev:
+        condition: service_healthy
+      medpro-redis-dev:
+        condition: service_healthy
+    networks:
+      - medpro-dev-network
+    restart: unless-stopped
+
+  # ─────────────────────────── PostgreSQL ───────────────────────────
+  medpro-pg-dev:
+    image: postgres:14
+    container_name: medpro-pg-dev
+    environment:
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: ruoyi-fastapi
+      POSTGRES_INITDB_ARGS: --encoding=UTF8 --lc-collate=C --lc-ctype=C
+    ports:
+      - "15432:5432"  # 宿主机可用 psql -h localhost -p 15432 连接
+    volumes:
+      # 数据持久化，重启容器不丢失数据
+      - medpro-pg-dev-data:/var/lib/postgresql/data
+      # 首次启动时自动初始化数据库结构
+      - ./medpro-fastapi-backend/sql/ruoyi-fastapi-pg.sql:/docker-entrypoint-initdb.d/01-init.sql
+    networks:
+      - medpro-dev-network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 10s
+      retries: 30
+    restart: unless-stopped
+
+  # ─────────────────────────── Redis ───────────────────────────
+  medpro-redis-dev:
+    image: redis:latest
+    container_name: medpro-redis-dev
+    ports:
+      - "16379:6379"  # 宿主机可用 redis-cli -p 16379 连接
+    volumes:
+      - medpro-redis-dev-data:/data
+    networks:
+      - medpro-dev-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 10s
+      retries: 30
+    restart: unless-stopped
+
+# ─────────────────────────── 数据卷 ───────────────────────────
+volumes:
+  medpro-pg-dev-data:
+    name: medpro-pg-dev-data
+  medpro-redis-dev-data:
+    name: medpro-redis-dev-data
+  medpro-backend-dev-logs:
+    name: medpro-backend-dev-logs
+
+# ─────────────────────────── 网络 ───────────────────────────
+networks:
+  medpro-dev-network:
+    name: medpro-dev-network
+    driver: bridge

@@ -34,6 +34,15 @@ def _build_section_tree(sections: list[VfCourseSection], parent_id: int = 0) -> 
             children = _build_section_tree(sections, s.section_id)  # type: ignore[arg-type]
             if children:
                 node['children'] = children
+                # 将子节点的资源标志聚合到父章节，确保章级彩色徽章正确显示
+                if any(c.get('hasResource') == '1' for c in children):
+                    node['hasResource'] = '1'
+                if any(c.get('hasExperiment') == '1' for c in children):
+                    node['hasExperiment'] = '1'
+                if any(c.get('hasTest') == '1' for c in children):
+                    node['hasTest'] = '1'
+                if any(c.get('hasMicroVideo') == '1' for c in children):
+                    node['hasMicroVideo'] = '1'
             result.append(node)
     return result
 

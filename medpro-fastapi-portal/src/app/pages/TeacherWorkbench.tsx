@@ -1,102 +1,54 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   BookOpen, FlaskConical, Users, BarChart2, User, Edit3,
   Save, X, LogOut, ChevronRight, CheckCircle, Eye,
   TrendingUp, Star, Clock, FileText, Settings,
-  Award, Play, Layers,
+  Award, Play, Layers, NotebookPen,
 } from 'lucide-react';
-import { courses, experiments } from '../data/mockData';
+import { getTeacherCourses, getTeacherDashboard, type Course } from '../../api/course';
+import { LessonPrepManager } from './teacher/LessonPrepManager';
 
-// ─── Mock teacher data ──────────────────────────────────────────
+// ─── Types ──────────────────────────────────────────────────────
 
-const TEACHER = {
-  name: '李晓华',
-  teacherId: 'teacher001',
-  title: '副教授',
-  department: '生理学教研室',
-  college: '基础医学院',
-  email: 'lixiaohua@med.edu.cn',
-  phone: '139****6666',
-  avatar: '李',
-  researchArea: '神经生理学、心血管生理学',
-};
+interface DashboardData {
+  courseCount: number;
+  studentCount: number;
+  expCount: number;
+  recentCourses: Array<{
+    courseId: number;
+    courseName: string;
+    status: string;
+    enrollCount: number;
+    createTime: string | null;
+  }>;
+}
 
-// Courses this teacher manages
-const MY_COURSES = [
-  {
-    ...courses[1], // 基础生理学实验课程
-    enrollCount: 1876,
-    completedStudents: 1203,
-    avgScore: 87.5,
-    pendingReviews: 5,
-    status: 'published',
-    thisWeekActive: 234,
-  },
-  {
-    ...courses[0], // 人体解剖学虚拟实验课程
-    enrollCount: 2341,
-    completedStudents: 1890,
-    avgScore: 91.2,
-    pendingReviews: 2,
-    status: 'published',
-    thisWeekActive: 312,
-  },
-  {
-    ...courses[2], // 病原微生物学实验
-    enrollCount: 1432,
-    completedStudents: 876,
-    avgScore: 85.3,
-    pendingReviews: 8,
-    status: 'published',
-    thisWeekActive: 178,
-  },
-];
 
-// Managed experiments (linked to teacher's courses)
-const MY_EXPERIMENTS = experiments.slice(0, 5).map((e, i) => ({
-  ...e,
-  courseTitle: MY_COURSES[i % 3].title,
-  participantCount: [456, 389, 512, 298, 423][i],
-  avgScore: [88.2, 91.5, 85.4, 93.1, 87.8][i],
-  status: 'published',
-}));
-
-// Mock students in teacher's courses
-const MY_STUDENTS = [
-  { id: 1, name: '张小明', studentId: '2022001', college: '基础医学院', enrolledCourses: 2, progress: 82, lastActive: '2025-04-29', avgScore: 91 },
-  { id: 2, name: '李雨欣', studentId: '2022045', college: '临床医学院', enrolledCourses: 2, progress: 65, lastActive: '2025-04-28', avgScore: 85 },
-  { id: 3, name: '王浩然', studentId: '2022088', college: '基础医学院', enrolledCourses: 1, progress: 93, lastActive: '2025-04-29', avgScore: 94 },
-  { id: 4, name: '陈思琪', studentId: '2022103', college: '药学院', enrolledCourses: 2, progress: 40, lastActive: '2025-04-25', avgScore: 78 },
-  { id: 5, name: '刘明阳', studentId: '2022156', college: '临床医学院', enrolledCourses: 1, progress: 77, lastActive: '2025-04-27', avgScore: 88 },
-  { id: 6, name: '赵静雯', studentId: '2022178', college: '护理学院', enrolledCourses: 3, progress: 55, lastActive: '2025-04-26', avgScore: 82 },
-  { id: 7, name: '孙博文', studentId: '2022201', college: '基础医学院', enrolledCourses: 2, progress: 98, lastActive: '2025-04-29', avgScore: 96 },
-  { id: 8, name: '周雪梅', studentId: '2022234', college: '临床医学院', enrolledCourses: 1, progress: 30, lastActive: '2025-04-20', avgScore: 72 },
-];
-
-const STATS = [
-  { label: '主讲课程', value: MY_COURSES.length, icon: BookOpen, color: 'from-[#0B5394] to-[#1E88E5]' },
-  { label: '学生总数', value: MY_COURSES.reduce((s, c) => s + c.enrollCount, 0).toLocaleString(), icon: Users, color: 'from-[#00695C] to-[#00897B]' },
-  { label: '关联实验', value: MY_EXPERIMENTS.length, icon: FlaskConical, color: 'from-[#6D28D9] to-[#7C3AED]' },
-  { label: '本周活跃', value: MY_COURSES.reduce((s, c) => s + c.thisWeekActive, 0), icon: TrendingUp, color: 'from-[#B45309] to-[#D97706]' },
-];
 
 const TABS = [
   { key: 'overview', label: '教学概览', icon: BarChart2 },
   { key: 'courses', label: '我的课程', icon: BookOpen },
   { key: 'students', label: '学生管理', icon: Users },
+  { key: 'lesson-prep', label: '备课管理', icon: NotebookPen },
   { key: 'profile', label: '个人中心', icon: User },
 ];
 
 // ─── Sub-sections ───────────────────────────────────────────────
 
-function Overview() {
+function Overview({ dashboard, courses }: { dashboard: DashboardData | null; courses: Course[] }) {
+  const stats = [
+    { label: '主讲课程', value: dashboard?.courseCount ?? courses.length, icon: BookOpen, color: 'from-[#0B5394] to-[#1E88E5]' },
+    { label: '学生总数', value: (dashboard?.studentCount ?? 0).toLocaleString(), icon: Users, color: 'from-[#00695C] to-[#00897B]' },
+    { label: '关联实验', value: dashboard?.expCount ?? 0, icon: FlaskConical, color: 'from-[#6D28D9] to-[#7C3AED]' },
+    { label: '我的课程', value: dashboard?.courseCount ?? courses.length, icon: TrendingUp, color: 'from-[#B45309] to-[#D97706]' },
+  ];
   return (
     <div className="space-y-6">
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {STATS.map(s => (
+        {stats.map(s => (
           <div key={s.label} className="bg-white rounded-2xl p-4 border border-[#E2E8F0] flex items-center gap-4">
             <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${s.color} flex items-center justify-center flex-shrink-0 shadow-md`}>
               <s.icon size={20} className="text-white" />
@@ -109,9 +61,8 @@ function Overview() {
         ))}
       </div>
 
-      {/* Course performance + student activity */}
+      {/* Course enrollment summary + recent courses */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Course enrollment summary */}
         <div className="bg-white rounded-2xl border border-[#E2E8F0] overflow-hidden">
           <div className="px-5 py-4 border-b border-[#F0F4F8] flex items-center justify-between">
             <h3 className="text-[#1A2332] font-semibold text-sm flex items-center gap-2">
@@ -119,87 +70,61 @@ function Overview() {
             </h3>
           </div>
           <div className="p-4 space-y-4">
-            {MY_COURSES.map(c => (
-              <div key={c.id} className="space-y-2">
+            {courses.length === 0 ? (
+              <p className="text-[#94A3B8] text-sm text-center py-4">暂无课程</p>
+            ) : courses.slice(0, 4).map(c => (
+              <div key={c.courseId} className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-[#1A2332] text-sm truncate pr-3">{c.title.substring(0, 16)}…</span>
-                  <span className="text-[#0B5394] text-sm font-semibold flex-shrink-0">{c.enrollCount.toLocaleString()}人</span>
+                  <span className="text-[#1A2332] text-sm truncate pr-3">{c.courseName}</span>
+                  <span className="text-[#0B5394] text-sm font-semibold flex-shrink-0">{(c.enrollCount ?? 0).toLocaleString()}人</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="flex-1 h-2 bg-[#E2E8F0] rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${Math.round((c.completedStudents / c.enrollCount) * 100)}%` }}
-                      transition={{ duration: 0.8, ease: 'easeOut' }}
-                      className="h-full bg-gradient-to-r from-[#0B5394] to-[#1E88E5] rounded-full"
-                    />
+                    <div className="h-full bg-gradient-to-r from-[#0B5394] to-[#1E88E5] rounded-full" style={{ width: `${Math.min(100, (c.enrollCount ?? 0) / 10)}%` }} />
                   </div>
-                  <span className="text-[#94A3B8] text-xs flex-shrink-0">
-                    完成率 {Math.round((c.completedStudents / c.enrollCount) * 100)}%
-                  </span>
+                  <span className="text-[#94A3B8] text-xs flex-shrink-0">{c.status === '0' ? '已发布' : '草稿'}</span>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Top students this week */}
+        {/* Recent courses */}
         <div className="bg-white rounded-2xl border border-[#E2E8F0] overflow-hidden">
           <div className="px-5 py-4 border-b border-[#F0F4F8]">
             <h3 className="text-[#1A2332] font-semibold text-sm flex items-center gap-2">
-              <Award size={15} className="text-[#D97706]" /> 本周学习活跃学生
+              <Award size={15} className="text-[#D97706]" /> 最近更新的课程
             </h3>
           </div>
           <div className="p-4 space-y-2.5">
-            {MY_STUDENTS.sort((a, b) => b.progress - a.progress).slice(0, 5).map((s, i) => (
-              <div key={s.id} className="flex items-center gap-3 p-2 rounded-xl hover:bg-[#F8FAFC] transition-colors">
+            {(dashboard?.recentCourses ?? []).slice(0, 5).map((c, i) => (
+              <div key={c.courseId} className="flex items-center gap-3 p-2 rounded-xl hover:bg-[#F8FAFC] transition-colors">
                 <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                  i === 0 ? 'bg-[#FEF3C7] text-[#B45309]' :
-                  i === 1 ? 'bg-[#F0F4F8] text-[#475569]' :
-                  i === 2 ? 'bg-[#FFF0E6] text-[#C2410C]' :
-                  'bg-[#F8FAFC] text-[#94A3B8]'
+                  i === 0 ? 'bg-[#FEF3C7] text-[#B45309]' : i === 1 ? 'bg-[#F0F4F8] text-[#475569]' : 'bg-[#F8FAFC] text-[#94A3B8]'
                 }`}>
                   {i + 1}
                 </div>
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#0B5394] to-[#1E88E5] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                  {s.name.charAt(0)}
-                </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-[#1A2332] text-sm">{s.name}</div>
-                  <div className="text-[#94A3B8] text-xs">{s.studentId}</div>
+                  <div className="text-[#1A2332] text-sm truncate">{c.courseName}</div>
+                  <div className="text-[#94A3B8] text-xs">{c.createTime?.slice(0, 10)}</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-[#0B5394] text-sm font-semibold">{s.progress}%</div>
-                  <div className="text-[#94A3B8] text-xs">完成度</div>
+                  <div className="text-[#0B5394] text-sm font-semibold">{c.enrollCount ?? 0}</div>
+                  <div className="text-[#94A3B8] text-xs">选课</div>
                 </div>
               </div>
             ))}
+            {(dashboard?.recentCourses?.length ?? 0) === 0 && (
+              <p className="text-[#94A3B8] text-sm text-center py-4">暂无数据</p>
+            )}
           </div>
-        </div>
-      </div>
-
-      {/* Pending items */}
-      <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5">
-        <h3 className="text-[#1A2332] font-semibold text-sm flex items-center gap-2 mb-4">
-          <FileText size={15} className="text-[#E53935]" /> 待处理事项
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {MY_COURSES.map(c => (
-            <div key={c.id} className="flex items-center gap-3 bg-[#FFF8E1] border border-[#FDE68A] rounded-xl p-3">
-              <div className="w-2 h-2 bg-[#F59E0B] rounded-full flex-shrink-0" />
-              <div className="flex-1 min-w-0">
-                <div className="text-[#1A2332] text-sm truncate">{c.title.substring(0, 10)}…</div>
-                <div className="text-[#B45309] text-xs">{c.pendingReviews} 份作业待批改</div>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
     </div>
   );
 }
 
-function TeacherCourses() {
+function TeacherCourses({ courses }: { courses: Course[] }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -208,129 +133,93 @@ function TeacherCourses() {
           查看全部课程 <ChevronRight size={13} />
         </Link>
       </div>
-      <div className="space-y-4">
-        {MY_COURSES.map(c => (
-          <div key={c.id} className="bg-white rounded-2xl border border-[#E2E8F0] overflow-hidden hover:shadow-md transition-shadow">
-            <div className="flex flex-col sm:flex-row">
-              {/* Cover */}
-              <div className="sm:w-40 h-36 sm:h-auto flex-shrink-0 overflow-hidden">
-                <img src={c.image} alt={c.title} className="w-full h-full object-cover" />
-              </div>
-              {/* Info */}
-              <div className="flex-1 p-5">
-                <div className="flex items-start justify-between gap-3 mb-2">
-                  <div>
-                    <h4 className="text-[#1A2332] font-semibold">{c.title}</h4>
-                    <p className="text-[#64748B] text-xs mt-0.5">{c.department} · {c.chapters} 章节 · {c.totalHours}学时</p>
-                  </div>
-                  <span className="flex-shrink-0 px-2.5 py-1 bg-[#E8F5E9] text-[#2E7D32] text-xs rounded-full font-medium flex items-center gap-1">
-                    <CheckCircle size={10} /> 已发布
-                  </span>
-                </div>
-
-                {/* Stats row */}
-                <div className="grid grid-cols-4 gap-3 mb-4">
-                  {[
-                    { label: '选课人数', value: c.enrollCount.toLocaleString() },
-                    { label: '完成人数', value: c.completedStudents.toLocaleString() },
-                    { label: '平均得分', value: `${c.avgScore}` },
-                    { label: '评分', value: `${c.rating}★` },
-                  ].map(s => (
-                    <div key={s.label} className="text-center bg-[#F8FAFC] rounded-xl py-2">
-                      <div className="text-[#1A2332] font-semibold text-sm">{s.value}</div>
-                      <div className="text-[#94A3B8] text-xs">{s.label}</div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Completion bar */}
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-[#64748B] text-xs flex-shrink-0">完成率</span>
-                  <div className="flex-1 h-2 bg-[#E2E8F0] rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-[#00897B] to-[#43A047] rounded-full"
-                      style={{ width: `${Math.round((c.completedStudents / c.enrollCount) * 100)}%` }}
-                    />
-                  </div>
-                  <span className="text-[#00897B] text-xs font-medium flex-shrink-0">
-                    {Math.round((c.completedStudents / c.enrollCount) * 100)}%
-                  </span>
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-2">
-                  <Link
-                    to={`/courses/${c.id}`}
-                    className="flex items-center gap-1.5 px-3 py-2 text-xs border border-[#E2E8F0] text-[#64748B] rounded-xl hover:bg-[#F0F4F8] transition-colors"
-                  >
-                    <Eye size={13} /> 查看详情
-                  </Link>
-                  {c.pendingReviews > 0 && (
-                    <button className="flex items-center gap-1.5 px-3 py-2 text-xs bg-[#FFF8E1] text-[#B45309] border border-[#FDE68A] rounded-xl hover:bg-[#FEF3C7] transition-colors">
-                      <FileText size={13} /> {c.pendingReviews} 份待批改
-                    </button>
+      {courses.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-[#E2E8F0] p-10 text-center">
+          <BookOpen size={32} className="text-[#CBD5E1] mx-auto mb-3" />
+          <p className="text-[#94A3B8] text-sm">暂无课程，可通过备课管理新建课程</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {courses.map(c => (
+            <div key={c.courseId} className="bg-white rounded-2xl border border-[#E2E8F0] overflow-hidden hover:shadow-md transition-shadow">
+              <div className="flex flex-col sm:flex-row">
+                {/* Cover */}
+                <div className="sm:w-40 h-36 sm:h-auto flex-shrink-0 overflow-hidden bg-gradient-to-br from-[#0B5394] to-[#1E88E5] flex items-center justify-center">
+                  {c.coverImage ? (
+                    <img src={c.coverImage} alt={c.courseName} className="w-full h-full object-cover" />
+                  ) : (
+                    <BookOpen size={40} className="text-white/60" />
                   )}
+                </div>
+                {/* Info */}
+                <div className="flex-1 p-5">
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <div>
+                      <h4 className="text-[#1A2332] font-semibold">{c.courseName}</h4>
+                      <p className="text-[#64748B] text-xs mt-0.5">
+                        {c.department ?? '—'} · {c.totalSections ?? 0} 章节 · {c.totalHours ?? 0}学时
+                      </p>
+                    </div>
+                    <span className={`flex-shrink-0 px-2.5 py-1 text-xs rounded-full font-medium flex items-center gap-1 ${
+                      c.status === '0' ? 'bg-[#E8F5E9] text-[#2E7D32]' : 'bg-[#FFF8E1] text-[#B45309]'
+                    }`}>
+                      {c.status === '0' ? <><CheckCircle size={10} /> 已发布</> : '草稿'}
+                    </span>
+                  </div>
+
+                  {/* Stats row */}
+                  <div className="grid grid-cols-3 gap-3 mb-4">
+                    {[
+                      { label: '选课人数', value: (c.enrollCount ?? 0).toLocaleString() },
+                      { label: '总学时', value: `${c.totalHours ?? 0}` },
+                      { label: '评分', value: c.rating ? `${c.rating}★` : '—' },
+                    ].map(s => (
+                      <div key={s.label} className="text-center bg-[#F8FAFC] rounded-xl py-2">
+                        <div className="text-[#1A2332] font-semibold text-sm">{s.value}</div>
+                        <div className="text-[#94A3B8] text-xs">{s.label}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex gap-2">
+                    <Link
+                      to={`/courses/${c.courseId}`}
+                      className="flex items-center gap-1.5 px-3 py-2 text-xs border border-[#E2E8F0] text-[#64748B] rounded-xl hover:bg-[#F0F4F8] transition-colors"
+                    >
+                      <Eye size={13} /> 查看详情
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Managed experiments */}
-      <div className="mt-6">
-        <h3 className="text-[#1A2332] font-semibold mb-4 flex items-center gap-2">
-          <FlaskConical size={16} className="text-[#00897B]" /> 关联实验项目
-        </h3>
-        <div className="bg-white rounded-2xl border border-[#E2E8F0] overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
-                {['实验名称', '所属课程', '类型', '参与人数', '平均得分', '操作'].map(h => (
-                  <th key={h} className="px-4 py-3 text-left text-xs font-medium text-[#64748B] whitespace-nowrap">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {MY_EXPERIMENTS.map((e, i) => (
-                <tr key={e.id} className={`border-b border-[#F0F4F8] hover:bg-[#F8FAFC] transition-colors ${i % 2 ? 'bg-[#FAFBFD]' : ''}`}>
-                  <td className="px-4 py-3">
-                    <div className="text-[#1A2332] text-sm font-medium max-w-[160px] line-clamp-1">{e.title}</div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="text-[#64748B] text-xs max-w-[140px] line-clamp-1">{e.courseTitle}</div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${e.type === 'WebGL' ? 'bg-[#E3F2FD] text-[#0B5394]' : 'bg-[#EDE9FE] text-[#6D28D9]'}`}>
-                      {e.typeLabel}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-[#1A2332] text-sm font-medium">{e.participantCount}</td>
-                  <td className="px-4 py-3">
-                    <span className={`text-sm font-semibold ${e.avgScore >= 90 ? 'text-[#2E7D32]' : 'text-[#0B5394]'}`}>{e.avgScore}</span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <Link to={`/experiments/${e.id}`} className="text-xs text-[#0B5394] hover:underline flex items-center gap-1">
-                      <Eye size={12} /> 查看
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          ))}
         </div>
-      </div>
+      )}
     </div>
   );
 }
 
-function StudentManagement() {
+function StudentManagement({ courses }: { courses: Course[] }) {
+  const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
+  const [students, setStudents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
-  const [courseFilter, setCourseFilter] = useState('all');
 
-  const filtered = MY_STUDENTS.filter(s =>
-    (!search || s.name.includes(search) || s.studentId.includes(search)) &&
-    (courseFilter === 'all')
+  useEffect(() => {
+    const id = selectedCourseId ?? courses[0]?.courseId;
+    if (!id) return;
+    setLoading(true);
+    import('../../api/course').then(({ getTeacherStudents }) => {
+      getTeacherStudents(id)
+        .then(data => setStudents(data?.list ?? []))
+        .catch(() => setStudents([]))
+        .finally(() => setLoading(false));
+    });
+  }, [selectedCourseId, courses]);
+
+  const filtered = students.filter(s =>
+    !search || (s.nickName ?? s.userName ?? '').includes(search)
   );
 
   return (
@@ -338,17 +227,17 @@ function StudentManagement() {
       <div className="flex items-center justify-between">
         <h3 className="text-[#1A2332] font-semibold">学生管理</h3>
         <span className="text-[#64748B] text-xs bg-[#F0F4F8] px-3 py-1.5 rounded-full">
-          共 {MY_COURSES.reduce((s, c) => s + c.enrollCount, 0).toLocaleString()} 位学生
+          共 {students.length} 位学生
         </span>
       </div>
 
       {/* Filters */}
-      <div className="flex gap-3">
+      <div className="flex gap-3 flex-wrap">
         <div className="relative flex-1 max-w-xs">
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="搜索学生姓名/学号..."
+            placeholder="搜索学生姓名..."
             className="w-full pl-9 pr-4 py-2 bg-white border border-[#E2E8F0] rounded-xl text-sm focus:outline-none focus:border-[#0B5394]"
           />
           <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -356,88 +245,67 @@ function StudentManagement() {
           </svg>
         </div>
         <select
-          value={courseFilter}
-          onChange={e => setCourseFilter(e.target.value)}
+          value={selectedCourseId ?? ''}
+          onChange={e => setSelectedCourseId(e.target.value ? Number(e.target.value) : null)}
           className="px-3 py-2 bg-white border border-[#E2E8F0] rounded-xl text-sm focus:outline-none focus:border-[#0B5394]"
         >
-          <option value="all">所有课程</option>
-          {MY_COURSES.map(c => (
-            <option key={c.id} value={c.id}>{c.title.substring(0, 12)}…</option>
+          {courses.map(c => (
+            <option key={c.courseId} value={c.courseId}>{c.courseName}</option>
           ))}
         </select>
       </div>
 
       {/* Student table */}
       <div className="bg-white rounded-2xl border border-[#E2E8F0] overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
-              {['学生信息', '学院', '选课数', '学习进度', '平均得分', '最近活跃', '状态'].map(h => (
-                <th key={h} className="px-4 py-3 text-left text-xs font-medium text-[#64748B] whitespace-nowrap">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((s, i) => (
-              <tr key={s.id} className={`border-b border-[#F0F4F8] hover:bg-[#F8FAFC] transition-colors ${i % 2 ? 'bg-[#FAFBFD]' : ''}`}>
-                <td className="px-4 py-3">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0B5394] to-[#1E88E5] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                      {s.name.charAt(0)}
-                    </div>
-                    <div>
-                      <div className="text-[#1A2332] text-sm font-medium">{s.name}</div>
-                      <div className="text-[#94A3B8] text-xs">{s.studentId}</div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-4 py-3 text-[#64748B] text-sm">{s.college}</td>
-                <td className="px-4 py-3 text-center">
-                  <span className="w-6 h-6 rounded-full bg-[#E3F2FD] text-[#0B5394] text-xs font-semibold flex items-center justify-center mx-auto">{s.enrolledCourses}</span>
-                </td>
-                <td className="px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-20 h-1.5 bg-[#E2E8F0] rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${s.progress >= 80 ? 'bg-[#43A047]' : s.progress >= 50 ? 'bg-[#1E88E5]' : 'bg-[#FB8C00]'}`}
-                        style={{ width: `${s.progress}%` }}
-                      />
-                    </div>
-                    <span className="text-xs text-[#64748B]">{s.progress}%</span>
-                  </div>
-                </td>
-                <td className="px-4 py-3">
-                  <span className={`text-sm font-semibold ${s.avgScore >= 90 ? 'text-[#2E7D32]' : s.avgScore >= 80 ? 'text-[#0B5394]' : 'text-[#FB8C00]'}`}>
-                    {s.avgScore}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-[#94A3B8] text-xs">{s.lastActive}</td>
-                <td className="px-4 py-3">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                    s.progress >= 80 ? 'bg-[#E8F5E9] text-[#2E7D32]' :
-                    s.progress >= 40 ? 'bg-[#E3F2FD] text-[#0B5394]' :
-                    'bg-[#FFF8E1] text-[#B45309]'
-                  }`}>
-                    {s.progress >= 80 ? '良好' : s.progress >= 40 ? '学习中' : '待跟进'}
-                  </span>
-                </td>
+        {loading ? (
+          <div className="p-10 text-center text-[#94A3B8] text-sm">加载中…</div>
+        ) : filtered.length === 0 ? (
+          <div className="p-10 text-center text-[#94A3B8] text-sm">暂无学生数据</div>
+        ) : (
+          <table className="w-full">
+            <thead>
+              <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
+                {['学生信息', '选课时间', '状态'].map(h => (
+                  <th key={h} className="px-4 py-3 text-left text-xs font-medium text-[#64748B] whitespace-nowrap">{h}</th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filtered.map((s, i) => (
+                <tr key={s.enrollmentId} className={`border-b border-[#F0F4F8] hover:bg-[#F8FAFC] transition-colors ${i % 2 ? 'bg-[#FAFBFD]' : ''}`}>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0B5394] to-[#1E88E5] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                        {(s.nickName || s.userName || '?').charAt(0)}
+                      </div>
+                      <div>
+                        <div className="text-[#1A2332] text-sm font-medium">{s.nickName || s.userName}</div>
+                        <div className="text-[#94A3B8] text-xs">{s.userName}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-[#94A3B8] text-xs">{s.enrollTime?.slice(0, 10)}</td>
+                  <td className="px-4 py-3">
+                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-[#E8F5E9] text-[#2E7D32]">已选课</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
 }
 
-function TeacherProfile() {
+function TeacherProfile({ currentUser }: { currentUser: any }) {
   const [editing, setEditing] = useState(false);
+  const displayName = currentUser?.user?.nickName || currentUser?.user?.userName || '教师';
   const [form, setForm] = useState({
-    name: TEACHER.name,
-    email: TEACHER.email,
-    phone: TEACHER.phone,
-    department: TEACHER.department,
-    researchArea: TEACHER.researchArea,
+    name: displayName,
+    email: currentUser?.user?.email || '',
+    phone: currentUser?.user?.phonenumber || '',
+    department: currentUser?.user?.dept?.deptName || '',
   });
 
   return (
@@ -445,14 +313,13 @@ function TeacherProfile() {
       <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6">
         <div className="flex items-center gap-4 mb-6">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#00695C] to-[#00897B] flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-            {TEACHER.avatar}
+            {displayName.charAt(0)}
           </div>
           <div>
-            <h3 className="text-[#1A2332] font-bold text-lg">{TEACHER.name}</h3>
-            <p className="text-[#64748B] text-sm">{TEACHER.teacherId}</p>
+            <h3 className="text-[#1A2332] font-bold text-lg">{displayName}</h3>
+            <p className="text-[#64748B] text-sm">{currentUser?.user?.userName}</p>
             <div className="flex items-center gap-2 mt-1">
-              <span className="px-2 py-0.5 bg-[#E0F2F1] text-[#00695C] text-xs rounded-full font-medium">{TEACHER.title}</span>
-              <span className="px-2 py-0.5 bg-[#E3F2FD] text-[#0B5394] text-xs rounded-full font-medium">教师</span>
+              <span className="px-2 py-0.5 bg-[#E0F2F1] text-[#00695C] text-xs rounded-full font-medium">教师</span>
             </div>
           </div>
           <button
@@ -468,8 +335,7 @@ function TeacherProfile() {
             { label: '姓名', key: 'name' },
             { label: '邮箱', key: 'email' },
             { label: '手机', key: 'phone' },
-            { label: '教研室', key: 'department' },
-            { label: '研究方向', key: 'researchArea' },
+            { label: '所属部门', key: 'department' },
           ].map(f => (
             <div key={f.key} className="grid grid-cols-3 gap-4 items-center">
               <label className="text-[#64748B] text-sm col-span-1">{f.label}</label>
@@ -480,7 +346,7 @@ function TeacherProfile() {
                   className="col-span-2 px-3 py-2 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-sm focus:outline-none focus:border-[#00897B]"
                 />
               ) : (
-                <span className="col-span-2 text-[#1A2332] text-sm">{form[f.key as keyof typeof form]}</span>
+                <span className="col-span-2 text-[#1A2332] text-sm">{form[f.key as keyof typeof form] || '—'}</span>
               )}
             </div>
           ))}
@@ -498,26 +364,6 @@ function TeacherProfile() {
           </div>
         )}
       </div>
-
-      {/* Teaching stats */}
-      <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5">
-        <h4 className="text-[#1A2332] font-semibold text-sm mb-4">教学统计</h4>
-        <div className="space-y-3">
-          {[
-            { label: '主讲课程', value: `${MY_COURSES.length} 门`, icon: BookOpen },
-            { label: '学生总数', value: `${MY_COURSES.reduce((s, c) => s + c.enrollCount, 0).toLocaleString()} 人`, icon: Users },
-            { label: '关联实验', value: `${MY_EXPERIMENTS.length} 个`, icon: FlaskConical },
-            { label: '课程平均评分', value: `${(MY_COURSES.reduce((s, c) => s + c.rating, 0) / MY_COURSES.length).toFixed(1)} ★`, icon: Star },
-          ].map(s => (
-            <div key={s.label} className="flex items-center justify-between py-2 border-b border-[#F0F4F8] last:border-0">
-              <div className="flex items-center gap-2 text-[#64748B] text-sm">
-                <s.icon size={14} className="text-[#94A3B8]" /> {s.label}
-              </div>
-              <span className="text-[#1A2332] font-medium text-sm">{s.value}</span>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
@@ -526,12 +372,44 @@ function TeacherProfile() {
 
 export function TeacherWorkbench() {
   const [activeTab, setActiveTab] = useState('overview');
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [dashboard, setDashboard] = useState<DashboardData | null>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  const loadData = () => {
+    Promise.allSettled([
+      getTeacherDashboard().then(setDashboard).catch(() => {}),
+      getTeacherCourses({ pageSize: 50 }).then(r => setCourses(r.rows ?? [])).catch(() => {}),
+    ]).finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    // Load current user from store
+    try {
+      const raw = localStorage.getItem('user') || sessionStorage.getItem('user') || '';
+      if (raw) setCurrentUser(JSON.parse(raw));
+    } catch { /* ignore */ }
+
+    loadData();
+  }, []);
+
+  // 切换到概览或课程 tab 时重新拉取数据
+  const handleTabChange = (key: string) => {
+    setActiveTab(key);
+    if (key === 'overview' || key === 'courses') loadData();
+  };
+
+  const displayName = currentUser?.user?.nickName || currentUser?.user?.userName || '教师';
+  const courseCount = dashboard?.courseCount ?? courses.length;
+  const studentCount = dashboard?.studentCount ?? 0;
 
   const tabContent: Record<string, React.ReactNode> = {
-    overview: <Overview />,
-    courses: <TeacherCourses />,
-    students: <StudentManagement />,
-    profile: <TeacherProfile />,
+    overview: <Overview dashboard={dashboard} courses={courses} />,
+    courses: <TeacherCourses courses={courses} />,
+    students: <StudentManagement courses={courses} />,
+    'lesson-prep': <LessonPrepManager onPublish={loadData} />,
+    profile: <TeacherProfile currentUser={currentUser} />,
   };
 
   return (
@@ -544,21 +422,20 @@ export function TeacherWorkbench() {
               {/* Profile card */}
               <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5 text-center">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#00695C] to-[#00897B] flex items-center justify-center text-white text-2xl font-bold mx-auto mb-3 shadow-lg">
-                  {TEACHER.avatar}
+                  {displayName.charAt(0)}
                 </div>
-                <h3 className="text-[#1A2332] font-semibold">{TEACHER.name}</h3>
-                <p className="text-[#64748B] text-xs mt-0.5">{TEACHER.teacherId}</p>
+                <h3 className="text-[#1A2332] font-semibold">{displayName}</h3>
+                <p className="text-[#64748B] text-xs mt-0.5">{currentUser?.user?.userName}</p>
                 <div className="flex justify-center gap-2 mt-2">
-                  <span className="px-2 py-0.5 bg-[#E0F2F1] text-[#00695C] text-xs rounded-full">{TEACHER.title}</span>
-                  <span className="px-2 py-0.5 bg-[#E3F2FD] text-[#0B5394] text-xs rounded-full">教师</span>
+                  <span className="px-2 py-0.5 bg-[#E0F2F1] text-[#00695C] text-xs rounded-full">教师</span>
                 </div>
                 <div className="mt-3 pt-3 border-t border-[#F0F4F8] grid grid-cols-2 gap-2 text-center">
                   <div>
-                    <div className="text-[#1A2332] font-semibold text-base">{MY_COURSES.length}</div>
+                    <div className="text-[#1A2332] font-semibold text-base">{courseCount}</div>
                     <div className="text-[#94A3B8] text-xs">课程</div>
                   </div>
                   <div>
-                    <div className="text-[#1A2332] font-semibold text-base">{MY_COURSES.reduce((s, c) => s + c.enrollCount, 0).toLocaleString()}</div>
+                    <div className="text-[#1A2332] font-semibold text-base">{studentCount.toLocaleString()}</div>
                     <div className="text-[#94A3B8] text-xs">学生</div>
                   </div>
                 </div>
@@ -569,7 +446,7 @@ export function TeacherWorkbench() {
                 {TABS.map(tab => (
                   <button
                     key={tab.key}
-                    onClick={() => setActiveTab(tab.key)}
+                    onClick={() => handleTabChange(tab.key)}
                     className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all mb-0.5 ${
                       activeTab === tab.key
                         ? 'bg-[#00897B] text-white'
@@ -581,12 +458,12 @@ export function TeacherWorkbench() {
                   </button>
                 ))}
                 <div className="border-t border-[#F0F4F8] mt-2 pt-2">
-                  <Link
-                    to="/"
+                  <a
+                    href="/"
                     className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-[#94A3B8] hover:bg-[#FFF5F5] hover:text-[#E53935] transition-all"
                   >
                     <LogOut size={16} /> 退出登录
-                  </Link>
+                  </a>
                 </div>
               </nav>
             </div>
@@ -599,7 +476,7 @@ export function TeacherWorkbench() {
               {TABS.map(tab => (
                 <button
                   key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
+                  onClick={() => handleTabChange(tab.key)}
                   className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                     activeTab === tab.key ? 'bg-[#00897B] text-white' : 'text-[#64748B] hover:bg-[#F0F4F8]'
                   }`}

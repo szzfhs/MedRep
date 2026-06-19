@@ -16,6 +16,7 @@ class OrgMemberModel(BaseModel):
     dept: str | None = Field(default=None, description='职责描述')
     color: str | None = Field(default='#0B5394', description='显示颜色')
     sort_order: int | None = Field(default=0, description='排序')
+    tenant_id: int | None = Field(default=None, description='租户ID')
 
 
 class EditOrgMemberModel(BaseModel):
@@ -28,6 +29,7 @@ class EditOrgMemberModel(BaseModel):
     dept: str | None = Field(default=None, description='职责描述')
     color: str | None = Field(default='#0B5394', description='显示颜色')
     sort_order: int | None = Field(default=0, description='排序')
+    tenant_id: int | None = Field(default=None, description='租户ID')
 
 
 class TeamMemberModel(BaseModel):
@@ -43,6 +45,7 @@ class TeamMemberModel(BaseModel):
     image_url: str | None = Field(default=None, description='头像URL')
     sort_order: int | None = Field(default=0, description='排序')
     status: str | None = Field(default='0', description='状态')
+    tenant_id: int | None = Field(default=None, description='租户ID')
 
 
 class EditTeamMemberModel(BaseModel):
@@ -57,6 +60,7 @@ class EditTeamMemberModel(BaseModel):
     image_url: str | None = Field(default=None, description='头像URL')
     sort_order: int | None = Field(default=0, description='排序')
     status: str | None = Field(default='0', description='状态')
+    tenant_id: int | None = Field(default=None, description='租户ID')
 
 
 class CenterInfoModel(BaseModel):
@@ -80,6 +84,7 @@ class CenterInfoModel(BaseModel):
     contact_address: str | None = Field(default=None, description='联系地址')
     contact_phone: str | None = Field(default=None, description='联系电话')
     contact_email: str | None = Field(default=None, description='联系邮箱')
+    tenant_id: int | None = Field(default=None, description='租户ID')
     update_by: str | None = Field(default=None, description='更新者')
     update_time: datetime | None = Field(default=None, description='更新时间')
 
@@ -104,3 +109,4 @@ class EditCenterInfoModel(BaseModel):
     contact_address: str | None = Field(default=None, description='联系地址')
     contact_phone: str | None = Field(default=None, description='联系电话')
     contact_email: str | None = Field(default=None, description='联系邮箱')
+    tenant_id: int | None = Field(default=None, description='租户ID')

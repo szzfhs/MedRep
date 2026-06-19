@@ -1,5 +1,24 @@
 <template>
   <div class="app-container">
+
+    <!-- 学校选择器：超级管理员可见，校级管理员只显示本校 -->
+    <el-card class="mb12 tenant-selector-card" shadow="never" v-if="isAdmin || currentTenantLabel">
+      <div class="tenant-selector-row">
+        <span class="tenant-label">当前学校：</span>
+        <el-select
+          v-if="isAdmin"
+          v-model="selectedTenantId"
+          placeholder="请选择学校"
+          style="width:260px"
+          @change="onTenantChange"
+          clearable
+        >
+          <el-option v-for="t in tenantOptions" :key="t.tenantId" :label="t.tenantName" :value="t.tenantId" />
+        </el-select>
+        <el-tag v-else type="primary" size="large">{{ currentTenantLabel }}</el-tag>
+      </div>
+    </el-card>
+
     <el-tabs v-model="activeTab" type="border-card">
 
       <!-- Tab 1: 基本信息 -->
@@ -91,14 +110,15 @@
 
       <!-- Tab 2: 中心简介 -->
       <el-tab-pane label="中心简介" name="intro">
-        <el-form ref="introRef" :model="introForm" label-width="130px" v-loading="basicLoading">
+        <el-form ref="introRef" :model="introForm" label-width="80px" v-loading="basicLoading">
           <el-form-item label="简介正文" prop="description">
-            <div class="w-full">
+            <div style="width:100%">
               <div class="mb8 text-secondary text-sm">支持多段落，使用换行分隔段落</div>
               <el-input
                 v-model="introForm.description"
                 type="textarea"
-                :rows="8"
+                :rows="12"
+                style="width:100%"
                 placeholder="请输入中心简介正文，多段落之间用空行分隔"
               />
             </div>
@@ -317,8 +337,39 @@ import {
   listOrgMembers, addOrgMember, updateOrgMember, deleteOrgMember,
   listTeamMembers, addTeamMember, updateTeamMember, deleteTeamMember,
 } from '@/api/simhub/center'
+import { useTenantOptions } from '@/composables/useTenantOptions'
+import useUserStore from '@/store/modules/user'
 
 const { proxy } = getCurrentInstance()
+const userStore = useUserStore()
+
+// ===== 租户选择 =====
+const { tenantOptions } = useTenantOptions()
+
+/** 是否超级管理员（可切换任意学校） */
+const isAdmin = computed(() => userStore.roles.includes('admin'))
+
+/** 当前用户所属租户ID（非管理员固定为自己的） */
+const selectedTenantId = ref(isAdmin.value ? null : userStore.tenantId)
+
+/** 当前租户显示名称（非管理员用） */
+const currentTenantLabel = computed(() => {
+  if (isAdmin.value) return ''
+  const t = tenantOptions.value.find(t => t.tenantId === userStore.tenantId)
+  return t ? t.tenantName : (userStore.tenantId ? `租户#${userStore.tenantId}` : '平台数据')
+})
+
+/** 超级管理员切换学校时重新加载所有数据 */
+function onTenantChange() {
+  loadCenterInfo()
+  loadOrgMembers()
+  loadTeamMembers()
+}
+
+/** 获取当前有效租户ID（管理员用选择器值，校管理员用自身ID） */
+const effectiveTenantId = computed(() =>
+  isAdmin.value ? selectedTenantId.value : userStore.tenantId
+)
 
 const activeTab = ref('basic')
 
@@ -388,9 +439,8 @@ const teamRules = {
 async function loadCenterInfo() {
   basicLoading.value = true
   try {
-    const res = await getCenterInfo()
+    const res = await getCenterInfo(effectiveTenantId.value)
     const data = res.data || {}
-    // 基本信息
     basicForm.value = {
       centerName: data.centerName,
       heroBadge: data.heroBadge,
@@ -405,15 +455,12 @@ async function loadCenterInfo() {
       logoUrl: data.logoUrl,
       bannerUrl: data.bannerUrl,
     }
-    // 简介内容
     introForm.value = { description: data.description || '' }
-    // 荣誉成就
     try {
       achievementsForm.value = data.achievementsJson ? JSON.parse(data.achievementsJson) : []
     } catch {
       achievementsForm.value = []
     }
-    // 基本职能
     try {
       functionsForm.value = data.functionsJson ? JSON.parse(data.functionsJson) : []
     } catch {
@@ -427,7 +474,7 @@ async function loadCenterInfo() {
 async function loadOrgMembers() {
   orgLoading.value = true
   try {
-    const res = await listOrgMembers()
+    const res = await listOrgMembers(effectiveTenantId.value)
     orgList.value = res.data || []
   } finally {
     orgLoading.value = false
@@ -437,7 +484,7 @@ async function loadOrgMembers() {
 async function loadTeamMembers() {
   teamLoading.value = true
   try {
-    const res = await listTeamMembers()
+    const res = await listTeamMembers(effectiveTenantId.value)
     teamList.value = res.data || []
   } finally {
     teamLoading.value = false
@@ -449,7 +496,7 @@ function saveBasic() {
   proxy.$refs.basicRef?.validate(valid => {
     if (!valid) return
     basicSaving.value = true
-    updateCenterInfo(basicForm.value)
+    updateCenterInfo({ ...basicForm.value, tenantId: effectiveTenantId.value })
       .then(() => proxy.$modal.msgSuccess('基本信息保存成功'))
       .finally(() => (basicSaving.value = false))
   })
@@ -461,6 +508,7 @@ function saveIntro() {
     description: introForm.value.description,
     achievementsJson: JSON.stringify(achievementsForm.value),
     functionsJson: JSON.stringify(functionsForm.value.filter(f => f.trim())),
+    tenantId: effectiveTenantId.value,
   }
   updateCenterInfo(payload)
     .then(() => proxy.$modal.msgSuccess('简介内容保存成功'))
@@ -486,9 +534,10 @@ function submitOrgForm() {
   orgFormRef.value?.validate(valid => {
     if (!valid) return
     orgSaving.value = true
+    const payload = { ...orgForm.value, tenantId: effectiveTenantId.value }
     const action = orgEditId.value
-      ? updateOrgMember(orgEditId.value, orgForm.value)
-      : addOrgMember(orgForm.value)
+      ? updateOrgMember(orgEditId.value, payload)
+      : addOrgMember(payload)
     action
       .then(() => {
         proxy.$modal.msgSuccess(orgEditId.value ? '修改成功' : '新增成功')
@@ -527,9 +576,10 @@ function submitTeamForm() {
   teamFormRef.value?.validate(valid => {
     if (!valid) return
     teamSaving.value = true
+    const payload = { ...teamForm.value, tenantId: effectiveTenantId.value }
     const action = teamEditId.value
-      ? updateTeamMember(teamEditId.value, teamForm.value)
-      : addTeamMember(teamForm.value)
+      ? updateTeamMember(teamEditId.value, payload)
+      : addTeamMember(payload)
     action
       .then(() => {
         proxy.$modal.msgSuccess(teamEditId.value ? '修改成功' : '新增成功')
@@ -565,5 +615,8 @@ loadTeamMembers()
 .ml8 { margin-left: 8px; }
 .text-secondary { color: #909399; }
 .achievement-row { padding: 8px; background: #fafafa; border-radius: 6px; border: 1px solid #ebeef5; }
+.tenant-selector-card { border-color: #e4e7ed; }
+.tenant-selector-row { display: flex; align-items: center; gap: 12px; }
+.tenant-label { font-size: 14px; color: #606266; white-space: nowrap; }
 </style>
 

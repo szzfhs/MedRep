@@ -11,6 +11,8 @@ from module_simhub.entity.do.simhub_do import (
     VfCourseEnrollment,
     VfCourseSection,
     VfLearningProgress,
+    VfLessonPrep,
+    VfResource,
     VfSectionExperiment,
     VfSectionResource,
 )
@@ -74,6 +76,100 @@ class CourseSectionDao:
         return list(result.scalars().all())
 
     @classmethod
+    async def get_section_resources_with_detail(cls, db: AsyncSession, section_id: int) -> list[dict]:
+        """JOIN 查询章节绑定资源（含资源详情）"""
+        result = await db.execute(
+            select(VfSectionResource, VfResource)
+            .join(VfResource, VfResource.resource_id == VfSectionResource.resource_id)
+            .where(
+                VfSectionResource.section_id == section_id,
+                VfSectionResource.status == '0',
+            )
+            .order_by(VfSectionResource.sort_order)
+        )
+        rows = result.all()
+        return [
+            {
+                'bindId': sr.id,
+                'resourceId': r.resource_id,
+                'resourceName': r.resource_name,
+                'resourceType': r.resource_type,
+                'fileFormat': r.file_format,
+                'fileUrl': r.file_url,
+                'coverImage': r.cover_image,
+                'duration': r.duration,
+                'sortOrder': sr.sort_order,
+            }
+            for sr, r in rows
+        ]
+
+    @classmethod
+    async def sort_section_resources(cls, db: AsyncSession, bind_ids: list[int]) -> None:
+        """batch更新章节资源排序，bind_ids 应按新顺序传入"""
+        for new_order, bind_id in enumerate(bind_ids):
+            await db.execute(
+                update(VfSectionResource)
+                .where(VfSectionResource.id == bind_id)
+                .values(sort_order=new_order)
+            )
+        await db.flush()
+
+    @classmethod
+    async def refresh_section_flags(cls, db: AsyncSession, section_id: int) -> None:
+        """\u6839据当前绑定情况自动刷新章节 has_* 标志位"""
+        # 查资源
+        res_count = await db.execute(
+            select(func.count()).where(
+                VfSectionResource.section_id == section_id, VfSectionResource.status == '0'
+            )
+        )
+        has_resource = '1' if (res_count.scalar() or 0) > 0 else '0'
+
+        # 查微课视频（资源类型 micro_video）
+        micro_count = await db.execute(
+            select(func.count())
+            .select_from(VfSectionResource)
+            .join(VfResource, VfResource.resource_id == VfSectionResource.resource_id)
+            .where(
+                VfSectionResource.section_id == section_id,
+                VfSectionResource.status == '0',
+                VfResource.resource_type == 'micro_video',
+            )
+        )
+        has_micro_video = '1' if (micro_count.scalar() or 0) > 0 else '0'
+
+        # 查拓展资源（资源类型 extension）
+        ext_count = await db.execute(
+            select(func.count())
+            .select_from(VfSectionResource)
+            .join(VfResource, VfResource.resource_id == VfSectionResource.resource_id)
+            .where(
+                VfSectionResource.section_id == section_id,
+                VfSectionResource.status == '0',
+                VfResource.resource_type == 'extension',
+            )
+        )
+        has_extension = '1' if (ext_count.scalar() or 0) > 0 else '0'
+
+        # 查实验
+        exp_count = await db.execute(
+            select(func.count()).where(VfSectionExperiment.section_id == section_id)
+        )
+        has_experiment = '1' if (exp_count.scalar() or 0) > 0 else '0'
+
+        await db.execute(
+            update(VfCourseSection)
+            .where(VfCourseSection.section_id == section_id)
+            .values(
+                has_resource=has_resource,
+                has_micro_video=has_micro_video,
+                has_extension=has_extension,
+                has_experiment=has_experiment,
+            )
+        )
+        await db.flush()
+
+    @classmethod
     async def add_section_experiment(cls, db: AsyncSession, section_id: int, exp_id: int, sort_order: int = 0) -> None:
         # 通过 section 获取 course_id 以填充冗余字段
         section = await cls.get_section_by_id(db, section_id)
@@ -115,6 +211,75 @@ class CourseSectionDao:
         if rel:
             await db.delete(rel)
             await db.flush()
+
+
+class LessonPrepDao:
+    @classmethod
+    async def get_by_teacher(cls, db: AsyncSession, teacher_id: int) -> list[VfLessonPrep]:
+        result = await db.execute(
+            select(VfLessonPrep)
+            .where(VfLessonPrep.teacher_id == teacher_id, VfLessonPrep.del_flag == '0')
+            .order_by(desc(VfLessonPrep.update_time))
+        )
+        return list(result.scalars().all())
+
+    @classmethod
+    async def get_by_id(cls, db: AsyncSession, prep_id: int) -> VfLessonPrep | None:
+        result = await db.execute(
+            select(VfLessonPrep)
+            .where(VfLessonPrep.prep_id == prep_id, VfLessonPrep.del_flag == '0')
+        )
+        return result.scalars().first()
+
+    @classmethod
+    async def create(cls, db: AsyncSession, teacher_id: int, prep_name: str, course_id: int | None = None) -> VfLessonPrep:
+        prep = VfLessonPrep(
+            teacher_id=teacher_id,
+            prep_name=prep_name,
+            course_id=course_id,
+            current_step=1,
+            status='0',
+            create_time=datetime.now(),
+        )
+        db.add(prep)
+        await db.flush()
+        return prep
+
+    @classmethod
+    async def save_step(cls, db: AsyncSession, prep_id: int, step: int, data: str) -> None:
+        field_map = {
+            1: 'basic_info_json',
+            2: 'outline_json',
+            3: 'resource_config_json',
+        }
+        update_data: dict = {'update_time': datetime.now()}
+        if step in field_map:
+            update_data[field_map[step]] = data
+        # 如果当前步骤大于记录的 current_step，则更新
+        update_data['current_step'] = step
+        await db.execute(
+            update(VfLessonPrep).where(VfLessonPrep.prep_id == prep_id).values(**update_data)
+        )
+        await db.flush()
+
+    @classmethod
+    async def delete(cls, db: AsyncSession, prep_id: int) -> None:
+        await db.execute(
+            update(VfLessonPrep).where(VfLessonPrep.prep_id == prep_id).values(del_flag='2')
+        )
+        await db.flush()
+
+    @classmethod
+    async def publish(cls, db: AsyncSession, prep_id: int, course_id: int | None = None) -> None:
+        values: dict = {'status': '2', 'current_step': 5, 'update_time': datetime.now()}
+        if course_id is not None:
+            values['course_id'] = course_id
+        await db.execute(
+            update(VfLessonPrep)
+            .where(VfLessonPrep.prep_id == prep_id)
+            .values(**values)
+        )
+        await db.flush()
 
 
 class CourseDao:

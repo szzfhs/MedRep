@@ -3,9 +3,21 @@ import { useParams, Link } from 'react-router';
 import {
   ChevronLeft, ChevronRight, BookOpen, FlaskConical,
   HelpCircle, FileText, Play, CheckCircle, Menu, X,
-  Maximize2, Volume2, Settings, ArrowLeft, ArrowRight
+  ExternalLink, Loader2, Download, ArrowLeft, ArrowRight, Video
 } from 'lucide-react';
-import { getCourseDetail, type Course, type CourseSection } from '../../api/course';
+import {
+  getCourseDetail, getPortalSectionResources,
+  type Course, type CourseSection, type ResourceItem
+} from '../../api/course';
+
+const RESOURCE_TYPE_MAP: Record<string, { label: string; icon: React.ElementType; bg: string; color: string }> = {
+  courseware: { label: '课件', icon: FileText, bg: 'bg-[#1E3A5F]', color: 'text-[#42A5F5]' },
+  micro_video: { label: '微课视频', icon: Video, bg: 'bg-[#1A3A2A]', color: 'text-[#4CAF50]' },
+  lesson_plan: { label: '教案', icon: BookOpen, bg: 'bg-[#3A2A1A]', color: 'text-[#FFA726]' },
+  ebook: { label: '电子书', icon: BookOpen, bg: 'bg-[#2A1A3A]', color: 'text-[#BA68C8]' },
+  extension: { label: '拓展资源', icon: ExternalLink, bg: 'bg-[#1A3A3A]', color: 'text-[#26C6DA]' },
+  _default: { label: '资源', icon: FileText, bg: 'bg-[#2D3F55]', color: 'text-[#94A3B8]' },
+};
 
 export function CourseLearningPage() {
   const { id } = useParams<{ id: string }>();
@@ -15,6 +27,8 @@ export function CourseLearningPage() {
   const [currentChapter, setCurrentChapter] = useState(0);
   const [activeTab, setActiveTab] = useState<'resource' | 'experiment' | 'test'>('resource');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [chapterResources, setChapterResources] = useState<ResourceItem[]>([]);
+  const [resourcesLoading, setResourcesLoading] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -24,6 +38,24 @@ export function CourseLearningPage() {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [id]);
+
+  // 加载当前章节的资源（聚合子节点资源）
+  useEffect(() => {
+    if (!sections.length) return;
+    const ch = sections[currentChapter];
+    if (!ch) return;
+    if (ch.hasResource !== '1') { setChapterResources([]); return; }
+    setResourcesLoading(true);
+    setChapterResources([]);
+    const sectionIds: number[] =
+      (ch.children?.length ?? 0) > 0
+        ? ch.children!.map((c) => c.sectionId)
+        : [ch.sectionId];
+    Promise.all(sectionIds.map((sid) => getPortalSectionResources(sid)))
+      .then((results) => setChapterResources(results.flat()))
+      .catch(() => {})
+      .finally(() => setResourcesLoading(false));
+  }, [currentChapter, sections]);
 
   if (loading) {
     return (
@@ -117,72 +149,58 @@ export function CourseLearningPage() {
           {/* Content */}
           <div className="flex-1 overflow-auto">
             {activeTab === 'resource' && (
-              <div className="h-full flex flex-col">
-                {/* Mock PDF viewer */}
-                <div className="flex-1 bg-[#1A2332] p-8 overflow-auto">
+              <div className="h-full overflow-auto p-6">
+                {resourcesLoading ? (
+                  <div className="flex items-center justify-center h-40">
+                    <Loader2 size={28} className="text-[#1E88E5] animate-spin" />
+                  </div>
+                ) : chapterResources.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-40 text-center">
+                    <FileText size={36} className="text-[#2D3F55] mb-3" />
+                    <p className="text-[#64748B] text-sm">本章暂无课件资源</p>
+                  </div>
+                ) : (
                   <div className="max-w-3xl mx-auto">
-                    {/* PDF-like content */}
-                    <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
-                      <div className="bg-[#F0F4F8] px-8 py-4 border-b border-[#E2E8F0] flex items-center justify-between">
-                        <span className="text-[#64748B] text-sm">第{currentChapter + 1}章 {chapter.title} - 课件讲义</span>
-                        <div className="flex items-center gap-2 text-xs text-[#94A3B8]">
-                          <button className="px-3 py-1 border border-[#E2E8F0] rounded hover:bg-white transition-colors">上一页</button>
-                          <span>1 / 24</span>
-                          <button className="px-3 py-1 border border-[#E2E8F0] rounded hover:bg-white transition-colors">下一页</button>
-                        </div>
-                      </div>
-                      <div className="p-8 sm:p-12">
-                        <h2 className="text-[#1A2332] mb-6 text-center" style={{ fontSize: '1.4rem', fontWeight: 700 }}>
-                          第{currentChapter + 1}章 {chapter.title}
-                        </h2>
-                        <div className="w-full h-px bg-[#E2E8F0] mb-6" />
-                        <div className="space-y-4 text-[#4A5568] text-sm leading-relaxed">
-                          <h3 className="text-[#1A2332] font-semibold text-base">学习目标</h3>
-                          <ul className="list-disc pl-5 space-y-2">
-                            <li>掌握本章核心概念与基础理论</li>
-                            <li>理解相关医学知识的临床应用意义</li>
-                            <li>能够运用所学知识分析实验现象</li>
-                            <li>完成虚拟仿真实验操作并撰写实验报告</li>
-                          </ul>
-                          <h3 className="text-[#1A2332] font-semibold text-base mt-6">核心内容概述</h3>
-                          <p>
-                            本章系统介绍了{chapter.title}的基本原理与实验方法。
-                            通过理论讲授与虚拟仿真实验相结合的教学方式，帮助学生深入理解
-                            相关医学概念，建立完整的知识体系。
-                          </p>
-                          <p>
-                            实验内容涵盖标准操作流程、数据采集与分析、结果解读等关键环节，
-                            为后续临床实践奠定坚实基础。学生应认真完成每个实验步骤，
-                            并详细记录实验数据，以便进行科学分析。
-                          </p>
-                          <div className="bg-[#E3F2FD] rounded-xl p-4 mt-4">
-                            <p className="text-[#0B5394] text-sm font-medium mb-2">📖 课前预习提示</p>
-                            <p className="text-[#0B5394] text-sm">
-                              请在开始本章学习前，复习相关基础医学知识，确保已掌握前置课程的核心内容。
-                              如有疑问，请参考教材对应章节或联系任课教师。
-                            </p>
-                          </div>
-                        </div>
-                      </div>
+                    <h3 className="text-white font-semibold text-base mb-4">
+                      {chapter.title} · 课件资源
+                      <span className="ml-2 text-[#64748B] text-sm font-normal">共 {chapterResources.length} 个</span>
+                    </h3>
+                    <div className="space-y-3">
+                      {chapterResources.map((res) => {
+                        const typeConfig = RESOURCE_TYPE_MAP[res.resourceType] ?? RESOURCE_TYPE_MAP['_default'];
+                        const Icon = typeConfig.icon;
+                        return (
+                          <a
+                            key={res.bindId}
+                            href={res.fileUrl ?? '#'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-4 p-4 bg-[#1A2332] rounded-xl border border-[#2D3F55] hover:border-[#1E88E5] transition-all group"
+                          >
+                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${typeConfig.bg}`}>
+                              <Icon size={20} className={typeConfig.color} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-white text-sm font-medium group-hover:text-[#42A5F5] transition-colors truncate">
+                                {res.resourceName}
+                              </p>
+                              <p className="text-[#64748B] text-xs mt-0.5">
+                                {typeConfig.label}
+                                {res.fileFormat ? ` · ${res.fileFormat.toUpperCase()}` : ''}
+                                {res.duration ? ` · ${Math.ceil(res.duration / 60)}分钟` : ''}
+                              </p>
+                            </div>
+                            {res.fileUrl ? (
+                              <ExternalLink size={16} className="text-[#2D3F55] group-hover:text-[#1E88E5] flex-shrink-0 transition-colors" />
+                            ) : (
+                              <Download size={16} className="text-[#2D3F55] flex-shrink-0 opacity-40" />
+                            )}
+                          </a>
+                        );
+                      })}
                     </div>
                   </div>
-                </div>
-
-                {/* PDF Controls */}
-                <div className="flex items-center justify-between px-6 py-3 bg-[#161F2A] border-t border-[#2D3F55]">
-                  <div className="flex items-center gap-2">
-                    <button className="p-1.5 text-[#64748B] hover:text-white transition-colors">
-                      <Settings size={16} />
-                    </button>
-                    <button className="p-1.5 text-[#64748B] hover:text-white transition-colors">
-                      <Maximize2 size={16} />
-                    </button>
-                  </div>
-                  <div className="text-[#64748B] text-xs">正在查看课件 · 共24页</div>
-                  <button className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0B5394] text-white rounded-lg text-xs hover:bg-[#1565C0] transition-colors">
-                    下载课件
-                  </button>
-                </div>
+                )}
               </div>
             )}
 

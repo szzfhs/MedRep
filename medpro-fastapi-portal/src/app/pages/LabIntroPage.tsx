@@ -13,6 +13,10 @@ import {
   type OrgMember,
   type TeamMember,
 } from '../../api/center';
+import { useAuth } from '../../stores/auth';
+import labImg from '../../assets/images/Lab.jpeg';
+import heartSimImg from '../../assets/images/heartSim.jpg';
+import digiatImg from '../../assets/images/digiat.jpg';
 
 /** 图标名称 → Lucide 组件映射 */
 const ICON_MAP: Record<string, React.ComponentType<{ size?: number; style?: React.CSSProperties }>> = {
@@ -27,15 +31,16 @@ const ICON_MAP: Record<string, React.ComponentType<{ size?: number; style?: Reac
 const DEFAULT_ORG_COLORS = ['#0B5394', '#00897B', '#6A1B9A', '#E65100', '#1565C0', '#2E7D32'];
 
 export function LabIntroPage() {
+  const { tenantId } = useAuth();
   const [data, setData] = useState<FullCenterData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getFullCenterInfo()
+    getFullCenterInfo(tenantId)
       .then(setData)
       .catch(() => setData(null))
       .finally(() => setLoading(false));
-  }, []);
+  }, [tenantId]);
 
   const info = data?.info ?? {};
   const orgMembers: OrgMember[] = data?.orgMembers ?? [];
@@ -154,14 +159,14 @@ export function LabIntroPage() {
 
           <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
             <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-2xl overflow-hidden h-52 col-span-2 bg-[#E3F2FD] flex items-center justify-center">
-                <FlaskConical size={48} className="text-[#0B5394]/30" />
+              <div className="rounded-2xl overflow-hidden h-52 col-span-2">
+                <img src={labImg} alt="实验室" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
               </div>
-              <div className="rounded-2xl overflow-hidden h-36 bg-[#E0F2F1] flex items-center justify-center">
-                <span className="text-[#00897B]/40 text-sm font-medium">VR Lab</span>
+              <div className="rounded-2xl overflow-hidden h-36">
+                <img src={heartSimImg} alt="VR Lab" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
               </div>
-              <div className="rounded-2xl overflow-hidden h-36 bg-[#F3E5F5] flex items-center justify-center">
-                <span className="text-[#6A1B9A]/40 text-sm font-medium">Digital</span>
+              <div className="rounded-2xl overflow-hidden h-36">
+                <img src={digiatImg} alt="Digital" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
               </div>
             </div>
           </motion.div>

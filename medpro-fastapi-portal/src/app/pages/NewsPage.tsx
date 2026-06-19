@@ -5,10 +5,12 @@ import {
   Search, ChevronRight, Newspaper, Eye, Calendar, X, Tag
 } from 'lucide-react';
 import { getNewsList, type News } from '../../api/news';
+import { useAuth } from '../../stores/auth';
 
 const FIXED_CATEGORIES = ['全部', '重要新闻', '教学通知', '平台动态', '培训通知', '合作交流'];
 
 export function NewsPage() {
+  const { tenantId } = useAuth();
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('全部');
   const [newsList, setNewsList] = useState<News[]>([]);
@@ -17,11 +19,11 @@ export function NewsPage() {
 
   useEffect(() => {
     setLoading(true);
-    getNewsList({ pageNum: 1, pageSize: 50, status: '1' })
+    getNewsList({ pageNum: 1, pageSize: 50, status: '1', tenantId: tenantId ?? undefined })
       .then((res) => { setNewsList(res.rows); setTotal(res.total); })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [tenantId]);
 
   const filtered = newsList.filter((n) => {
     const matchSearch = n.title.includes(search) || (n.summary ?? '').includes(search);

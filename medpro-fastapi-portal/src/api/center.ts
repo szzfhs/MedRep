@@ -53,8 +53,8 @@ export interface FullCenterData {
   teamMembers: TeamMember[];
 }
 
-export function getFullCenterInfo(): Promise<FullCenterData> {
-  return request.get('/simhub/portal/center').then((res: any) => {
+export function getFullCenterInfo(tenantId?: number | null): Promise<FullCenterData> {
+  return request.get('/simhub/portal/center', { params: tenantId != null ? { tenantId } : undefined }).then((res: any) => {
     const data: FullCenterData = res.data?.data ?? { info: {}, orgMembers: [], teamMembers: [] };
     return data;
   });

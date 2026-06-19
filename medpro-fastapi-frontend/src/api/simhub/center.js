@@ -2,8 +2,8 @@ import request from '@/utils/request'
 
 // ===== 中心基本信息 =====
 
-export function getCenterInfo() {
-  return request({ url: '/simhub/center', method: 'get' })
+export function getCenterInfo(tenantId) {
+  return request({ url: '/simhub/center', method: 'get', params: tenantId != null ? { tenantId } : {} })
 }
 
 export function updateCenterInfo(data) {
@@ -12,8 +12,8 @@ export function updateCenterInfo(data) {
 
 // ===== 组织架构成员 =====
 
-export function listOrgMembers() {
-  return request({ url: '/simhub/center/org', method: 'get' })
+export function listOrgMembers(tenantId) {
+  return request({ url: '/simhub/center/org', method: 'get', params: tenantId != null ? { tenantId } : {} })
 }
 
 export function addOrgMember(data) {
@@ -30,8 +30,8 @@ export function deleteOrgMember(memberId) {
 
 // ===== 核心团队成员 =====
 
-export function listTeamMembers() {
-  return request({ url: '/simhub/center/team', method: 'get' })
+export function listTeamMembers(tenantId) {
+  return request({ url: '/simhub/center/team', method: 'get', params: tenantId != null ? { tenantId } : {} })
 }
 
 export function addTeamMember(data) {

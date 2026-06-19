@@ -159,11 +159,23 @@ class AiUtil:
             'max_tokens': max_tokens,
             **kwargs,
         }
-        params = {k: v for k, v in params.items() if v is not None}
+        # 过滤 None 及空字符串
+        params = {k: v for k, v in params.items() if v is not None and v != ''}
+
         if provider == 'Ollama':
-            params['host'] = base_url
+            params.pop('base_url', None)
+            if base_url:
+                params['host'] = base_url
+
         if provider == 'DashScope' and not base_url:
             params['base_url'] = 'https://dashscope.aliyuncs.com/compatible-mode/v1'
+
+        # Google Gemini 不支持 base_url 参数，且最大输出 token 参数名为 max_output_tokens
+        if provider == 'Google':
+            params.pop('base_url', None)
+            if 'max_tokens' in params:
+                params['max_output_tokens'] = params.pop('max_tokens')
+
         model_class = cls._resolve_provider_class(provider)
         if model_class is None:
             # 未知提供商，回退到OpenAI

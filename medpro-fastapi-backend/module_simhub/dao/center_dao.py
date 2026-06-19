@@ -12,37 +12,45 @@ class CenterDao:
     # ===== 中心基本信息 =====
 
     @classmethod
-    async def get_center_info(cls, db: AsyncSession) -> VfCenterInfo | None:
-        result = (await db.execute(select(VfCenterInfo).limit(1))).scalars().first()
+    async def get_center_info(cls, db: AsyncSession, tenant_id: int | None = None) -> VfCenterInfo | None:
+        stmt = select(VfCenterInfo)
+        if tenant_id is not None:
+            stmt = stmt.where(VfCenterInfo.tenant_id == tenant_id)
+        result = (await db.execute(stmt.order_by(VfCenterInfo.id).limit(1))).scalars().first()
         return result
 
     @classmethod
-    async def upsert_center_info(cls, db: AsyncSession, update_by: str, data: EditCenterInfoModel) -> VfCenterInfo:
-        """更新或创建中心信息（始终保持一条记录）"""
-        existing = await cls.get_center_info(db)
+    async def upsert_center_info(cls, db: AsyncSession, update_by: str, data: EditCenterInfoModel, tenant_id: int | None = None) -> VfCenterInfo:
+        """更新或创建中心信息（每租户一条记录）"""
+        existing = await cls.get_center_info(db, tenant_id)
         if existing is None:
-            center = VfCenterInfo(
-                update_by=update_by,
-                **data.model_dump(exclude_none=True, by_alias=False),
-            )
+            dump = data.model_dump(exclude_none=True, by_alias=False)
+            if tenant_id is not None:
+                dump['tenant_id'] = tenant_id
+            center = VfCenterInfo(update_by=update_by, **dump)
             db.add(center)
             await db.flush()
             return center
         else:
             update_data = data.model_dump(exclude_none=True, by_alias=False)
             update_data['update_by'] = update_by
+            if tenant_id is not None:
+                update_data['tenant_id'] = tenant_id
             await db.execute(
                 update(VfCenterInfo).where(VfCenterInfo.id == existing.id).values(**update_data)
             )
             await db.flush()
-            updated = await cls.get_center_info(db)
+            updated = await cls.get_center_info(db, tenant_id)
             return updated  # type: ignore[return-value]
 
     # ===== 组织架构成员 =====
 
     @classmethod
-    async def get_org_members(cls, db: AsyncSession) -> list[VfOrgMember]:
-        result = await db.execute(select(VfOrgMember).order_by(VfOrgMember.sort_order))
+    async def get_org_members(cls, db: AsyncSession, tenant_id: int | None = None) -> list[VfOrgMember]:
+        stmt = select(VfOrgMember)
+        if tenant_id is not None:
+            stmt = stmt.where(VfOrgMember.tenant_id == tenant_id)
+        result = await db.execute(stmt.order_by(VfOrgMember.sort_order))
         return list(result.scalars().all())
 
     @classmethod
@@ -71,13 +79,19 @@ class CenterDao:
     # ===== 核心团队成员 =====
 
     @classmethod
-    async def get_team_members(cls, db: AsyncSession) -> list[VfTeamMember]:
-        result = await db.execute(select(VfTeamMember).where(VfTeamMember.status == '0').order_by(VfTeamMember.sort_order))
+    async def get_team_members(cls, db: AsyncSession, tenant_id: int | None = None) -> list[VfTeamMember]:
+        stmt = select(VfTeamMember).where(VfTeamMember.status == '0')
+        if tenant_id is not None:
+            stmt = stmt.where(VfTeamMember.tenant_id == tenant_id)
+        result = await db.execute(stmt.order_by(VfTeamMember.sort_order))
         return list(result.scalars().all())
 
     @classmethod
-    async def get_all_team_members(cls, db: AsyncSession) -> list[VfTeamMember]:
-        result = await db.execute(select(VfTeamMember).order_by(VfTeamMember.sort_order))
+    async def get_all_team_members(cls, db: AsyncSession, tenant_id: int | None = None) -> list[VfTeamMember]:
+        stmt = select(VfTeamMember)
+        if tenant_id is not None:
+            stmt = stmt.where(VfTeamMember.tenant_id == tenant_id)
+        result = await db.execute(stmt.order_by(VfTeamMember.sort_order))
         return list(result.scalars().all())
 
     @classmethod

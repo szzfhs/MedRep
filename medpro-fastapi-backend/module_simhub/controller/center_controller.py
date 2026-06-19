@@ -1,7 +1,7 @@
 """SimHub 中心简介 Controller"""
 from typing import Annotated
 
-from fastapi import Path, Request, Response
+from fastapi import Path, Query, Request, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from common.annotation.log_annotation import Log
@@ -25,6 +25,13 @@ center_controller = APIRouterPro(
 )
 
 
+def _resolve_tenant_id(current_user: CurrentUserModel, requested_tenant_id: int | None) -> int | None:
+    """超级管理员可查看任意租户；校管理员只能查看自己所属租户"""
+    if current_user.user and current_user.user.admin:
+        return requested_tenant_id
+    return current_user.user.tenant_id if current_user.user else None
+
+
 # ===== 中心基本信息 =====
 
 @center_controller.get(
@@ -36,8 +43,11 @@ center_controller = APIRouterPro(
 async def get_center_info(
     request: Request,
     query_db: Annotated[AsyncSession, DBSessionDependency()],
+    current_user: Annotated[CurrentUserModel, CurrentUserDependency()],
+    tenant_id: int | None = Query(default=None, alias='tenantId'),
 ) -> Response:
-    result = await CenterService.get_center_info(query_db)
+    effective_tenant_id = _resolve_tenant_id(current_user, tenant_id)
+    result = await CenterService.get_center_info(query_db, effective_tenant_id)
     return ResponseUtil.success(data=result or {})
 
 
@@ -54,7 +64,8 @@ async def update_center_info(
     query_db: Annotated[AsyncSession, DBSessionDependency()],
     current_user: Annotated[CurrentUserModel, CurrentUserDependency()],
 ) -> Response:
-    result = await CenterService.update_center_info(query_db, current_user.user.user_name, data)
+    effective_tenant_id = _resolve_tenant_id(current_user, data.tenant_id)
+    result = await CenterService.update_center_info(query_db, current_user.user.user_name, data, effective_tenant_id)
     logger.info(result.message)
     return ResponseUtil.success(msg=result.message)
 
@@ -70,8 +81,11 @@ async def update_center_info(
 async def list_org_members(
     request: Request,
     query_db: Annotated[AsyncSession, DBSessionDependency()],
+    current_user: Annotated[CurrentUserModel, CurrentUserDependency()],
+    tenant_id: int | None = Query(default=None, alias='tenantId'),
 ) -> Response:
-    result = await CenterService.get_org_members(query_db)
+    effective_tenant_id = _resolve_tenant_id(current_user, tenant_id)
+    result = await CenterService.get_org_members(query_db, effective_tenant_id)
     return ResponseUtil.success(data=result)
 
 
@@ -135,8 +149,11 @@ async def delete_org_member(
 async def list_team_members(
     request: Request,
     query_db: Annotated[AsyncSession, DBSessionDependency()],
+    current_user: Annotated[CurrentUserModel, CurrentUserDependency()],
+    tenant_id: int | None = Query(default=None, alias='tenantId'),
 ) -> Response:
-    result = await CenterService.get_team_members(query_db, include_disabled=True)
+    effective_tenant_id = _resolve_tenant_id(current_user, tenant_id)
+    result = await CenterService.get_team_members(query_db, include_disabled=True, tenant_id=effective_tenant_id)
     return ResponseUtil.success(data=result)
 
 

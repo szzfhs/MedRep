@@ -1,41 +1,41 @@
 services:
   # 前端服务
-  ruoyi-frontend:
+  medpro-frontend:
     build:
       context: ./medpro-fastapi-frontend
       dockerfile: Dockerfile
-    image: ruoyi-frontend:latest
-    container_name: ruoyi-frontend
+    image: medpro-frontend:latest
+    container_name: medpro-frontend
     ports:
       - "12580:80"
     volumes:
       - ./medpro-fastapi-frontend/bin/nginx.dockermy.conf:/etc/nginx/conf.d/default.conf
     depends_on:
-      - ruoyi-backend-my
+      - medpro-backend-my
     networks:
-      - ruoyi-network
+      - medpro-network
 
   # 后端服务（MySQL版本）
-  ruoyi-backend-my:
+  medpro-backend-my:
     build:
       context: ./medpro-fastapi-backend
       dockerfile: Dockerfile.my
-    image: ruoyi-backend-my:latest
-    container_name: ruoyi-backend-my
+    image: medpro-backend-my:latest
+    container_name: medpro-backend-my
     ports:
-      - "19099:9099"
+      - "19399:9399"
     depends_on:
-      ruoyi-mysql:
+      medpro-mysql:
         condition: service_healthy
-      ruoyi-redis:
+      medpro-redis:
         condition: service_healthy
     networks:
-      - ruoyi-network
+      - medpro-network
 
   # MySQL服务
-  ruoyi-mysql:
+  medpro-mysql:
     image: mysql:8.0
-    container_name: ruoyi-mysql
+    container_name: medpro-mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: ruoyi-fastapi
@@ -45,7 +45,7 @@ services:
       - ./medpro-fastapi-backend/sql/ruoyi-fastapi.sql:/docker-entrypoint-initdb.d/ruoyi-fastapi.sql
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --skip-character-set-client-handshake=1
     networks:
-      - ruoyi-network
+      - medpro-network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
       interval: 5s
@@ -53,13 +53,13 @@ services:
       retries: 30
 
   # Redis服务
-  ruoyi-redis:
+  medpro-redis:
     image: redis:latest
-    container_name: ruoyi-redis
+    container_name: medpro-redis
     ports:
       - "16379:6379"
     networks:
-      - ruoyi-network
+      - medpro-network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -68,6 +68,6 @@ services:
 
 # 网络配置
 networks:
-  ruoyi-network:
-    name: ruoyi-network
+  medpro-network:
+    name: medpro-network
     driver: bridge

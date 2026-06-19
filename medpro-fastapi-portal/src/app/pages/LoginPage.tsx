@@ -8,14 +8,7 @@ import {
 import { useAuth } from '@/stores/auth';
 import { getCaptchaImage } from '@/api/auth';
 
-const ROLES = [
-  { key: 'student', label: '学生', icon: '👨‍🎓', desc: '使用学号登录' },
-  { key: 'teacher', label: '教师', icon: '👨‍🏫', desc: '使用教工号登录' },
-  { key: 'admin', label: '管理员', icon: '⚙️', desc: '后台管理账号' },
-];
-
 const REDIRECT_MAP: Record<string, string> = {
-  admin: '/admin',
   teacher: '/teacher',
   student: '/student',
 };
@@ -24,7 +17,6 @@ export function LoginPage() {
   const navigate = useNavigate();
   const { login, isLoggedIn, role } = useAuth();
 
-  const [selectedRole, setSelectedRole] = useState('student');
   const [account, setAccount] = useState('');
   const [password, setPassword] = useState('');
   const [captcha, setCaptcha] = useState('');
@@ -174,35 +166,14 @@ export function LoginPage() {
           </div>
 
           <h2 className="text-[#1A2332] mb-1" style={{ fontSize: '1.5rem', fontWeight: 700 }}>欢迎登录</h2>
-          <p className="text-[#64748B] text-sm mb-7">请选择您的身份并填写登录信息</p>
-
-          {/* Role selector */}
-          <div className="grid grid-cols-3 gap-2 mb-6">
-            {ROLES.map((r) => (
-              <button
-                key={r.key}
-                type="button"
-                onClick={() => { setSelectedRole(r.key); setErrors({}); }}
-                className={`flex flex-col items-center py-3 px-2 rounded-xl border-2 transition-all ${
-                  selectedRole === r.key
-                    ? 'border-[#0B5394] bg-[#E3F2FD]'
-                    : 'border-[#E2E8F0] hover:border-[#1E88E5]/50 hover:bg-[#F0F4F8]'
-                }`}
-              >
-                <span className="text-2xl mb-1">{r.icon}</span>
-                <span className={`text-xs font-medium ${selectedRole === r.key ? 'text-[#0B5394]' : 'text-[#4A5568]'}`}>
-                  {r.label}
-                </span>
-              </button>
-            ))}
-          </div>
+          <p className="text-[#64748B] text-sm mb-7">请填写登录信息，系统将自动识别您的身份</p>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Account */}
             <div>
               <label className="block text-[#1A2332] text-sm font-medium mb-1.5">
-                {selectedRole === 'student' ? '学号' : selectedRole === 'teacher' ? '教工号' : '管理员账号'}
+                账号
               </label>
               <div className="relative">
                 <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
@@ -210,7 +181,7 @@ export function LoginPage() {
                   type="text"
                   value={account}
                   onChange={(e) => setAccount(e.target.value)}
-                  placeholder={selectedRole === 'student' ? '请输入学号' : selectedRole === 'teacher' ? '请输入教工号' : '请输入管理员账号'}
+                  placeholder="请输入账号"
                   className={`w-full pl-10 pr-4 py-3 bg-[#F8FAFC] border rounded-xl text-sm text-[#1A2332] focus:outline-none focus:bg-white transition-all ${
                     errors.account ? 'border-red-400 focus:border-red-400' : 'border-[#E2E8F0] focus:border-[#0B5394]'
                   }`}

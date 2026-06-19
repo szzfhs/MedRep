@@ -40,6 +40,7 @@ export interface ExperimentListQuery {
   categoryId?: number;
   expType?: string;
   status?: string;
+  tenantId?: number | null;
 }
 
 export interface PageResult<T> {
@@ -47,8 +48,8 @@ export interface PageResult<T> {
   total: number;
 }
 
-export function getExperimentCategories(): Promise<ExperimentCategory[]> {
-  return request.get('/simhub/portal/experiment/categories').then((res: any) => res.data.data ?? []);
+export function getExperimentCategories(tenantId?: number | null): Promise<ExperimentCategory[]> {
+  return request.get('/simhub/portal/experiment/categories', { params: tenantId != null ? { tenantId } : undefined }).then((res: any) => res.data.data ?? []);
 }
 
 export function getExperimentList(params?: ExperimentListQuery): Promise<PageResult<Experiment>> {

@@ -21,6 +21,7 @@ class RegulationModel(BaseModel):
     update_by: str | None = Field(default=None, description='更新者')
     update_time: datetime | None = Field(default=None, description='更新时间')
     del_flag: str | None = Field(default=None, description='删除标志')
+    tenant_id: int | None = Field(default=None, description='租户ID')
 
 
 class AddRegulationModel(BaseModel):

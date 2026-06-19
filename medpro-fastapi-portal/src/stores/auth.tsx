@@ -7,6 +7,7 @@ import {
   UserInfo,
 } from '@/api/auth';
 import { getToken, setToken, removeToken } from '@/lib/request';
+import { resolveSubdomainTenantId } from '@/lib/tenant';
 
 interface AuthState {
   token: string | null;
@@ -15,6 +16,8 @@ interface AuthState {
   isLoggedIn: boolean;
   /** 角色判断：student / teacher / admin */
   role: 'student' | 'teacher' | 'admin' | null;
+  /** 有效租户 ID（子域名优先，登录用户次之） */
+  tenantId: number | null;
 }
 
 interface AuthContextValue extends AuthState {
@@ -37,6 +40,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setTokenState] = useState<string | null>(getToken());
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [isLoading, setIsLoading] = useState(!!getToken());
+  const [subdomainTenantId, setSubdomainTenantId] = useState<number | null>(null);
+
+  // 启动时解析子域名租户（无需登录即可加载学校品牌）
+  useEffect(() => {
+    resolveSubdomainTenantId().then(setSubdomainTenantId);
+  }, []);
 
   const fetchUserInfo = useCallback(async () => {
     try {
@@ -79,12 +88,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // 有效租户 ID：子域名优先，登录用户次之
+  const tenantId: number | null =
+    subdomainTenantId ?? userInfo?.user?.tenantId ?? null;
+
   const value: AuthContextValue = {
     token,
     userInfo,
     isLoading,
     isLoggedIn: !!token && !!userInfo,
     role: resolveRole(userInfo),
+    tenantId,
     login,
     logout,
     refreshUserInfo: fetchUserInfo,

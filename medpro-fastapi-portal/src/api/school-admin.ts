@@ -309,9 +309,11 @@ export interface SaveNewsParams {
   title?: string;
   summary?: string;
   content?: string;
+  coverImage?: string;
   author?: string;
   category?: string;
   status?: '0' | '1';
+  publishTime?: string;
 }
 
 export function getAdminNewsList(params?: NewsListQuery): Promise<PageResult<AdminNews>> {
@@ -342,6 +344,7 @@ export interface AdminRegulation {
   hasAttachment: boolean;
   status: '0' | '1' | null;
   publishDate: string | null;
+  sortOrder: number | null;
   createTime: string | null;
 }
 
@@ -362,6 +365,7 @@ export interface SaveRegulationParams {
   hasAttachment?: boolean;
   status?: '0' | '1';
   publishDate?: string;
+  sortOrder?: number;
 }
 
 export function getAdminRegulationList(params?: RegulationListQuery): Promise<PageResult<AdminRegulation>> {
@@ -386,8 +390,11 @@ export function deleteRegulation(regId: number): Promise<void> {
 export interface AdminCenterInfo {
   id: number | null;
   centerName: string | null;
+  heroBadge: string | null;
   centerSlogan: string | null;
   description: string | null;
+  achievementsJson: string | null;
+  functionsJson: string | null;
   logoUrl: string | null;
   bannerUrl: string | null;
   statFoundedYear: string | null;
@@ -398,6 +405,15 @@ export interface AdminCenterInfo {
   contactPhone: string | null;
   contactEmail: string | null;
   updateTime: string | null;
+}
+
+export interface AdminOrgMember {
+  id: number;
+  name: string;
+  titleText: string | null;
+  dept: string | null;
+  color: string | null;
+  sortOrder: number | null;
 }
 
 export interface AdminTeamMember {
@@ -413,11 +429,12 @@ export interface AdminTeamMember {
 
 export interface FullAdminCenterData {
   info: AdminCenterInfo;
+  orgMembers: AdminOrgMember[];
   teamMembers: AdminTeamMember[];
 }
 
 export function getAdminCenterInfo(): Promise<FullAdminCenterData> {
-  return request.get('/simhub/center/info').then((res: any) => res.data?.data ?? { info: {}, teamMembers: [] });
+  return request.get('/simhub/center/info').then((res: any) => res.data?.data ?? { info: {}, orgMembers: [], teamMembers: [] });
 }
 
 export function updateCenterInfo(data: Partial<AdminCenterInfo>): Promise<void> {
@@ -434,6 +451,18 @@ export function updateTeamMember(data: AdminTeamMember): Promise<void> {
 
 export function deleteTeamMember(memberId: number): Promise<void> {
   return request.delete(`/simhub/center/team/${memberId}`);
+}
+
+export function createOrgMember(data: Omit<AdminOrgMember, 'id'>): Promise<void> {
+  return request.post('/simhub/center/org', data);
+}
+
+export function updateOrgMember(data: AdminOrgMember): Promise<void> {
+  return request.put('/simhub/center/org', data);
+}
+
+export function deleteOrgMember(memberId: number): Promise<void> {
+  return request.delete(`/simhub/center/org/${memberId}`);
 }
 
 // ─────────────────────────────────────────────

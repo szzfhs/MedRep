@@ -44,9 +44,15 @@
         </template>
       </el-table-column>
       <el-table-column label="学校名称" prop="tenantName" min-width="150" />
-      <el-table-column label="子域名" prop="subdomain" width="120" align="center">
+      <el-table-column label="子域名" prop="subdomain" width="110" align="center">
         <template #default="{ row }">
           <span v-if="row.subdomain">{{ row.subdomain }}</span>
+          <span v-else class="text-muted">—</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="二级域名" prop="domain" min-width="160" :show-overflow-tooltip="true">
+        <template #default="{ row }">
+          <a v-if="row.domain" :href="'https://' + row.domain" target="_blank" class="el-link el-link--primary">{{ row.domain }}</a>
           <span v-else class="text-muted">—</span>
         </template>
       </el-table-column>
@@ -92,7 +98,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="子域名" prop="subdomain">
-              <el-input v-model="form.subdomain" placeholder="如：hzsf（用于门户访问）" />
+              <el-input v-model="form.subdomain" placeholder="如：hzsf（子域名前缀）" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -101,6 +107,11 @@
                 <el-radio value="0">启用</el-radio>
                 <el-radio value="1">停用</el-radio>
               </el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="二级域名" prop="domain">
+              <el-input v-model="form.domain" placeholder="如：hzsf.medpro.com（完整二级域名，用于门户访问）" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -292,7 +303,7 @@ const dialogTitle = ref('')
 const submitLoading = ref(false)
 const tenantRef = ref(null)
 const form = reactive({
-  tenantId: null, tenantCode: '', tenantName: '', subdomain: '',
+  tenantId: null, tenantCode: '', tenantName: '', subdomain: '', domain: '',
   contactEmail: '', contactPhone: '', address: '', status: '0', remark: ''
 })
 const rules = {
@@ -303,7 +314,7 @@ const rules = {
 
 function resetForm() {
   Object.assign(form, {
-    tenantId: null, tenantCode: '', tenantName: '', subdomain: '',
+    tenantId: null, tenantCode: '', tenantName: '', subdomain: '', domain: '',
     contactEmail: '', contactPhone: '', address: '', status: '0', remark: ''
   })
   tenantRef.value?.resetFields()

@@ -4,9 +4,9 @@ import { motion } from 'motion/react';
 import {
   ChevronRight, BookOpen, Users, Star, Clock, Play,
   FlaskConical, FileText, HelpCircle, GraduationCap,
-  Award, CheckCircle, Lock
+  Award, CheckCircle, Lock, ExternalLink, Loader2
 } from 'lucide-react';
-import { getCourseDetail, type Course, type CourseSection } from '../../api/course';
+import { getCourseDetail, getPortalSectionResources, type Course, type CourseSection, type ResourceItem } from '../../api/course';
 
 const COURSE_CATEGORY_MAP: Record<string, string> = { '1': '理论课', '2': '实验课', '3': '理实一体化课' };
 
@@ -15,12 +15,40 @@ export function CourseDetailPage() {
   const [course, setCourse] = useState<Course | null>(null);
   const [sections, setSections] = useState<CourseSection[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedChapters, setExpandedChapters] = useState<Set<number>>(new Set());
+  // 小节资源：sectionId -> 资源列表（undefined=未加载，[]= 加载完无资源）
+  const [sectionResources, setSectionResources] = useState<Record<number, ResourceItem[]>>({});
+  const [loadingResources, setLoadingResources] = useState<Set<number>>(new Set());
+  const [expandedResources, setExpandedResources] = useState<Set<number>>(new Set());
+
+  // 点击小节：展开/收起资源，首次懒加载
+  const toggleSectionResources = async (sectionId: number) => {
+    if (expandedResources.has(sectionId)) {
+      setExpandedResources(prev => { const n = new Set(prev); n.delete(sectionId); return n; });
+      return;
+    }
+    setExpandedResources(prev => new Set([...prev, sectionId]));
+    if (sectionId in sectionResources) return; // 已加载
+    setLoadingResources(prev => new Set([...prev, sectionId]));
+    try {
+      const res = await getPortalSectionResources(sectionId);
+      setSectionResources(prev => ({ ...prev, [sectionId]: res }));
+    } finally {
+      setLoadingResources(prev => { const n = new Set(prev); n.delete(sectionId); return n; });
+    }
+  };
 
   useEffect(() => {
     if (!id) return;
     setLoading(true);
     getCourseDetail(Number(id))
-      .then((res) => { setCourse(res.course); setSections(res.sections ?? []); })
+      .then((res) => {
+        setCourse(res.course);
+        const secs = res.sections ?? [];
+        setSections(secs);
+        // 默认展开所有章节
+        setExpandedChapters(new Set(secs.map(s => s.sectionId)));
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [id]);
@@ -158,54 +186,224 @@ export function CourseDetailPage() {
               </div>
 
               <div className="divide-y divide-[#E2E8F0]">
-                {sections.map((section, i) => (
-                  <motion.div
-                    key={section.sectionId}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: i * 0.03 }}
-                    className="flex items-center gap-4 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors group"
-                  >
-                    {/* Chapter number */}
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold ${
-                      i < 2 ? 'bg-[#0B5394] text-white' : 'bg-[#F0F4F8] text-[#94A3B8]'
-                    }`}>
-                      {i < 2 ? <CheckCircle size={16} /> : i + 1}
-                    </div>
+                {sections.map((chapter, i) => {
+                  const isExpanded = expandedChapters.has(chapter.sectionId);
+                  const hasChildren = (chapter.children?.length ?? 0) > 0;
+                  const chapterHasResource = chapter.hasResource === '1' || chapter.hasExperiment === '1' || chapter.hasTest === '1';
+                  const chapterResources = sectionResources[chapter.sectionId];
+                  const isChapterResExpanded = expandedResources.has(chapter.sectionId);
+                  const isChapterLoading = loadingResources.has(chapter.sectionId);
+                  const toggleChapter = () => {
+                    if (hasChildren) {
+                      setExpandedChapters(prev => {
+                        const next = new Set(prev);
+                        if (next.has(chapter.sectionId)) next.delete(chapter.sectionId);
+                        else next.add(chapter.sectionId);
+                        return next;
+                      });
+                    } else {
+                      // 叶子章节：始终展开资源
+                      toggleSectionResources(chapter.sectionId);
+                    }
+                  };
+                  return (
+                    <div key={chapter.sectionId} className="border-b border-[#E2E8F0] last:border-0">
+                      {/* 章行 */}
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: i * 0.03 }}
+                        className="flex items-center gap-4 px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors group cursor-pointer"
+                        onClick={toggleChapter}
+                      >
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold ${
+                          i < 2 ? 'bg-[#0B5394] text-white' : 'bg-[#F0F4F8] text-[#94A3B8]'
+                        }`}>
+                          {i < 2 ? <CheckCircle size={16} /> : i + 1}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-sm font-medium ${i < 2 ? 'text-[#1A2332]' : 'text-[#4A5568]'} group-hover:text-[#0B5394] transition-colors`}>
+                            {`第${i + 1}章 ${chapter.title}`}
+                          </p>
+                          {(chapter.hours ?? 0) > 0 && (
+                            <span className="text-[#94A3B8] text-xs">{chapter.hours}学时</span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          {chapter.hasResource === '1' ? (
+                            <span className="flex items-center gap-1 px-2 py-1 rounded-md text-xs bg-[#E3F2FD] text-[#0B5394]">
+                              <FileText size={11} /> 课件
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-1 px-2 py-1 rounded-md text-xs bg-[#F1F5F9] text-[#CBD5E1]">
+                              <FileText size={11} /> 课件
+                            </span>
+                          )}
+                          {chapter.hasExperiment === '1' ? (
+                            <span className="flex items-center gap-1 px-2 py-1 rounded-md text-xs bg-[#E0F2F1] text-[#00695C]">
+                              <FlaskConical size={11} /> 实验
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-1 px-2 py-1 rounded-md text-xs bg-[#F1F5F9] text-[#CBD5E1]">
+                              <FlaskConical size={11} /> 实验
+                            </span>
+                          )}
+                          {chapter.hasTest === '1' ? (
+                            <span className="flex items-center gap-1 px-2 py-1 rounded-md text-xs bg-[#FFF3E0] text-[#E65100]">
+                              <HelpCircle size={11} /> 习题
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-1 px-2 py-1 rounded-md text-xs bg-[#F1F5F9] text-[#CBD5E1]">
+                              <HelpCircle size={11} /> 习题
+                            </span>
+                          )}
+                          {isChapterLoading ? (
+                            <Loader2 size={14} className="text-[#94A3B8] animate-spin" />
+                          ) : (
+                            <ChevronRight
+                              size={14}
+                              className={`text-[#94A3B8] transition-transform duration-200 ${
+                                hasChildren ? (isExpanded ? 'rotate-90' : '') : (isChapterResExpanded ? 'rotate-90' : '')
+                              }`}
+                            />
+                          )}
+                        </div>
+                      </motion.div>
 
-                    {/* Title */}
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-medium ${i < 2 ? 'text-[#1A2332]' : 'text-[#4A5568]'} group-hover:text-[#0B5394] transition-colors`}>
-                        {`第${i + 1}章 ${section.title}`}
-                      </p>
-                      {(section.hours ?? 0) > 0 && (
-                        <span className="text-[#94A3B8] text-xs">{section.hours}学时</span>
+                      {/* 叶子章节的资源列表 */}
+                      {!hasChildren && isChapterResExpanded && chapterResources !== undefined && (
+                        <div className="pl-16 pr-5 pb-2 pt-1 bg-[#F5F7FA] border-t border-[#EEF0F4]">
+                          {chapterResources.length === 0 ? (
+                            <p className="text-xs text-[#94A3B8] py-1.5">暂无资源</p>
+                          ) : (
+                            chapterResources.map(res => {
+                              const resIcon = res.resourceType === 'micro_video'
+                                ? <Play size={11} />
+                                : res.resourceType === 'ebook'
+                                  ? <BookOpen size={11} />
+                                  : <FileText size={11} />;
+                              return (
+                                <a
+                                  key={res.bindId}
+                                  href={res.fileUrl ?? '#'}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={e => e.stopPropagation()}
+                                  className="flex items-center gap-2 py-1.5 text-xs text-[#4A5568] hover:text-[#0B5394] group/res transition-colors"
+                                >
+                                  <span className="text-[#94A3B8] group-hover/res:text-[#0B5394] flex-shrink-0">{resIcon}</span>
+                                  <span className="flex-1 truncate">{res.resourceName}</span>
+                                  <ExternalLink size={10} className="text-[#CBD5E1] group-hover/res:text-[#0B5394] flex-shrink-0" />
+                                </a>
+                              );
+                            })
+                          )}
+                        </div>
                       )}
-                    </div>
 
-                    {/* Icons */}
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      {section.hasResource === '1' && (
-                        <span className="flex items-center gap-1 px-2 py-1 rounded-md text-xs bg-[#E3F2FD] text-[#0B5394]">
-                          <FileText size={11} /> 课件
-                        </span>
-                      )}
-                      {section.hasExperiment === '1' && (
-                        <span className="flex items-center gap-1 px-2 py-1 rounded-md text-xs bg-[#E0F2F1] text-[#00695C]">
-                          <FlaskConical size={11} /> 实验
-                        </span>
-                      )}
-                      {section.hasTest === '1' && (
-                        <span className="flex items-center gap-1 px-2 py-1 rounded-md text-xs bg-[#FFF3E0] text-[#E65100]">
-                          <HelpCircle size={11} /> 测试
-                        </span>
-                      )}
-                      {i >= 2 && (
-                        <Lock size={14} className="text-[#CBD5E1] ml-1" />
+                      {/* 节列表 */}
+                      {isExpanded && hasChildren && (
+                        <div className="bg-[#FAFBFC]">
+                          {chapter.children!.map((sec, j) => {
+                            const secResources = sectionResources[sec.sectionId];
+                            const isResExpanded = expandedResources.has(sec.sectionId);
+                            const isLoading = loadingResources.has(sec.sectionId);
+                            return (
+                              <div key={sec.sectionId} className="border-t border-[#F0F4F8]">
+                                {/* 节行 - 始终可点击展开资源 */}
+                                <div
+                                  className="flex items-center gap-3 pl-16 pr-5 py-2.5 hover:bg-[#F0F4F8] transition-colors group cursor-pointer"
+                                  onClick={() => toggleSectionResources(sec.sectionId)}
+                                >
+                                  <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-medium text-[#94A3B8] bg-white border border-[#E2E8F0]">
+                                    {j + 1}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-xs text-[#4A5568] group-hover:text-[#0B5394] transition-colors truncate">
+                                      {sec.title}
+                                    </p>
+                                    {(sec.hours ?? 0) > 0 && (
+                                      <span className="text-[#94A3B8] text-[10px]">{sec.hours}学时</span>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                                    {/* 有资源时显示彩色徽章，无资源时显示灰色占位 */}
+                                    {sec.hasResource === '1' ? (
+                                      <span className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-[#E3F2FD] text-[#0B5394]">
+                                        <FileText size={10} /> 课件
+                                      </span>
+                                    ) : (
+                                      <span className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-[#F1F5F9] text-[#CBD5E1]">
+                                        <FileText size={10} /> 课件
+                                      </span>
+                                    )}
+                                    {sec.hasExperiment === '1' ? (
+                                      <span className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-[#E0F2F1] text-[#00695C]">
+                                        <FlaskConical size={10} /> 实验
+                                      </span>
+                                    ) : (
+                                      <span className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-[#F1F5F9] text-[#CBD5E1]">
+                                        <FlaskConical size={10} /> 实验
+                                      </span>
+                                    )}
+                                    {sec.hasTest === '1' ? (
+                                      <span className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-[#FFF3E0] text-[#E65100]">
+                                        <HelpCircle size={10} /> 习题
+                                      </span>
+                                    ) : (
+                                      <span className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-[#F1F5F9] text-[#CBD5E1]">
+                                        <HelpCircle size={10} /> 习题
+                                      </span>
+                                    )}
+                                    {isLoading ? (
+                                      <Loader2 size={12} className="text-[#94A3B8] animate-spin ml-1" />
+                                    ) : (
+                                      <ChevronRight
+                                        size={12}
+                                        className={`text-[#94A3B8] transition-transform duration-200 ml-1 ${isResExpanded ? 'rotate-90' : ''}`}
+                                      />
+                                    )}
+                                  </div>
+                                </div>
+
+                                {/* 资源列表 */}
+                                {isResExpanded && secResources !== undefined && (
+                                  <div className="pl-24 pr-5 pb-2 pt-1 bg-[#F5F7FA] border-t border-[#EEF0F4]">
+                                    {secResources.length === 0 ? (
+                                      <p className="text-[10px] text-[#94A3B8] py-1.5">暂无资源</p>
+                                    ) : (
+                                      secResources.map(res => {
+                                        const resIcon = res.resourceType === 'micro_video'
+                                          ? <Play size={10} />
+                                          : res.resourceType === 'ebook'
+                                            ? <BookOpen size={10} />
+                                            : <FileText size={10} />;
+                                        return (
+                                          <a
+                                            key={res.bindId}
+                                            href={res.fileUrl ?? '#'}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            onClick={e => e.stopPropagation()}
+                                            className="flex items-center gap-2 py-1.5 text-[11px] text-[#4A5568] hover:text-[#0B5394] group/res transition-colors"
+                                          >
+                                            <span className="text-[#94A3B8] group-hover/res:text-[#0B5394] flex-shrink-0">{resIcon}</span>
+                                            <span className="flex-1 truncate">{res.resourceName}</span>
+                                            <ExternalLink size={9} className="text-[#CBD5E1] group-hover/res:text-[#0B5394] flex-shrink-0" />
+                                          </a>
+                                        );
+                                      })
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
                       )}
                     </div>
-                  </motion.div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>

@@ -23,7 +23,7 @@
           </svg>
         </div>
         <h2 class="login-brand-title">{{ title }}</h2>
-        <p class="login-brand-subtitle">心血管介入虚拟仿真教学平台</p>
+        <p class="login-brand-subtitle">管理后台 · 仅限管理员登录</p>
       </div>
 
       <el-form-item prop="username">

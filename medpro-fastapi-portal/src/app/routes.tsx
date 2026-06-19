@@ -22,11 +22,7 @@ import { UserManagementPage } from './pages/admin/UserManagementPage';
 import { ExperimentsManagePage } from './pages/admin/ExperimentsManagePage';
 import { CoursesManagePage } from './pages/admin/CoursesManagePage';
 import { ResourcesManagePage } from './pages/admin/ResourcesManagePage';
-import { NewsManagePage } from './pages/admin/NewsManagePage';
-import { RegulationsManagePage } from './pages/admin/RegulationsManagePage';
-import { LabIntroManagePage } from './pages/admin/LabIntroManagePage';
 import { AppsManagePage } from './pages/admin/AppsManagePage';
-import { SettingsPage } from './pages/admin/SettingsPage';
 
 export const router = createBrowserRouter([
   {
@@ -77,11 +73,7 @@ export const router = createBrowserRouter([
       { path: 'experiments', Component: ExperimentsManagePage },
       { path: 'courses', Component: CoursesManagePage },
       { path: 'resources', Component: ResourcesManagePage },
-      { path: 'news', Component: NewsManagePage },
-      { path: 'regulations', Component: RegulationsManagePage },
-      { path: 'lab-intro', Component: LabIntroManagePage },
       { path: 'apps', Component: AppsManagePage },
-      { path: 'settings', Component: SettingsPage },
     ],
   },
 ]);

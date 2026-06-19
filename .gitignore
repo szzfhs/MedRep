@@ -171,3 +171,6 @@ ENV/
 # Build outputs
 build/
 *.egg-info/
+
+# Release output (Docker images)
+release-output/

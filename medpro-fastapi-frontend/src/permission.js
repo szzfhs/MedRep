@@ -33,6 +33,17 @@ router.beforeEach((to, from, next) => {
         // 判断当前用户是否已拉取完user_info信息
         useUserStore().getInfo().then(() => {
           isRelogin.show = false
+          // 角色检查：仅允许含 'admin' 字样的角色访问管理后台
+          const userRoles = useUserStore().roles || []
+          const hasAdminRole = userRoles.some(r => typeof r === 'string' && r.toLowerCase().includes('admin'))
+          if (!hasAdminRole) {
+            useUserStore().logOut().then(() => {
+              ElMessage.error('您没有访问权限，本系统仅供管理员使用')
+              next('/login')
+            })
+            NProgress.done()
+            return
+          }
           usePermissionStore().generateRoutes().then(accessRoutes => {
             // 根据roles权限生成可访问的路由表
             accessRoutes.forEach(route => {
